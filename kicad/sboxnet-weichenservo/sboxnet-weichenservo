@@ -1,0 +1,35 @@
+Source,/home/balagi/src/kicad/sboxnet-weichenservo/sboxnet-weichenservo.sch
+Kicad Rev,Eeschema 5.1.4-e60b266~84~ubuntu18.04.1
+Generated Date,Tue 29 Oct 2019 10:39:37 CET
+
+Title,sboxnet weichenservo
+Company,balagi
+Revision,1
+Date Issue,31.08.2019
+
+Reference,Value,Library,Library Ref
+U1,LF50_TO220,Regulator_Linear,LF50_TO220
+C1,100n,Device,C
+C2,10u,Device,CP
+D1,1N4001,Diode,1N4001
+J1,Screw_Terminal_01x02,Connector,Screw_Terminal_01x02
+R1,R,Device,R
+D2,LED,Device,LED
+J3,Conn_02x17_Odd_Even,Connector_Generic,Conn_02x17_Odd_Even
+U3,74HCT151,74xx_IEEE,74151
+J4,Conn_01x09_Female,Connector,Conn_01x09_Female
+J2,Conn_01x05_Female,Connector,Conn_01x05_Female
+RN2,8x 10k,Device,R_Network08
+RN3,R_Pack08,Device,R_Pack08
+J9,Conn_01x03_Male,Connector,Conn_01x03_Male
+J8,Conn_01x03_Male,Connector,Conn_01x03_Male
+J7,Conn_01x03_Male,Connector,Conn_01x03_Male
+J6,Conn_01x03_Male,Connector,Conn_01x03_Male
+J5,Conn_01x03_Male,Connector,Conn_01x03_Male
+J11,Conn_01x03_Male,Connector,Conn_01x03_Male
+J12,Conn_01x03_Male,Connector,Conn_01x03_Male
+J10,Conn_01x03_Male,Connector,Conn_01x03_Male
+R2,100,Device,R
+BAR1,HDSP-4830_2,LED,HDSP-4830_2
+RN1,8x 1k,Device,R_Network08
+U2,74hct540,sboxnet,74hct540

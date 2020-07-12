@@ -1,0 +1,1031 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L sboxnet:sboxnet-stecker_02x17 J1
+U 1 1 5E1F5168
+P 2405 3020
+F 0 "J1" H 2395 4060 50  0000 C CNN
+F 1 "sboxnet-stecker_02x17" H 2395 3969 50  0000 C CNN
+F 2 "" H 2355 3020 50  0001 C CNN
+F 3 "" H 2355 3020 50  0001 C CNN
+	1    2405 3020
+	1    0    0    -1  
+$EndComp
+Text GLabel 2885 3720 2    50   Input ~ 0
+3,3V
+Wire Wire Line
+	2655 3720 2660 3720
+Text GLabel 2885 3620 2    50   Input ~ 0
+PA0
+Wire Wire Line
+	2655 3620 2885 3620
+Text GLabel 2885 3520 2    50   Input ~ 0
+PA2
+Wire Wire Line
+	2655 3520 2885 3520
+Text GLabel 2885 3420 2    50   Input ~ 0
+PA4
+Wire Wire Line
+	2655 3420 2885 3420
+Text GLabel 2885 3320 2    50   Input ~ 0
+PA6
+Wire Wire Line
+	2655 3320 2885 3320
+Text GLabel 2885 3220 2    50   Input ~ 0
+PB0
+Wire Wire Line
+	2655 3220 2885 3220
+Text GLabel 2885 3120 2    50   Input ~ 0
+PB2
+Wire Wire Line
+	2655 3120 2885 3120
+Text GLabel 2885 3020 2    50   Input ~ 0
+PC0
+Wire Wire Line
+	2655 3020 2885 3020
+Text GLabel 2885 2920 2    50   Input ~ 0
+PC2
+Wire Wire Line
+	2655 2920 2885 2920
+Text GLabel 2885 2820 2    50   Input ~ 0
+PC4
+Wire Wire Line
+	2655 2820 2885 2820
+Text GLabel 2885 2720 2    50   Input ~ 0
+PC6
+Wire Wire Line
+	2655 2720 2885 2720
+Text GLabel 2885 2620 2    50   Input ~ 0
+PD0
+Wire Wire Line
+	2655 2620 2885 2620
+Text GLabel 2885 2520 2    50   Input ~ 0
+PD2
+Wire Wire Line
+	2655 2520 2885 2520
+Text GLabel 2885 2420 2    50   Input ~ 0
+PD4
+Wire Wire Line
+	2655 2420 2885 2420
+Text GLabel 2885 2320 2    50   Input ~ 0
+PD6
+Wire Wire Line
+	2655 2320 2885 2320
+Text GLabel 2885 2220 2    50   Input ~ 0
+DCC_A
+Wire Wire Line
+	2655 2220 2885 2220
+Text GLabel 1940 3820 0    50   Input ~ 0
+GND
+Wire Wire Line
+	1940 3820 2000 3820
+Text GLabel 1940 3720 0    50   Input ~ 0
++5V
+Wire Wire Line
+	1940 3720 2120 3720
+Text GLabel 1940 3620 0    50   Input ~ 0
+PA1
+Wire Wire Line
+	1940 3620 2155 3620
+Text GLabel 1940 3520 0    50   Input ~ 0
+PA3
+Wire Wire Line
+	1940 3520 2155 3520
+Text GLabel 1940 3420 0    50   Input ~ 0
+PA5
+Wire Wire Line
+	1940 3420 2155 3420
+Text GLabel 1940 3320 0    50   Input ~ 0
+PA7
+Wire Wire Line
+	1940 3320 2155 3320
+Text GLabel 1940 3220 0    50   Input ~ 0
+PB1
+Wire Wire Line
+	1940 3220 2155 3220
+Text GLabel 1940 3120 0    50   Input ~ 0
+PB3
+Wire Wire Line
+	1940 3120 2155 3120
+Text GLabel 1940 3020 0    50   Input ~ 0
+PC1
+Wire Wire Line
+	1940 3020 2155 3020
+Text GLabel 1940 2920 0    50   Input ~ 0
+PC3
+Wire Wire Line
+	1940 2920 2155 2920
+Text GLabel 1940 2820 0    50   Input ~ 0
+PC5
+Wire Wire Line
+	1940 2820 2155 2820
+Text GLabel 1940 2720 0    50   Input ~ 0
+PC7
+Wire Wire Line
+	1940 2720 2155 2720
+Text GLabel 1940 2620 0    50   Input ~ 0
+PD1
+Wire Wire Line
+	1940 2620 2155 2620
+Text GLabel 1940 2520 0    50   Input ~ 0
+PD3
+Wire Wire Line
+	1940 2520 2155 2520
+Text GLabel 1940 2420 0    50   Input ~ 0
+PD5
+Wire Wire Line
+	1940 2420 2155 2420
+Text GLabel 1940 2320 0    50   Input ~ 0
+PD7
+Wire Wire Line
+	1940 2320 2155 2320
+Text GLabel 1940 2220 0    50   Input ~ 0
+DCC_B
+Wire Wire Line
+	1940 2220 2155 2220
+Text GLabel 2885 3820 2    50   Input ~ 0
++V
+Wire Wire Line
+	2655 3820 2695 3820
+$Comp
+L power:PWR_FLAG #FLG01
+U 1 1 5E207545
+P 2105 3820
+F 0 "#FLG01" H 2105 3895 50  0001 C CNN
+F 1 "PWR_FLAG" H 2105 3993 50  0000 C CNN
+F 2 "" H 2105 3820 50  0001 C CNN
+F 3 "~" H 2105 3820 50  0001 C CNN
+	1    2105 3820
+	-1   0    0    1   
+$EndComp
+Connection ~ 2105 3820
+Wire Wire Line
+	2105 3820 2155 3820
+$Comp
+L power:GND #PWR01
+U 1 1 5E207DC6
+P 2000 3820
+F 0 "#PWR01" H 2000 3570 50  0001 C CNN
+F 1 "GND" H 2005 3647 50  0000 C CNN
+F 2 "" H 2000 3820 50  0001 C CNN
+F 3 "" H 2000 3820 50  0001 C CNN
+	1    2000 3820
+	1    0    0    -1  
+$EndComp
+Connection ~ 2000 3820
+Wire Wire Line
+	2000 3820 2105 3820
+$Comp
+L Device:LED D1
+U 1 1 5E2087BA
+P 3640 2200
+F 0 "D1" V 3679 2083 50  0000 R CNN
+F 1 "LED" V 3588 2083 50  0000 R CNN
+F 2 "" H 3640 2200 50  0001 C CNN
+F 3 "~" H 3640 2200 50  0001 C CNN
+	1    3640 2200
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R1
+U 1 1 5E2097F2
+P 3640 2510
+F 0 "R1" H 3710 2556 50  0000 L CNN
+F 1 "390" H 3710 2465 50  0000 L CNN
+F 2 "" V 3570 2510 50  0001 C CNN
+F 3 "~" H 3640 2510 50  0001 C CNN
+	1    3640 2510
+	1    0    0    -1  
+$EndComp
+Text GLabel 3640 2035 1    50   Input ~ 0
+PA0
+$Comp
+L Device:LED D2
+U 1 1 5E20B4E0
+P 4310 2195
+F 0 "D2" V 4349 2078 50  0000 R CNN
+F 1 "LED" V 4258 2078 50  0000 R CNN
+F 2 "" H 4310 2195 50  0001 C CNN
+F 3 "~" H 4310 2195 50  0001 C CNN
+	1    4310 2195
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R2
+U 1 1 5E20B4EA
+P 4310 2505
+F 0 "R2" H 4380 2551 50  0000 L CNN
+F 1 "390" H 4380 2460 50  0000 L CNN
+F 2 "" V 4240 2505 50  0001 C CNN
+F 3 "~" H 4310 2505 50  0001 C CNN
+	1    4310 2505
+	1    0    0    -1  
+$EndComp
+Text GLabel 4310 2035 1    50   Input ~ 0
+PA1
+$Comp
+L Device:LED D3
+U 1 1 5E20FC23
+P 5075 2220
+F 0 "D3" V 5114 2103 50  0000 R CNN
+F 1 "LED" V 5023 2103 50  0000 R CNN
+F 2 "" H 5075 2220 50  0001 C CNN
+F 3 "~" H 5075 2220 50  0001 C CNN
+	1    5075 2220
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R3
+U 1 1 5E20FC2D
+P 5075 2545
+F 0 "R3" H 5145 2591 50  0000 L CNN
+F 1 "390" H 5145 2500 50  0000 L CNN
+F 2 "" V 5005 2545 50  0001 C CNN
+F 3 "~" H 5075 2545 50  0001 C CNN
+	1    5075 2545
+	1    0    0    -1  
+$EndComp
+Text GLabel 5075 2040 1    50   Input ~ 0
+PA2
+$Comp
+L Device:LED D4
+U 1 1 5E2137A9
+P 5805 2220
+F 0 "D4" V 5844 2103 50  0000 R CNN
+F 1 "LED" V 5753 2103 50  0000 R CNN
+F 2 "" H 5805 2220 50  0001 C CNN
+F 3 "~" H 5805 2220 50  0001 C CNN
+	1    5805 2220
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R4
+U 1 1 5E2137B3
+P 5805 2535
+F 0 "R4" H 5875 2581 50  0000 L CNN
+F 1 "390" H 5875 2490 50  0000 L CNN
+F 2 "" V 5735 2535 50  0001 C CNN
+F 3 "~" H 5805 2535 50  0001 C CNN
+	1    5805 2535
+	1    0    0    -1  
+$EndComp
+Text GLabel 5815 2050 1    50   Input ~ 0
+PA3
+$Comp
+L Device:LED D5
+U 1 1 5E2137C8
+P 6395 2230
+F 0 "D5" V 6434 2113 50  0000 R CNN
+F 1 "LED" V 6343 2113 50  0000 R CNN
+F 2 "" H 6395 2230 50  0001 C CNN
+F 3 "~" H 6395 2230 50  0001 C CNN
+	1    6395 2230
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R5
+U 1 1 5E2137D2
+P 6395 2555
+F 0 "R5" H 6465 2601 50  0000 L CNN
+F 1 "390" H 6465 2510 50  0000 L CNN
+F 2 "" V 6325 2555 50  0001 C CNN
+F 3 "~" H 6395 2555 50  0001 C CNN
+	1    6395 2555
+	1    0    0    -1  
+$EndComp
+Text GLabel 6395 2050 1    50   Input ~ 0
+PA4
+$Comp
+L Device:LED D6
+U 1 1 5E2137E7
+P 7220 2300
+F 0 "D6" V 7259 2183 50  0000 R CNN
+F 1 "LED" V 7168 2183 50  0000 R CNN
+F 2 "" H 7220 2300 50  0001 C CNN
+F 3 "~" H 7220 2300 50  0001 C CNN
+	1    7220 2300
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R6
+U 1 1 5E2137F1
+P 7220 2630
+F 0 "R6" H 7290 2676 50  0000 L CNN
+F 1 "390" H 7290 2585 50  0000 L CNN
+F 2 "" V 7150 2630 50  0001 C CNN
+F 3 "~" H 7220 2630 50  0001 C CNN
+	1    7220 2630
+	1    0    0    -1  
+$EndComp
+Text GLabel 7220 2105 1    50   Input ~ 0
+PA5
+$Comp
+L Device:LED D7
+U 1 1 5E21A56E
+P 7895 2205
+F 0 "D7" V 7934 2088 50  0000 R CNN
+F 1 "LED" V 7843 2088 50  0000 R CNN
+F 2 "" H 7895 2205 50  0001 C CNN
+F 3 "~" H 7895 2205 50  0001 C CNN
+	1    7895 2205
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R7
+U 1 1 5E21A578
+P 7895 2545
+F 0 "R7" H 7965 2591 50  0000 L CNN
+F 1 "390" H 7965 2500 50  0000 L CNN
+F 2 "" V 7825 2545 50  0001 C CNN
+F 3 "~" H 7895 2545 50  0001 C CNN
+	1    7895 2545
+	1    0    0    -1  
+$EndComp
+Text GLabel 7895 1995 1    50   Input ~ 0
+PA6
+$Comp
+L Device:LED D8
+U 1 1 5E21A58D
+P 8510 2245
+F 0 "D8" V 8549 2128 50  0000 R CNN
+F 1 "LED" V 8458 2128 50  0000 R CNN
+F 2 "" H 8510 2245 50  0001 C CNN
+F 3 "~" H 8510 2245 50  0001 C CNN
+	1    8510 2245
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R8
+U 1 1 5E21A597
+P 8510 2585
+F 0 "R8" H 8580 2631 50  0000 L CNN
+F 1 "390" H 8580 2540 50  0000 L CNN
+F 2 "" V 8440 2585 50  0001 C CNN
+F 3 "~" H 8510 2585 50  0001 C CNN
+	1    8510 2585
+	1    0    0    -1  
+$EndComp
+Text GLabel 8510 2035 1    50   Input ~ 0
+PA7
+$Comp
+L Device:LED D11
+U 1 1 5E21F07E
+P 3635 3315
+F 0 "D11" V 3674 3198 50  0000 R CNN
+F 1 "LED" V 3583 3198 50  0000 R CNN
+F 2 "" H 3635 3315 50  0001 C CNN
+F 3 "~" H 3635 3315 50  0001 C CNN
+	1    3635 3315
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R9
+U 1 1 5E21F088
+P 3635 3650
+F 0 "R9" H 3705 3696 50  0000 L CNN
+F 1 "390" H 3705 3605 50  0000 L CNN
+F 2 "" V 3565 3650 50  0001 C CNN
+F 3 "~" H 3635 3650 50  0001 C CNN
+	1    3635 3650
+	1    0    0    -1  
+$EndComp
+Text GLabel 3635 3130 1    50   Input ~ 0
+PB0
+$Comp
+L Device:LED D14
+U 1 1 5E21F09D
+P 4265 3360
+F 0 "D14" V 4304 3243 50  0000 R CNN
+F 1 "LED" V 4213 3243 50  0000 R CNN
+F 2 "" H 4265 3360 50  0001 C CNN
+F 3 "~" H 4265 3360 50  0001 C CNN
+	1    4265 3360
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R10
+U 1 1 5E21F0A7
+P 4265 3690
+F 0 "R10" H 4335 3736 50  0000 L CNN
+F 1 "390" H 4335 3645 50  0000 L CNN
+F 2 "" V 4195 3690 50  0001 C CNN
+F 3 "~" H 4265 3690 50  0001 C CNN
+	1    4265 3690
+	1    0    0    -1  
+$EndComp
+Text GLabel 4260 3160 1    50   Input ~ 0
+PB1
+$Comp
+L Device:LED D18
+U 1 1 5E21F0BC
+P 4955 3385
+F 0 "D18" V 4994 3268 50  0000 R CNN
+F 1 "LED" V 4903 3268 50  0000 R CNN
+F 2 "" H 4955 3385 50  0001 C CNN
+F 3 "~" H 4955 3385 50  0001 C CNN
+	1    4955 3385
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R11
+U 1 1 5E21F0C6
+P 4955 3720
+F 0 "R11" H 5025 3766 50  0000 L CNN
+F 1 "390" H 5025 3675 50  0000 L CNN
+F 2 "" V 4885 3720 50  0001 C CNN
+F 3 "~" H 4955 3720 50  0001 C CNN
+	1    4955 3720
+	1    0    0    -1  
+$EndComp
+Text GLabel 4955 3150 1    50   Input ~ 0
+PB2
+$Comp
+L Device:LED D22
+U 1 1 5E21F0DB
+P 5595 3385
+F 0 "D22" V 5634 3268 50  0000 R CNN
+F 1 "LED" V 5543 3268 50  0000 R CNN
+F 2 "" H 5595 3385 50  0001 C CNN
+F 3 "~" H 5595 3385 50  0001 C CNN
+	1    5595 3385
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R13
+U 1 1 5E21F0E5
+P 5595 3730
+F 0 "R13" H 5665 3776 50  0000 L CNN
+F 1 "390" H 5665 3685 50  0000 L CNN
+F 2 "" V 5525 3730 50  0001 C CNN
+F 3 "~" H 5595 3730 50  0001 C CNN
+	1    5595 3730
+	1    0    0    -1  
+$EndComp
+Text GLabel 5595 3165 1    50   Input ~ 0
+PB3
+Text GLabel 3640 2660 3    50   Input ~ 0
+PC0
+Text GLabel 4310 2655 3    50   Input ~ 0
+PC1
+Text GLabel 5805 2685 3    50   Input ~ 0
+PC3
+Text GLabel 7220 2780 3    50   Input ~ 0
+PC5
+Text GLabel 7895 2695 3    50   Input ~ 0
+PC6
+Text GLabel 8510 2735 3    50   Input ~ 0
+PC7
+Text GLabel 3640 3895 3    50   Input ~ 0
+PD0
+Text GLabel 4265 3840 3    50   Input ~ 0
+PD1
+Text GLabel 4955 3870 3    50   Input ~ 0
+PD2
+Text GLabel 5595 3880 3    50   Input ~ 0
+PD3
+$Comp
+L Device:LED D19
+U 1 1 5E2505DE
+P 3875 4840
+F 0 "D19" V 3914 4723 50  0000 R CNN
+F 1 "LED" V 3823 4723 50  0000 R CNN
+F 2 "" H 3875 4840 50  0001 C CNN
+F 3 "~" H 3875 4840 50  0001 C CNN
+	1    3875 4840
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R12
+U 1 1 5E2505E8
+P 3875 5205
+F 0 "R12" H 3945 5251 50  0000 L CNN
+F 1 "390" H 3945 5160 50  0000 L CNN
+F 2 "" V 3805 5205 50  0001 C CNN
+F 3 "~" H 3875 5205 50  0001 C CNN
+	1    3875 5205
+	1    0    0    -1  
+$EndComp
+Text GLabel 3875 4550 1    50   Input ~ 0
+PD4
+$Comp
+L Device:LED D23
+U 1 1 5E2505FD
+P 4470 4845
+F 0 "D23" V 4509 4728 50  0000 R CNN
+F 1 "LED" V 4418 4728 50  0000 R CNN
+F 2 "" H 4470 4845 50  0001 C CNN
+F 3 "~" H 4470 4845 50  0001 C CNN
+	1    4470 4845
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R14
+U 1 1 5E250607
+P 4470 5185
+F 0 "R14" H 4540 5231 50  0000 L CNN
+F 1 "390" H 4540 5140 50  0000 L CNN
+F 2 "" V 4400 5185 50  0001 C CNN
+F 3 "~" H 4470 5185 50  0001 C CNN
+	1    4470 5185
+	1    0    0    -1  
+$EndComp
+Text GLabel 4470 4560 1    50   Input ~ 0
+PD5
+Text GLabel 3875 5355 3    50   Input ~ 0
+PD6
+Text GLabel 4470 5335 3    50   Input ~ 0
+PD7
+$Comp
+L Device:LED D9
+U 1 1 5E1F5803
+P 3455 2200
+F 0 "D9" V 3494 2083 50  0000 R CNN
+F 1 "LED" V 3403 2083 50  0000 R CNN
+F 2 "" H 3455 2200 50  0001 C CNN
+F 3 "~" H 3455 2200 50  0001 C CNN
+	1    3455 2200
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3455 2070 3455 2065
+Wire Wire Line
+	3455 2050 3640 2050
+Wire Wire Line
+	3640 2050 3640 2035
+Connection ~ 3640 2050
+Wire Wire Line
+	3455 2350 3640 2350
+Wire Wire Line
+	3640 2350 3640 2360
+Connection ~ 3640 2350
+$Comp
+L Device:LED D13
+U 1 1 5E20F238
+P 4175 2205
+F 0 "D13" V 4214 2088 50  0000 R CNN
+F 1 "LED" V 4123 2088 50  0000 R CNN
+F 2 "" H 4175 2205 50  0001 C CNN
+F 3 "~" H 4175 2205 50  0001 C CNN
+	1    4175 2205
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4175 2055 4310 2055
+Wire Wire Line
+	4310 2035 4310 2045
+Connection ~ 4310 2045
+Wire Wire Line
+	4310 2045 4310 2055
+Wire Wire Line
+	4175 2355 4310 2355
+Wire Wire Line
+	4310 2355 4310 2345
+Connection ~ 4310 2355
+$Comp
+L Device:LED D17
+U 1 1 5E21F025
+P 4930 2215
+F 0 "D17" V 4969 2098 50  0000 R CNN
+F 1 "LED" V 4878 2098 50  0000 R CNN
+F 2 "" H 4930 2215 50  0001 C CNN
+F 3 "~" H 4930 2215 50  0001 C CNN
+	1    4930 2215
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4930 2065 5075 2065
+Wire Wire Line
+	5075 2040 5075 2065
+Connection ~ 5075 2065
+Wire Wire Line
+	5075 2065 5075 2070
+Wire Wire Line
+	4930 2365 4930 2370
+Wire Wire Line
+	4930 2370 5075 2370
+Wire Wire Line
+	5075 2370 5075 2395
+Connection ~ 5075 2370
+Text GLabel 5075 2695 3    50   Input ~ 0
+PC2
+$Comp
+L Device:LED D24
+U 1 1 5E2279EB
+P 5680 2220
+F 0 "D24" V 5719 2103 50  0000 R CNN
+F 1 "LED" V 5628 2103 50  0000 R CNN
+F 2 "" H 5680 2220 50  0001 C CNN
+F 3 "~" H 5680 2220 50  0001 C CNN
+	1    5680 2220
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5680 2070 5805 2070
+Wire Wire Line
+	5805 2070 5815 2050
+Connection ~ 5805 2070
+Wire Wire Line
+	5680 2370 5805 2370
+Wire Wire Line
+	5805 2370 5805 2385
+Connection ~ 5805 2370
+$Comp
+L Device:LED D25
+U 1 1 5E23D25C
+P 6280 2230
+F 0 "D25" V 6319 2113 50  0000 R CNN
+F 1 "LED" V 6228 2113 50  0000 R CNN
+F 2 "" H 6280 2230 50  0001 C CNN
+F 3 "~" H 6280 2230 50  0001 C CNN
+	1    6280 2230
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6280 2080 6395 2080
+Wire Wire Line
+	6395 2050 6395 2080
+Connection ~ 6395 2080
+Wire Wire Line
+	6280 2380 6395 2380
+Wire Wire Line
+	6395 2380 6395 2405
+Connection ~ 6395 2380
+Text GLabel 6395 2705 3    50   Input ~ 0
+PC4
+$Comp
+L Device:LED D26
+U 1 1 5E24E2EA
+P 7095 2300
+F 0 "D26" V 7134 2183 50  0000 R CNN
+F 1 "LED" V 7043 2183 50  0000 R CNN
+F 2 "" H 7095 2300 50  0001 C CNN
+F 3 "~" H 7095 2300 50  0001 C CNN
+	1    7095 2300
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7095 2150 7220 2150
+Wire Wire Line
+	7220 2150 7220 2105
+Connection ~ 7220 2150
+Wire Wire Line
+	7095 2450 7220 2450
+Wire Wire Line
+	7220 2450 7220 2480
+Connection ~ 7220 2450
+$Comp
+L Device:LED D27
+U 1 1 5E258F64
+P 7770 2200
+F 0 "D27" V 7809 2083 50  0000 R CNN
+F 1 "LED" V 7718 2083 50  0000 R CNN
+F 2 "" H 7770 2200 50  0001 C CNN
+F 3 "~" H 7770 2200 50  0001 C CNN
+	1    7770 2200
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7770 2050 7895 2050
+Wire Wire Line
+	7895 1995 7895 2050
+Connection ~ 7895 2050
+Wire Wire Line
+	7895 2050 7895 2055
+Wire Wire Line
+	7770 2350 7895 2350
+Wire Wire Line
+	7895 2350 7895 2355
+Wire Wire Line
+	7895 2355 7895 2395
+Connection ~ 7895 2355
+$Comp
+L Device:LED D28
+U 1 1 5E265096
+P 8380 2250
+F 0 "D28" V 8419 2133 50  0000 R CNN
+F 1 "LED" V 8328 2133 50  0000 R CNN
+F 2 "" H 8380 2250 50  0001 C CNN
+F 3 "~" H 8380 2250 50  0001 C CNN
+	1    8380 2250
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8380 2100 8510 2100
+Wire Wire Line
+	8510 2100 8510 2095
+Wire Wire Line
+	8510 2095 8510 2035
+Connection ~ 8510 2095
+Wire Wire Line
+	8380 2400 8510 2400
+Wire Wire Line
+	8510 2395 8510 2400
+Connection ~ 8510 2400
+Wire Wire Line
+	8510 2400 8510 2435
+$Comp
+L Device:LED D10
+U 1 1 5E27A039
+P 3490 3310
+F 0 "D10" V 3529 3193 50  0000 R CNN
+F 1 "LED" V 3438 3193 50  0000 R CNN
+F 2 "" H 3490 3310 50  0001 C CNN
+F 3 "~" H 3490 3310 50  0001 C CNN
+	1    3490 3310
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3490 3160 3635 3160
+Wire Wire Line
+	3635 3130 3635 3160
+Connection ~ 3635 3160
+Wire Wire Line
+	3635 3160 3635 3165
+Wire Wire Line
+	3490 3460 3635 3460
+Wire Wire Line
+	3635 3460 3635 3465
+Wire Wire Line
+	3635 3465 3635 3500
+Connection ~ 3635 3465
+Wire Wire Line
+	3640 3895 3640 3805
+Wire Wire Line
+	3640 3805 3635 3800
+$Comp
+L Device:LED D12
+U 1 1 5E21000E
+P 4135 3360
+F 0 "D12" V 4174 3243 50  0000 R CNN
+F 1 "LED" V 4083 3243 50  0000 R CNN
+F 2 "" H 4135 3360 50  0001 C CNN
+F 3 "~" H 4135 3360 50  0001 C CNN
+	1    4135 3360
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4135 3210 4265 3210
+Wire Wire Line
+	4265 3160 4260 3160
+Wire Wire Line
+	4265 3160 4265 3210
+Connection ~ 4265 3210
+Wire Wire Line
+	4265 3210 4265 3215
+Wire Wire Line
+	4135 3510 4265 3510
+Wire Wire Line
+	4265 3510 4265 3540
+Connection ~ 4265 3510
+$Comp
+L Device:LED D15
+U 1 1 5E21D3D3
+P 4820 3385
+F 0 "D15" V 4859 3268 50  0000 R CNN
+F 1 "LED" V 4768 3268 50  0000 R CNN
+F 2 "" H 4820 3385 50  0001 C CNN
+F 3 "~" H 4820 3385 50  0001 C CNN
+	1    4820 3385
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4820 3235 4955 3235
+Wire Wire Line
+	4955 3235 4955 3150
+Connection ~ 4955 3235
+Wire Wire Line
+	4820 3535 4955 3535
+Wire Wire Line
+	4955 3535 4955 3570
+Connection ~ 4955 3535
+$Comp
+L Device:LED D20
+U 1 1 5E22C34F
+P 5475 3385
+F 0 "D20" V 5514 3268 50  0000 R CNN
+F 1 "LED" V 5423 3268 50  0000 R CNN
+F 2 "" H 5475 3385 50  0001 C CNN
+F 3 "~" H 5475 3385 50  0001 C CNN
+	1    5475 3385
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5475 3235 5595 3235
+Wire Wire Line
+	5595 3235 5595 3165
+Connection ~ 5595 3235
+Wire Wire Line
+	5475 3535 5595 3535
+Wire Wire Line
+	5595 3535 5595 3580
+Connection ~ 5595 3535
+$Comp
+L Device:LED D16
+U 1 1 5E240833
+P 3740 4840
+F 0 "D16" V 3779 4723 50  0000 R CNN
+F 1 "LED" V 3688 4723 50  0000 R CNN
+F 2 "" H 3740 4840 50  0001 C CNN
+F 3 "~" H 3740 4840 50  0001 C CNN
+	1    3740 4840
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED D21
+U 1 1 5E241643
+P 4350 4845
+F 0 "D21" V 4389 4728 50  0000 R CNN
+F 1 "LED" V 4298 4728 50  0000 R CNN
+F 2 "" H 4350 4845 50  0001 C CNN
+F 3 "~" H 4350 4845 50  0001 C CNN
+	1    4350 4845
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4350 4695 4470 4695
+Wire Wire Line
+	4470 4695 4470 4560
+Connection ~ 4470 4695
+Wire Wire Line
+	4350 4995 4470 4995
+Wire Wire Line
+	4470 4995 4470 5035
+Connection ~ 4470 4995
+Wire Wire Line
+	3740 4990 3875 4990
+Wire Wire Line
+	3875 4990 3875 5055
+Connection ~ 3875 4990
+Wire Wire Line
+	3740 4690 3875 4690
+Wire Wire Line
+	3875 4690 3875 4550
+Connection ~ 3875 4690
+$Comp
+L power:PWR_FLAG #FLG0101
+U 1 1 5E26C39A
+P 2120 3720
+F 0 "#FLG0101" H 2120 3795 50  0001 C CNN
+F 1 "PWR_FLAG" H 2120 3893 50  0000 C CNN
+F 2 "" H 2120 3720 50  0001 C CNN
+F 3 "~" H 2120 3720 50  0001 C CNN
+	1    2120 3720
+	1    0    0    -1  
+$EndComp
+Connection ~ 2120 3720
+Wire Wire Line
+	2120 3720 2155 3720
+$Comp
+L power:PWR_FLAG #FLG0102
+U 1 1 5E26CDFB
+P 2660 3720
+F 0 "#FLG0102" H 2660 3795 50  0001 C CNN
+F 1 "PWR_FLAG" H 2660 3893 50  0000 C CNN
+F 2 "" H 2660 3720 50  0001 C CNN
+F 3 "~" H 2660 3720 50  0001 C CNN
+	1    2660 3720
+	1    0    0    -1  
+$EndComp
+Connection ~ 2660 3720
+Wire Wire Line
+	2660 3720 2885 3720
+$Comp
+L power:PWR_FLAG #FLG0103
+U 1 1 5E26DCFE
+P 2695 3820
+F 0 "#FLG0103" H 2695 3895 50  0001 C CNN
+F 1 "PWR_FLAG" H 2695 3993 50  0000 C CNN
+F 2 "" H 2695 3820 50  0001 C CNN
+F 3 "~" H 2695 3820 50  0001 C CNN
+	1    2695 3820
+	-1   0    0    1   
+$EndComp
+Connection ~ 2695 3820
+Wire Wire Line
+	2695 3820 2885 3820
+Text GLabel 1895 4255 0    50   Input ~ 0
++5V
+Text GLabel 1900 4720 0    50   Input ~ 0
+3,3V
+Text GLabel 2935 4255 2    50   Input ~ 0
+GND
+$Comp
+L Device:R R15
+U 1 1 5E26E740
+P 2485 4255
+F 0 "R15" H 2555 4301 50  0000 L CNN
+F 1 "150" H 2555 4210 50  0000 L CNN
+F 2 "" V 2415 4255 50  0001 C CNN
+F 3 "~" H 2485 4255 50  0001 C CNN
+	1    2485 4255
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D29
+U 1 1 5E26E736
+P 2145 4255
+F 0 "D29" V 2184 4138 50  0000 R CNN
+F 1 "LED" V 2093 4138 50  0000 R CNN
+F 2 "" H 2145 4255 50  0001 C CNN
+F 3 "~" H 2145 4255 50  0001 C CNN
+	1    2145 4255
+	-1   0    0    1   
+$EndComp
+Text GLabel 2635 4720 2    50   Input ~ 0
+GND
+$Comp
+L Device:R R17
+U 1 1 5E27B733
+P 2485 4720
+F 0 "R17" H 2555 4766 50  0000 L CNN
+F 1 "330" H 2555 4675 50  0000 L CNN
+F 2 "" V 2415 4720 50  0001 C CNN
+F 3 "~" H 2485 4720 50  0001 C CNN
+	1    2485 4720
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D31
+U 1 1 5E27B73D
+P 2150 4720
+F 0 "D31" V 2189 4603 50  0000 R CNN
+F 1 "LED" V 2098 4603 50  0000 R CNN
+F 2 "" H 2150 4720 50  0001 C CNN
+F 3 "~" H 2150 4720 50  0001 C CNN
+	1    2150 4720
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1900 4720 2000 4720
+Wire Wire Line
+	2300 4720 2335 4720
+Text GLabel 1865 5175 0    50   Input ~ 0
++V
+Text GLabel 2935 5175 2    50   Input ~ 0
+GND
+$Comp
+L Device:R R16
+U 1 1 5E28CAAA
+P 2485 5175
+F 0 "R16" H 2555 5221 50  0000 L CNN
+F 1 "1,2k" H 2555 5130 50  0000 L CNN
+F 2 "" V 2415 5175 50  0001 C CNN
+F 3 "~" H 2485 5175 50  0001 C CNN
+	1    2485 5175
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D30
+U 1 1 5E28CAB4
+P 2150 5175
+F 0 "D30" V 2189 5058 50  0000 R CNN
+F 1 "LED" V 2098 5058 50  0000 R CNN
+F 2 "" H 2150 5175 50  0001 C CNN
+F 3 "~" H 2150 5175 50  0001 C CNN
+	1    2150 5175
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2300 5175 2335 5175
+Wire Wire Line
+	1865 5175 2000 5175
+Wire Wire Line
+	2295 4255 2335 4255
+Wire Wire Line
+	1895 4255 1995 4255
+$Comp
+L Device:D_Zener D?
+U 1 1 5E2B537E
+P 2785 4255
+F 0 "D?" H 2785 4471 50  0000 C CNN
+F 1 "2,7V" H 2785 4380 50  0000 C CNN
+F 2 "" H 2785 4255 50  0001 C CNN
+F 3 "~" H 2785 4255 50  0001 C CNN
+	1    2785 4255
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D_Zener D?
+U 1 1 5E2B6ED6
+P 2785 5175
+F 0 "D?" H 2785 5391 50  0000 C CNN
+F 1 "7,5V" H 2785 5300 50  0000 C CNN
+F 2 "" H 2785 5175 50  0001 C CNN
+F 3 "~" H 2785 5175 50  0001 C CNN
+	1    2785 5175
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

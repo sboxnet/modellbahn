@@ -1,0 +1,52 @@
+Source,/home/balagi/src/kicad/sboxnet-gbm/sboxnet-gbm.sch
+Kicad Rev,Eeschema 5.1.4-e60b266~84~ubuntu18.04.1
+Generated Date,Tue 29 Oct 2019 10:45:55 CET
+
+Title,Not Set
+Company,Not Set
+Revision,Not Set
+Date Issue,Not Set
+
+Reference,Value,Library,Library Ref
+R4,33,Device,R
+TH6,Thermistor_PTC,Device,Thermistor_PTC
+J1,Screw_Terminal_01x04,Connector,Screw_Terminal_01x04
+R6,33,Device,R
+R3,33,Device,R
+TH4,Thermistor_PTC,Device,Thermistor_PTC
+D4,D_Bridge_+-AA,Device,D_Bridge_+-AA
+R1,33,Device,R
+TH3,Thermistor_PTC,Device,Thermistor_PTC
+D1,D_Bridge_+-AA,Device,D_Bridge_+-AA
+R2,33,Device,R
+TH2,Thermistor_PTC,Device,Thermistor_PTC
+D2,D_Bridge_+-AA,Device,D_Bridge_+-AA
+R8,33,Device,R
+TH1,Thermistor_PTC,Device,Thermistor_PTC
+D8,D_Bridge_+-AA,Device,D_Bridge_+-AA
+R7,33,Device,R
+TH0,Thermistor_PTC,Device,Thermistor_PTC
+D7,D_Bridge_+-AA,Device,D_Bridge_+-AA
+D6,D_Bridge_+-AA,Device,D_Bridge_+-AA
+U2,LTV-844,Isolator,LTV-844
+U1,LTV-844,Isolator,LTV-844
+TH5,Thermistor_PTC,Device,Thermistor_PTC
+R5,33,Device,R
+D5,D_Bridge_+-AA,Device,D_Bridge_+-AA
+D3,D_Bridge_+-AA,Device,D_Bridge_+-AA
+TH7,Thermistor_PTC,Device,Thermistor_PTC
+J2,Screw_Terminal_01x04,Connector,Screw_Terminal_01x04
+J3,Screw_Terminal_01x04,Connector,Screw_Terminal_01x04
+R9,33,Device,R
+TH8,Thermistor_PTC,Device,Thermistor_PTC
+R10,33,Device,R
+D10,D_Bridge_+-AA,Device,D_Bridge_+-AA
+U3,LTV-844,Isolator,LTV-844
+D9,D_Bridge_+-AA,Device,D_Bridge_+-AA
+TH9,Thermistor_PTC,Device,Thermistor_PTC
+J5,Screw_Terminal_01x04,Connector,Screw_Terminal_01x04
+BAR1,HDSP-4830_2,LED,HDSP-4830_2
+RN1,R_Network08,Device,R_Network08
+R11,1k,Device,R
+R12,1k,Device,R
+J4,sboxnet-buchse_02x17,sboxnet,sboxnet-buchse_02x17

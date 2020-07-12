@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name sboxnet)(type Legacy)(uri /home/balagi/src/kicad/lib/sboxnet.lib)(options "")(descr ""))
+)

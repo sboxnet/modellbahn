@@ -1,0 +1,5 @@
+(fp_lib_table
+  (lib (name test)(type KiCad)(uri ${KIPRJMOD}/test.pretty)(options "")(descr "")(disabled))
+  (lib (name sboxnet-weichenservo)(type KiCad)(uri ${KIPRJMOD}/sboxnet-weichenservo.pretty)(options "")(descr "")(disabled))
+  (lib (name sboxnet)(type KiCad)(uri /home/balagi/src/kicad/lib/sboxnet.pretty)(options "")(descr ""))
+)

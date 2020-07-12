@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name gpio-usb)(type KiCad)(uri ${KIPRJMOD}/gpio-usb.pretty)(options "")(descr ""))
+)

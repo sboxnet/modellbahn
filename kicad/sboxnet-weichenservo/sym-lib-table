@@ -1,0 +1,6 @@
+(sym_lib_table
+  (lib (name 74540)(type Legacy)(uri ${KIPRJMOD}/74540.lib)(options "")(descr "")(disabled))
+  (lib (name 74-540)(type Legacy)(uri ${KIPRJMOD}/74-540.lib)(options "")(descr "")(disabled))
+  (lib (name 74hct540)(type Legacy)(uri /home/balagi/src/kicad/74hct540.lib)(options "")(descr "")(disabled))
+  (lib (name sboxnet)(type Legacy)(uri /home/balagi/src/kicad/lib/sboxnet.lib)(options "")(descr ""))
+)

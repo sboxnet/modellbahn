@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name sboxnet)(type KiCad)(uri /home/balagi/src/kicad/lib/sboxnet.pretty)(options "")(descr ""))
+)

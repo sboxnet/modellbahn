@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name sboxnet)(type Legacy)(uri /home/balagi/src/kicad/lib/sboxnet.lib)(options "")(descr ""))
+  (lib (name sboxnet-gbm-rescue)(type Legacy)(uri ${KIPRJMOD}/sboxnet-gbm-rescue.lib)(options "")(descr "")(disabled))
+)
