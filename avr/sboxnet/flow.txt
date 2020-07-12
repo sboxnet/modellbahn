@@ -1,0 +1,3 @@
+bootloader-crt0.c: bldr_boot; clear ram INTERNAL_SRAM_START -> INTERNAL_SRAM_END; jmp bldr_start bootloader-fw.c: bldr_start
+bootloader-fw.c: bldr_start:
+  wdt_reset
