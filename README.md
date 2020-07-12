@@ -11,4 +11,4 @@ schemas und layouts
 <h2>libtmb++</h2>
 library for programmer
 <h2>programmer</h2>
-programmer to programm atmel xmega mcu's over PDI
+programmer to program atmel xmega mcu's over PDI
