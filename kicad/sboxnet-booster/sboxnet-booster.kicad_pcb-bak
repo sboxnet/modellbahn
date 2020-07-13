@@ -245,7 +245,7 @@
   )
 
   (module sboxnet:MountingHole_2.2mm_M2 (layer F.Cu) (tedit 56D1B4CB) (tstamp 5F0AF7A1)
-    (at 74.93 105.41)
+    (at 74.422 105.41)
     (descr "Mounting Hole 2.2mm, no annular, M2")
     (tags "mounting hole 2.2mm no annular m2")
     (attr virtual)

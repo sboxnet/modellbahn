@@ -1,5 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:gpio-usb-cache
 EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
@@ -1015,15 +1014,4 @@ Wire Wire Line
 Wire Wire Line
 	8055 2185 8860 2185
 Connection ~ 8055 2205
-$Comp
-L Connector:RJ45 J5
-U 1 1 5D6AA968
-P 1450 6580
-F 0 "J5" H 1507 7247 50  0000 C CNN
-F 1 "RJ45" H 1507 7156 50  0000 C CNN
-F 2 "" V 1450 6605 50  0001 C CNN
-F 3 "~" V 1450 6605 50  0001 C CNN
-	1    1450 6580
-	1    0    0    -1  
-$EndComp
 $EndSCHEMATC
