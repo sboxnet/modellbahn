@@ -13,64 +13,33 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-Text GLabel 1739 4740 2    39   Input ~ 0
+Text GLabel 1730 4740 2    39   Input ~ 0
 PA0
-Text GLabel 864  4740 0    39   Input ~ 0
-PA1
-Wire Wire Line
-	1594 4740 1739 4740
-Wire Wire Line
-	929  4840 974  4840
-Wire Wire Line
-	1594 4840 1779 4840
-$Comp
-L power:PWR_FLAG #FLG03
-U 1 1 5DBB1F4E
-P 1779 4840
-F 0 "#FLG03" H 1779 4915 50  0001 C CNN
-F 1 "PWR_FLAG" H 1779 5013 50  0000 C CNN
-F 2 "" H 1779 4840 50  0001 C CNN
-F 3 "~" H 1779 4840 50  0001 C CNN
-	1    1779 4840
-	-1   0    0    1   
-$EndComp
 $Comp
 L power:PWR_FLAG #FLG01
 U 1 1 5DBB25B9
-P 974 4840
-F 0 "#FLG01" H 974 4915 50  0001 C CNN
-F 1 "PWR_FLAG" H 974 5013 50  0000 C CNN
-F 2 "" H 974 4840 50  0001 C CNN
-F 3 "~" H 974 4840 50  0001 C CNN
-	1    974  4840
+P 1095 4940
+F 0 "#FLG01" H 1095 5015 50  0001 C CNN
+F 1 "PWR_FLAG" H 1095 5113 50  0000 C CNN
+F 2 "" H 1095 4940 50  0001 C CNN
+F 3 "~" H 1095 4940 50  0001 C CNN
+	1    1095 4940
 	-1   0    0    1   
 $EndComp
-Connection ~ 974  4840
-Connection ~ 1779 4840
-Text GLabel 1759 4140 2    39   Input ~ 0
+Text GLabel 1760 4140 2    39   Input ~ 0
 PC0
-Wire Wire Line
-	1594 4140 1759 4140
-Text GLabel 1759 4040 2    39   Input ~ 0
+Text GLabel 1760 4040 2    39   Input ~ 0
 PC2
-Wire Wire Line
-	1594 4040 1759 4040
-Text GLabel 874  4140 0    39   Input ~ 0
+Text GLabel 875  4140 0    39   Input ~ 0
 PC1
-Text GLabel 874  4040 0    39   Input ~ 0
+Text GLabel 875  4040 0    39   Input ~ 0
 PC3
-Text GLabel 874  3940 0    39   Input ~ 0
+Text GLabel 875  3940 0    39   Input ~ 0
 PC5
-Text GLabel 1754 3740 2    39   Input ~ 0
-PD0
-Wire Wire Line
-	1594 3740 1754 3740
-Text GLabel 874  3740 0    39   Input ~ 0
+Text GLabel 880  3740 0    39   Input ~ 0
 PD1
-Text GLabel 1754 3640 2    39   Input ~ 0
+Text GLabel 1750 3640 2    39   Input ~ 0
 PD2
-Wire Wire Line
-	1594 3640 1754 3640
 $Comp
 L Device:C C3
 U 1 1 5DBC1215
@@ -93,31 +62,8 @@ F 3 "~" H 4550 2150 50  0001 C CNN
 	1    4550 2150
 	0    1    1    0   
 $EndComp
-$Comp
-L Device:D D7
-U 1 1 5DBC3504
-P 4315 2000
-F 0 "D7" V 4361 1921 50  0000 R CNN
-F 1 "1N4148" V 4305 2400 50  0000 R CNN
-F 2 "Diode_THT:D_5W_P10.16mm_Horizontal" H 4315 2000 50  0001 C CNN
-F 3 "~" H 4315 2000 50  0001 C CNN
-	1    4315 2000
-	0    -1   -1   0   
-$EndComp
 Wire Wire Line
 	4315 2150 4400 2150
-$Comp
-L Device:D D8
-U 1 1 5DBC4A35
-P 4315 2300
-F 0 "D8" V 4361 2221 50  0000 R CNN
-F 1 "1N4148" V 4270 2221 50  0000 R CNN
-F 2 "Diode_THT:D_5W_P10.16mm_Horizontal" H 4315 2300 50  0001 C CNN
-F 3 "~" H 4315 2300 50  0001 C CNN
-	1    4315 2300
-	0    -1   -1   0   
-$EndComp
-Connection ~ 4315 2150
 $Comp
 L Device:C C2
 U 1 1 5DBC5664
@@ -640,50 +586,20 @@ Wire Wire Line
 	6485 3300 6485 3170
 Wire Wire Line
 	6485 3170 6530 3170
-$Comp
-L power:+5V #PWR0101
-U 1 1 5DC52C67
-P 1819 4840
-F 0 "#PWR0101" H 1819 4690 50  0001 C CNN
-F 1 "+5V" V 1834 4968 50  0000 L CNN
-F 2 "" H 1819 4840 50  0001 C CNN
-F 3 "" H 1819 4840 50  0001 C CNN
-	1    1819 4840
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	1779 4840 1819 4840
-$Comp
-L power:+3.3V #PWR0102
-U 1 1 5DC56BCF
-P 929 4840
-F 0 "#PWR0102" H 929 4690 50  0001 C CNN
-F 1 "+3.3V" V 944 4968 50  0000 L CNN
-F 2 "" H 929 4840 50  0001 C CNN
-F 3 "" H 929 4840 50  0001 C CNN
-	1    929  4840
-	0    -1   -1   0   
-$EndComp
-NoConn ~ 1094 4940
-NoConn ~ 1094 4640
-NoConn ~ 1094 4540
-NoConn ~ 1094 4440
-NoConn ~ 1094 4340
-NoConn ~ 1094 4240
-NoConn ~ 1594 4240
-NoConn ~ 1594 4340
-NoConn ~ 1594 4440
-NoConn ~ 1594 4540
-NoConn ~ 1594 3940
-NoConn ~ 1594 3840
-NoConn ~ 1094 3840
-NoConn ~ 1094 3640
-NoConn ~ 1094 3540
-NoConn ~ 1094 3440
-NoConn ~ 1094 3340
-NoConn ~ 1594 3340
-NoConn ~ 1594 3440
-NoConn ~ 1594 3540
+NoConn ~ 1595 4240
+NoConn ~ 1595 4340
+NoConn ~ 1595 4440
+NoConn ~ 1595 4540
+NoConn ~ 1595 3940
+NoConn ~ 1595 3840
+NoConn ~ 1095 3840
+NoConn ~ 1095 3640
+NoConn ~ 1095 3540
+NoConn ~ 1095 3440
+NoConn ~ 1095 3340
+NoConn ~ 1595 3340
+NoConn ~ 1595 3440
+NoConn ~ 1595 3540
 $Comp
 L Connector:AudioJack2 J7
 U 1 1 5DB9D0B3
@@ -876,23 +792,8 @@ Wire Wire Line
 Connection ~ 2905 1720
 Text Notes 2505 1665 0    39   ~ 0
 Spannungsmessung
-Text GLabel 1599 5070 3    39   Input ~ 0
+Text GLabel 1625 5105 3    39   Input ~ 0
 +12V
-Wire Wire Line
-	1599 5070 1599 4940
-Wire Wire Line
-	1599 4940 1594 4940
-$Comp
-L power:GND #PWR02
-U 1 1 5F0423CC
-P 2200 2900
-F 0 "#PWR02" H 2200 2650 50  0001 C CNN
-F 1 "GND" H 2205 2727 50  0000 C CNN
-F 2 "" H 2200 2900 50  0001 C CNN
-F 3 "" H 2200 2900 50  0001 C CNN
-	1    2200 2900
-	1    0    0    -1  
-$EndComp
 Text GLabel 4710 4454 0    50   Input ~ 0
 IN1
 Text GLabel 4710 4554 0    50   Input ~ 0
@@ -922,15 +823,6 @@ VBOOT
 Text GLabel 4660 2480 3    39   Input ~ 0
 VBOOT
 Wire Wire Line
-	4315 2450 4315 2465
-Wire Wire Line
-	4315 2465 4660 2465
-Wire Wire Line
-	4660 2465 4660 2480
-Connection ~ 4315 2465
-Wire Wire Line
-	4315 2465 4315 2490
-Wire Wire Line
 	6530 2695 7140 2695
 Wire Wire Line
 	6530 3070 6530 2695
@@ -951,18 +843,6 @@ OUT2b
 Text GLabel 5935 3300 0    39   Input ~ 0
 OUT1b
 Wire Wire Line
-	974  4840 1094 4840
-Wire Wire Line
-	864  4740 1094 4740
-Wire Wire Line
-	874  4140 1094 4140
-Wire Wire Line
-	874  4040 1094 4040
-Wire Wire Line
-	874  3940 1094 3940
-Wire Wire Line
-	874  3740 1094 3740
-Wire Wire Line
 	1550 2400 1600 2400
 Connection ~ 1550 2400
 Wire Wire Line
@@ -982,22 +862,7 @@ Wire Wire Line
 	2250 2400 2300 2400
 Connection ~ 2250 2400
 Wire Wire Line
-	2250 2600 2200 2600
-Wire Wire Line
-	2250 2400 2250 2600
-Wire Wire Line
 	2200 2400 2250 2400
-$Comp
-L Regulator_Linear:L78L12_SOT89 U2
-U 1 1 5F0CF06C
-P 1900 2400
-F 0 "U2" H 1900 2642 50  0000 C CNN
-F 1 "L78L12_SOT89" H 1900 2551 50  0000 C CNN
-F 2 "Package_TO_SOT_SMD:SOT-89-3" H 1900 2600 50  0001 C CIN
-F 3 "http://www.st.com/content/ccc/resource/technical/document/datasheet/15/55/e5/aa/23/5b/43/fd/CD00000446.pdf/files/CD00000446.pdf/jcr:content/translations/en.CD00000446.pdf" H 1900 2350 50  0001 C CNN
-	1    1900 2400
-	1    0    0    -1  
-$EndComp
 $Comp
 L power:GND #PWR023
 U 1 1 5F0D1F73
@@ -1009,32 +874,10 @@ F 3 "" H 1900 2700 50  0001 C CNN
 	1    1900 2700
 	1    0    0    -1  
 $EndComp
-$Comp
-L Device:CP C8
-U 1 1 5F03B35C
-P 2200 2750
-F 0 "C8" H 2318 2796 50  0000 L CNN
-F 1 "47u" H 2318 2705 50  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm" H 2238 2600 50  0001 C CNN
-F 3 "~" H 2200 2750 50  0001 C CNN
-	1    2200 2750
-	1    0    0    -1  
-$EndComp
 Text GLabel 2300 2400 2    39   Input ~ 0
 +12V
 Text GLabel 1500 2400 0    50   Input ~ 0
 V
-$Comp
-L sboxnet-booster-rescue:sboxnet-stecker_02x17-sboxnet J1
-U 1 1 5DC2D77D
-P 1344 4140
-F 0 "J1" H 1322 5180 50  0000 C CNN
-F 1 "sboxnet-stecker_02x17" H 1322 5089 50  0000 C CNN
-F 2 "sboxnet:sboxnet-stecker-2x17" H 1294 4140 50  0001 C CNN
-F 3 "" H 1294 4140 50  0001 C CNN
-	1    1344 4140
-	1    0    0    -1  
-$EndComp
 $Comp
 L power:GND #PWR022
 U 1 1 5F0E8AC1
@@ -1101,12 +944,10 @@ F 3 "~" H 4074 5260 50  0001 C CNN
 	1    4074 5260
 	-1   0    0    1   
 $EndComp
-Text GLabel 1732 4640 2    39   Input ~ 0
+Text GLabel 1730 4640 2    39   Input ~ 0
 PA2
-Wire Wire Line
-	1594 4640 1732 4640
-Text Notes 642  4688 0    39   ~ 0
-Spannungsmessung
+Text Notes 500  4685 0    39   ~ 0
+Spannungs\nmessung
 Text Notes 1916 4706 0    39   ~ 0
 Strommessung
 Wire Wire Line
@@ -1325,4 +1166,179 @@ F 3 "" H 4860 3854 39  0001 C CNN
 	1    5010 3754
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	1595 4040 1760 4040
+Wire Wire Line
+	1595 4140 1760 4140
+Text GLabel 1750 3740 2    39   Input ~ 0
+PD0
+Wire Wire Line
+	1750 3740 1595 3740
+Wire Wire Line
+	1595 3640 1750 3640
+Wire Wire Line
+	1595 4640 1730 4640
+Wire Wire Line
+	1595 4740 1730 4740
+Wire Wire Line
+	1595 4940 1625 4940
+Wire Wire Line
+	1625 4940 1625 5105
+Text GLabel 865  4740 0    39   Input ~ 0
+PA1
+Wire Wire Line
+	1095 4740 865  4740
+NoConn ~ 1095 4640
+NoConn ~ 1095 4540
+NoConn ~ 1095 4440
+NoConn ~ 1095 4340
+NoConn ~ 1095 4240
+Wire Wire Line
+	1095 4140 875  4140
+Wire Wire Line
+	875  4040 1095 4040
+Wire Wire Line
+	875  3940 1095 3940
+Wire Wire Line
+	880  3740 1095 3740
+$Comp
+L Device:CP C8
+U 1 1 5F03B35C
+P 2250 2755
+F 0 "C8" H 2368 2801 50  0000 L CNN
+F 1 "47u" H 2368 2710 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm" H 2288 2605 50  0001 C CNN
+F 3 "~" H 2250 2755 50  0001 C CNN
+	1    2250 2755
+	1    0    0    -1  
+$EndComp
+$Comp
+L Regulator_Linear:L78L12_SOT89 U2
+U 1 1 5F0CF06C
+P 1900 2400
+F 0 "U2" H 1900 2642 50  0000 C CNN
+F 1 "L78L12_SOT89" H 1900 2551 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-89-3" H 1900 2600 50  0001 C CIN
+F 3 "http://www.st.com/content/ccc/resource/technical/document/datasheet/15/55/e5/aa/23/5b/43/fd/CD00000446.pdf/files/CD00000446.pdf/jcr:content/translations/en.CD00000446.pdf" H 1900 2350 50  0001 C CNN
+	1    1900 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR02
+U 1 1 5F0423CC
+P 2250 2905
+F 0 "#PWR02" H 2250 2655 50  0001 C CNN
+F 1 "GND" H 2255 2732 50  0000 C CNN
+F 2 "" H 2250 2905 50  0001 C CNN
+F 3 "" H 2250 2905 50  0001 C CNN
+	1    2250 2905
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2250 2400 2250 2605
+$Comp
+L power:GND #PWR027
+U 1 1 5F1C9F90
+P 1095 4940
+F 0 "#PWR027" H 1095 4690 50  0001 C CNN
+F 1 "GND" H 1100 4767 50  0000 C CNN
+F 2 "" H 1095 4940 50  0001 C CNN
+F 3 "" H 1095 4940 50  0001 C CNN
+	1    1095 4940
+	0    1    1    0   
+$EndComp
+Connection ~ 1095 4940
+$Comp
+L sboxnet:sboxnet-stecker_02x17 J1
+U 1 1 5F0F3620
+P 1345 4140
+F 0 "J1" H 1335 5180 50  0000 C CNN
+F 1 "sboxnet-stecker_02x17" H 1335 5089 50  0000 C CNN
+F 2 "sboxnet:sboxnet-stecker-2x17" H 1295 4140 50  0001 C CNN
+F 3 "" H 1295 4140 50  0001 C CNN
+	1    1345 4140
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR026
+U 1 1 5F1CD368
+P 1095 4840
+F 0 "#PWR026" H 1095 4690 50  0001 C CNN
+F 1 "+5V" V 1110 4968 50  0000 L CNN
+F 2 "" H 1095 4840 50  0001 C CNN
+F 3 "" H 1095 4840 50  0001 C CNN
+	1    1095 4840
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:PWR_FLAG #FLG02
+U 1 1 5F1CEEA3
+P 1095 4840
+F 0 "#FLG02" H 1095 4915 50  0001 C CNN
+F 1 "PWR_FLAG" H 1095 5013 50  0000 C CNN
+F 2 "" H 1095 4840 50  0001 C CNN
+F 3 "~" H 1095 4840 50  0001 C CNN
+	1    1095 4840
+	1    0    0    -1  
+$EndComp
+Connection ~ 1095 4840
+$Comp
+L power:+3.3V #PWR0101
+U 1 1 5F1D2D4B
+P 1850 4840
+F 0 "#PWR0101" H 1850 4690 50  0001 C CNN
+F 1 "+3.3V" V 1865 4968 50  0000 L CNN
+F 2 "" H 1850 4840 50  0001 C CNN
+F 3 "" H 1850 4840 50  0001 C CNN
+	1    1850 4840
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	1595 4840 1800 4840
+$Comp
+L power:PWR_FLAG #FLG0101
+U 1 1 5F1E40B2
+P 1800 4840
+F 0 "#FLG0101" H 1800 4915 50  0001 C CNN
+F 1 "PWR_FLAG" H 1800 5013 50  0000 C CNN
+F 2 "" H 1800 4840 50  0001 C CNN
+F 3 "~" H 1800 4840 50  0001 C CNN
+	1    1800 4840
+	-1   0    0    1   
+$EndComp
+Connection ~ 1800 4840
+Wire Wire Line
+	1800 4840 1850 4840
+$Comp
+L Diode:1N4148WS D7
+U 1 1 5F1E8679
+P 4315 2000
+F 0 "D7" V 4361 1920 50  0000 R CNN
+F 1 "1N4148WS" V 4270 1920 50  0000 R CNN
+F 2 "Diode_SMD:D_SOD-323" H 4315 1825 50  0001 C CNN
+F 3 "https://www.vishay.com/docs/85751/1n4148ws.pdf" H 4315 2000 50  0001 C CNN
+	1    4315 2000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Diode:1N4148WS D8
+U 1 1 5F1F6AFD
+P 4315 2300
+F 0 "D8" V 4361 2220 50  0000 R CNN
+F 1 "1N4148WS" V 4270 2220 50  0000 R CNN
+F 2 "Diode_SMD:D_SOD-323" H 4315 2125 50  0001 C CNN
+F 3 "https://www.vishay.com/docs/85751/1n4148ws.pdf" H 4315 2300 50  0001 C CNN
+	1    4315 2300
+	0    -1   -1   0   
+$EndComp
+Connection ~ 4315 2150
+Wire Wire Line
+	4315 2450 4315 2470
+Wire Wire Line
+	4315 2470 4660 2470
+Wire Wire Line
+	4660 2470 4660 2480
+Connection ~ 4315 2470
+Wire Wire Line
+	4315 2470 4315 2490
 $EndSCHEMATC
