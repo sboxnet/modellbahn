@@ -645,7 +645,7 @@ Wire Wire Line
 Wire Wire Line
 	6485 3170 6530 3170
 $Comp
-L sboxnet:sboxnet-stecker_02x17 J1
+L sboxnet-booster-rescue:sboxnet-stecker_02x17-sboxnet J1
 U 1 1 5DC2D77D
 P 1200 3790
 F 0 "J1" H 1178 4830 50  0000 C CNN
@@ -981,7 +981,7 @@ Wire Wire Line
 Wire Wire Line
 	730  3790 950  3790
 $Comp
-L sboxnet:L6206PSO U1
+L sboxnet-booster-rescue:L6206PSO-sboxnet U1
 U 1 1 5F0CD7F1
 P 5010 3755
 F 0 "U1" H 5410 3956 39  0000 C CNN

@@ -269,11 +269,11 @@ X pwr 1 0 0 0 U 50 50 0 0 w
 ENDDRAW
 ENDDEF
 #
-# sboxnet_L6206PSO
+# sboxnet-booster-rescue_L6206PSO-sboxnet
 #
-DEF sboxnet_L6206PSO U 0 40 Y Y 1 F N
+DEF sboxnet-booster-rescue_L6206PSO-sboxnet U 0 40 Y Y 1 F N
 F0 "U" -150 100 39 H V C CNN
-F1 "sboxnet_L6206PSO" -200 100 39 H V C CNN
+F1 "sboxnet-booster-rescue_L6206PSO-sboxnet" -200 100 39 H V C CNN
 F2 "" -150 100 39 H I C CNN
 F3 "" -150 100 39 H I C CNN
 DRAW
@@ -305,11 +305,11 @@ X PROGCLa 9 -300 -550 100 R 50 50 1 1 I
 ENDDRAW
 ENDDEF
 #
-# sboxnet_sboxnet-stecker_02x17
+# sboxnet-booster-rescue_sboxnet-stecker_02x17-sboxnet
 #
-DEF sboxnet_sboxnet-stecker_02x17 J 0 40 Y N 1 F N
+DEF sboxnet-booster-rescue_sboxnet-stecker_02x17-sboxnet J 0 40 Y N 1 F N
 F0 "J" 0 950 50 H V C CNN
-F1 "sboxnet_sboxnet-stecker_02x17" 50 -900 50 H V C CNN
+F1 "sboxnet-booster-rescue_sboxnet-stecker_02x17-sboxnet" 50 -900 50 H V C CNN
 F2 "" -50 0 50 H I C CNN
 F3 "" -50 0 50 H I C CNN
 $FPLIST
