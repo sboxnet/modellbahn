@@ -472,7 +472,7 @@ L Connector:AudioJack2 J7
 U 1 1 5DB9D0B3
 P 7275 1695
 F 0 "J7" H 7095 1678 50  0000 R CNN
-F 1 "Power von externen 15V/4A Netzteil " H 7095 1769 50  0000 R CNN
+F 1 "Power von externen 15V/4A Netzteil  DS_NRJ4HF" H 7095 1769 50  0000 R CNN
 F 2 "Connector_Audio:Jack_6.35mm_Neutrik_NRJ4HF_Horizontal" H 7275 1695 50  0001 C CNN
 F 3 "~" H 7275 1695 50  0001 C CNN
 	1    7275 1695
@@ -1177,17 +1177,6 @@ Connection ~ 1800 4840
 Wire Wire Line
 	1800 4840 1850 4840
 $Comp
-L Diode:1N4148WS D7
-U 1 1 5F1E8679
-P 4315 2000
-F 0 "D7" V 4361 1920 50  0000 R CNN
-F 1 "1N4148WS" V 4270 1920 50  0000 R CNN
-F 2 "Diode_SMD:D_SOD-323" H 4315 1825 50  0001 C CNN
-F 3 "https://www.vishay.com/docs/85751/1n4148ws.pdf" H 4315 2000 50  0001 C CNN
-	1    4315 2000
-	0    -1   -1   0   
-$EndComp
-$Comp
 L Diode:1N4148WS D8
 U 1 1 5F1F6AFD
 P 4315 2300
@@ -1198,7 +1187,6 @@ F 3 "https://www.vishay.com/docs/85751/1n4148ws.pdf" H 4315 2300 50  0001 C CNN
 	1    4315 2300
 	0    -1   -1   0   
 $EndComp
-Connection ~ 4315 2150
 Wire Wire Line
 	4315 2450 4315 2470
 Wire Wire Line
@@ -1362,5 +1350,17 @@ F 2 "Package_TO_SOT_SMD:SOT-23" H 2908 3647 50  0001 C CNN
 F 3 "www.st.com/resource/en/datasheet/bar42.pdf" H 2908 3822 50  0001 C CNN
 	1    2908 3822
 	-1   0    0    1   
+$EndComp
+Connection ~ 4315 2150
+$Comp
+L Diode:1N4148WS D7
+U 1 1 5F1E8679
+P 4315 2000
+F 0 "D7" V 4361 1920 50  0000 R CNN
+F 1 "1N4148WS" V 4270 1920 50  0000 R CNN
+F 2 "Diode_SMD:D_SOD-323" H 4315 1825 50  0001 C CNN
+F 3 "https://www.vishay.com/docs/85751/1n4148ws.pdf" H 4315 2000 50  0001 C CNN
+	1    4315 2000
+	0    -1   -1   0   
 $EndComp
 $EndSCHEMATC
