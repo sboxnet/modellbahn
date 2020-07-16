@@ -1,4 +1,4 @@
-18641200757832685
+18642795837815784
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -82079,8 +82079,8 @@ heatsink_f
 
 
 0
-0
-0
+3
+3
 sboxnet
 sboxnet-buchse-2x17
 
@@ -82095,6 +82095,13 @@ sboxnet-stecker-2x17
 0
 34
 34
+sboxnet
+test
+
+
+0
+0
+0
 sboxnet
 thermistor
 

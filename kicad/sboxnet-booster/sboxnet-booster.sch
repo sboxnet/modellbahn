@@ -1114,7 +1114,6 @@ F 3 "" H 1095 4940 50  0001 C CNN
 	1    1095 4940
 	0    1    1    0   
 $EndComp
-Connection ~ 1095 4940
 $Comp
 L sboxnet:sboxnet-stecker_02x17 J1
 U 1 1 5F0F3620
@@ -1148,7 +1147,6 @@ F 3 "~" H 1095 4840 50  0001 C CNN
 	1    1095 4840
 	1    0    0    -1  
 $EndComp
-Connection ~ 1095 4840
 $Comp
 L power:+3.3V #PWR0101
 U 1 1 5F1D2D4B
@@ -1363,4 +1361,6 @@ F 3 "https://www.vishay.com/docs/85751/1n4148ws.pdf" H 4315 2000 50  0001 C CNN
 	1    4315 2000
 	0    -1   -1   0   
 $EndComp
+Connection ~ 1095 4940
+Connection ~ 1095 4840
 $EndSCHEMATC
