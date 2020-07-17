@@ -213,7 +213,7 @@ F 3 "~" H 1890 1720 50  0001 C CNN
 	1    1890 1720
 	1    0    0    -1  
 $EndComp
-Text GLabel 1890 1870 3    39   Input ~ 0
+Text GLabel 800  1850 3    39   Input ~ 0
 PD0
 $Comp
 L Device:LED D2
@@ -269,7 +269,7 @@ F 3 "~" H 800 1700 50  0001 C CNN
 	1    800  1700
 	1    0    0    -1  
 $EndComp
-Text GLabel 800  1850 3    39   Input ~ 0
+Text GLabel 1890 1870 3    39   Input ~ 0
 PD2
 Wire Wire Line
 	800  1250 1345 1250
