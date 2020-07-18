@@ -275,7 +275,7 @@ F 3 "~" H 4130 5045 50  0001 C CNN
 	1    4130 5045
 	1    0    0    -1  
 $EndComp
-Text GLabel 2960 1825 2    39   Input ~ 0
+Text GLabel 3000 1825 2    39   Input ~ 0
 PA0
 $Comp
 L Device:R R7
@@ -1315,4 +1315,22 @@ Wire Wire Line
 	5075 3545 5550 3545
 Wire Wire Line
 	5550 3545 5550 3540
+$Comp
+L Connector:TestPoint TP1
+U 1 1 5F20F35B
+P 2978 1740
+F 0 "TP1" H 3036 1858 50  0000 L CNN
+F 1 "TestPoint" H 3036 1767 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 3178 1740 50  0001 C CNN
+F 3 "~" H 3178 1740 50  0001 C CNN
+	1    2978 1740
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2960 1825 2978 1825
+Wire Wire Line
+	2978 1740 2978 1825
+Connection ~ 2978 1825
+Wire Wire Line
+	2978 1825 3000 1825
 $EndSCHEMATC

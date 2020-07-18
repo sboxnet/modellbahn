@@ -102,7 +102,7 @@ Wire Wire Line
 Text GLabel 4545 4465 0    50   Input ~ 0
 D
 Wire Wire Line
-	4545 4465 4635 4465
+	4545 4465 4600 4465
 NoConn ~ 4635 4565
 NoConn ~ 4635 4665
 $Comp
@@ -296,7 +296,7 @@ L Device:R R7
 U 1 1 5F088297
 P 6405 4195
 F 0 "R7" V 6612 4195 50  0000 C CNN
-F 1 "120" V 6521 4195 50  0000 C CNN
+F 1 "120" V 6525 4090 50  0000 C CNN
 F 2 "Resistor_SMD:R_1206_3216Metric" V 6335 4195 50  0001 C CNN
 F 3 "~" H 6405 4195 50  0001 C CNN
 	1    6405 4195
@@ -307,7 +307,7 @@ L Device:R R6
 U 1 1 5F088916
 P 6400 4535
 F 0 "R6" V 6607 4535 50  0000 C CNN
-F 1 "120" V 6516 4535 50  0000 C CNN
+F 1 "120" V 6520 4415 50  0000 C CNN
 F 2 "Resistor_SMD:R_1206_3216Metric" V 6330 4535 50  0001 C CNN
 F 3 "~" H 6400 4535 50  0001 C CNN
 	1    6400 4535
@@ -333,8 +333,56 @@ Wire Wire Line
 Wire Wire Line
 	6595 4535 6550 4535
 Connection ~ 6595 4195
-Text GLabel 6255 4195 0    50   Input ~ 0
+Text GLabel 6195 4195 0    50   Input ~ 0
 DCC_B
-Text GLabel 6250 4535 0    50   Input ~ 0
+Text GLabel 6195 4535 0    50   Input ~ 0
 DCC_A
+$Comp
+L Connector:TestPoint TP1
+U 1 1 5F11E6CB
+P 4600 4260
+F 0 "TP1" H 4658 4378 50  0000 L CNN
+F 1 "TestPoint" H 4658 4287 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 4800 4260 50  0001 C CNN
+F 3 "~" H 4800 4260 50  0001 C CNN
+	1    4600 4260
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4600 4260 4600 4465
+Connection ~ 4600 4465
+Wire Wire Line
+	4600 4465 4635 4465
+$Comp
+L Connector:TestPoint TP2
+U 1 1 5F12488F
+P 6225 4195
+F 0 "TP2" H 6283 4313 50  0000 L CNN
+F 1 "TestPoint" H 5985 4425 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 6425 4195 50  0001 C CNN
+F 3 "~" H 6425 4195 50  0001 C CNN
+	1    6225 4195
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6195 4535 6235 4535
+Wire Wire Line
+	6195 4195 6225 4195
+Connection ~ 6225 4195
+Wire Wire Line
+	6225 4195 6255 4195
+$Comp
+L Connector:TestPoint TP3
+U 1 1 5F127DD2
+P 6235 4535
+F 0 "TP3" H 6293 4653 50  0000 L CNN
+F 1 "TestPoint" H 5960 4745 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 6435 4535 50  0001 C CNN
+F 3 "~" H 6435 4535 50  0001 C CNN
+	1    6235 4535
+	1    0    0    -1  
+$EndComp
+Connection ~ 6235 4535
+Wire Wire Line
+	6235 4535 6250 4535
 $EndSCHEMATC

@@ -55,8 +55,8 @@ $Comp
 L Device:R R10
 U 1 1 5DBC1FE9
 P 4550 2150
-F 0 "R10" V 4343 2150 50  0000 C CNN
-F 1 "100" V 4434 2150 50  0000 C CNN
+F 0 "R10" V 4255 2235 50  0000 C CNN
+F 1 "100" V 4330 2185 50  0000 C CNN
 F 2 "Resistor_SMD:R_1206_3216Metric" V 4480 2150 50  0001 C CNN
 F 3 "~" H 4550 2150 50  0001 C CNN
 	1    4550 2150
@@ -183,8 +183,6 @@ Text GLabel 4345 3300 2    50   Input ~ 0
 IN1
 Wire Wire Line
 	4255 3300 4345 3300
-Text GLabel 4345 3410 2    50   Input ~ 0
-IN2
 Wire Wire Line
 	4255 3410 4345 3410
 $Comp
@@ -213,7 +211,7 @@ F 3 "~" H 1890 1720 50  0001 C CNN
 	1    1890 1720
 	1    0    0    -1  
 $EndComp
-Text GLabel 1890 1870 3    39   Input ~ 0
+Text GLabel 800  1850 3    39   Input ~ 0
 PD0
 $Comp
 L Device:LED D2
@@ -269,7 +267,7 @@ F 3 "~" H 800 1700 50  0001 C CNN
 	1    800  1700
 	1    0    0    -1  
 $EndComp
-Text GLabel 800  1850 3    39   Input ~ 0
+Text GLabel 1890 1870 3    39   Input ~ 0
 PD2
 Wire Wire Line
 	800  1250 1345 1250
@@ -439,7 +437,7 @@ F 3 "~" H 6725 3400 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	5935 3400 6525 3400
+	5935 3400 6058 3400
 Wire Wire Line
 	6525 3300 6525 3250
 Wire Wire Line
@@ -448,8 +446,6 @@ Connection ~ 6815 3250
 Wire Wire Line
 	6815 3250 6815 3445
 Wire Wire Line
-	5935 3300 6485 3300
-Wire Wire Line
 	6485 3300 6485 3170
 Wire Wire Line
 	6485 3170 6530 3170
@@ -457,14 +453,11 @@ NoConn ~ 1595 4240
 NoConn ~ 1595 4340
 NoConn ~ 1595 4440
 NoConn ~ 1595 4540
-NoConn ~ 1595 3940
 NoConn ~ 1595 3840
 NoConn ~ 1095 3840
 NoConn ~ 1095 3640
 NoConn ~ 1095 3540
 NoConn ~ 1095 3440
-NoConn ~ 1095 3340
-NoConn ~ 1595 3340
 NoConn ~ 1595 3440
 NoConn ~ 1595 3540
 $Comp
@@ -637,7 +630,7 @@ F 3 "~" H 2905 1870 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	2905 1720 3265 1720
+	2905 1720 3090 1720
 Connection ~ 3265 1720
 Wire Wire Line
 	3265 1720 3265 1645
@@ -824,8 +817,6 @@ Wire Wire Line
 Wire Wire Line
 	4540 4736 4540 4944
 Wire Wire Line
-	4540 4944 4374 4944
-Wire Wire Line
 	4374 4944 4374 5086
 Connection ~ 4612 4704
 Wire Wire Line
@@ -918,8 +909,6 @@ Wire Wire Line
 	6312 4706 6312 4780
 Wire Wire Line
 	6312 4780 6762 4780
-Wire Wire Line
-	6762 4780 6762 5218
 Connection ~ 6302 4706
 $Comp
 L power:GND #PWR010
@@ -1028,7 +1017,7 @@ U 1 1 5F1829A0
 P 5010 3754
 F 0 "U1" H 5410 3955 39  0000 C CNN
 F 1 "L6206PSO-sboxnet" H 5410 3880 39  0000 C CNN
-F 2 "Package_SO:HSOP-36-1EP_11.0x15.9mm_P0.65mm_SlugDown_ThermalVias" H 4860 3854 39  0001 C CNN
+F 2 "sboxnet:HSOP-36-1EP_11.0x15.9mm_P0.65mm_SlugDown_ThermalVias" H 4860 3854 39  0001 C CNN
 F 3 "" H 4860 3854 39  0001 C CNN
 	1    5010 3754
 	1    0    0    -1  
@@ -1354,7 +1343,7 @@ $Comp
 L Diode:1N4148WS D7
 U 1 1 5F1E8679
 P 4315 2000
-F 0 "D7" V 4361 1920 50  0000 R CNN
+F 0 "D7" V 4455 1920 50  0000 R CNN
 F 1 "1N4148WS" V 4270 1920 50  0000 R CNN
 F 2 "Diode_SMD:D_SOD-323" H 4315 1825 50  0001 C CNN
 F 3 "https://www.vishay.com/docs/85751/1n4148ws.pdf" H 4315 2000 50  0001 C CNN
@@ -1363,4 +1352,249 @@ F 3 "https://www.vishay.com/docs/85751/1n4148ws.pdf" H 4315 2000 50  0001 C CNN
 $EndComp
 Connection ~ 1095 4940
 Connection ~ 1095 4840
+$Comp
+L Connector:TestPoint TP1
+U 1 1 5F1347ED
+P 3195 2925
+F 0 "TP1" H 3253 3043 50  0000 L CNN
+F 1 "TestPoint" H 3253 2952 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 3395 2925 50  0001 C CNN
+F 3 "~" H 3395 2925 50  0001 C CNN
+	1    3195 2925
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint TP2
+U 1 1 5F137AC7
+P 3705 2920
+F 0 "TP2" H 3763 3038 50  0000 L CNN
+F 1 "TestPoint" H 3763 2947 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 3905 2920 50  0001 C CNN
+F 3 "~" H 3905 2920 50  0001 C CNN
+	1    3705 2920
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint TP3
+U 1 1 5F138330
+P 4120 2925
+F 0 "TP3" H 4155 2950 50  0000 L CNN
+F 1 "TestPoint" H 4200 2765 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 4320 2925 50  0001 C CNN
+F 3 "~" H 4320 2925 50  0001 C CNN
+	1    4120 2925
+	1    0    0    -1  
+$EndComp
+Text GLabel 3195 2955 3    50   Input ~ 0
+IN1
+Text GLabel 4345 3410 2    50   Input ~ 0
+IN2
+Text GLabel 3705 2965 3    50   Input ~ 0
+IN2
+Text GLabel 4120 2975 3    50   Input ~ 0
+EN
+Wire Wire Line
+	3195 2955 3195 2925
+Wire Wire Line
+	3705 2965 3705 2920
+Wire Wire Line
+	4120 2975 4120 2925
+$Comp
+L Connector:TestPoint TP4
+U 1 1 5F14814D
+P 4715 2965
+F 0 "TP4" H 4773 3083 50  0000 L CNN
+F 1 "TestPoint" H 4773 2992 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 4915 2965 50  0001 C CNN
+F 3 "~" H 4915 2965 50  0001 C CNN
+	1    4715 2965
+	1    0    0    -1  
+$EndComp
+Text GLabel 4715 2990 3    50   Input ~ 0
+RC
+Wire Wire Line
+	4715 2990 4715 2965
+$Comp
+L Connector:TestPoint TP6
+U 1 1 5F14F034
+P 7140 2450
+F 0 "TP6" H 7198 2568 50  0000 L CNN
+F 1 "TestPoint" H 7198 2477 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 7340 2450 50  0001 C CNN
+F 3 "~" H 7340 2450 50  0001 C CNN
+	1    7140 2450
+	1    0    0    -1  
+$EndComp
+Connection ~ 7140 2450
+$Comp
+L Connector:TestPoint TP5
+U 1 1 5F15028D
+P 6815 2550
+F 0 "TP5" V 6769 2738 50  0000 L CNN
+F 1 "TestPoint" V 6855 2920 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 7015 2550 50  0001 C CNN
+F 3 "~" H 7015 2550 50  0001 C CNN
+	1    6815 2550
+	0    1    1    0   
+$EndComp
+Connection ~ 6815 2550
+$Comp
+L Connector:TestPoint TP7
+U 1 1 5F1524D7
+P 4315 2150
+F 0 "TP7" V 4335 2385 50  0000 C CNN
+F 1 "TestPoint" V 4410 2385 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 4515 2150 50  0001 C CNN
+F 3 "~" H 4515 2150 50  0001 C CNN
+	1    4315 2150
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Connector:TestPoint TP8
+U 1 1 5F1546D0
+P 4315 2470
+F 0 "TP8" V 4515 2680 50  0000 C CNN
+F 1 "TestPoint" V 4425 2710 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 4515 2470 50  0001 C CNN
+F 3 "~" H 4515 2470 50  0001 C CNN
+	1    4315 2470
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Connector:TestPoint TP9
+U 1 1 5F1579C6
+P 3090 1720
+F 0 "TP9" V 3110 1955 50  0000 C CNN
+F 1 "TestPoint" V 3185 1955 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 3290 1720 50  0001 C CNN
+F 3 "~" H 3290 1720 50  0001 C CNN
+	1    3090 1720
+	1    0    0    -1  
+$EndComp
+Connection ~ 3090 1720
+Wire Wire Line
+	3090 1720 3265 1720
+Wire Wire Line
+	4374 4944 4540 4944
+Wire Wire Line
+	6762 4780 6762 5218
+$Comp
+L Connector:TestPoint TP11
+U 1 1 5F18106E
+P 6076 3210
+F 0 "TP11" V 6030 3398 50  0000 L CNN
+F 1 "TestPoint" V 6116 3580 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 6276 3210 50  0001 C CNN
+F 3 "~" H 6276 3210 50  0001 C CNN
+	1    6076 3210
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP10
+U 1 1 5F181A06
+P 6058 3526
+F 0 "TP10" V 6012 3714 50  0000 L CNN
+F 1 "TestPoint" V 6098 3896 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x01_P2.54mm_Vertical" H 6258 3526 50  0001 C CNN
+F 3 "~" H 6258 3526 50  0001 C CNN
+	1    6058 3526
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6076 3210 6076 3300
+Wire Wire Line
+	5935 3300 6076 3300
+Connection ~ 6076 3300
+Wire Wire Line
+	6076 3300 6485 3300
+Wire Wire Line
+	6058 3526 6058 3400
+Connection ~ 6058 3400
+Wire Wire Line
+	6058 3400 6525 3400
+$Comp
+L Interface_CAN_LIN:SN65HVD230 U?
+U 1 1 5F13DA75
+P 2450 5650
+F 0 "U?" H 2450 6131 50  0000 C CNN
+F 1 "SN65HVD230" H 2450 6040 50  0000 C CNN
+F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 2450 5150 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/sn65hvd230.pdf" H 2350 6050 50  0001 C CNN
+	1    2450 5650
+	1    0    0    -1  
+$EndComp
+Text GLabel 3050 5650 2    39   Input ~ 0
+DCC_B
+Text GLabel 3050 5750 2    39   Input ~ 0
+DCC_A
+Wire Wire Line
+	2850 5650 3050 5650
+Wire Wire Line
+	2850 5750 3050 5750
+$Comp
+L power:GND #PWR?
+U 1 1 5F14DDC8
+P 2450 6050
+F 0 "#PWR?" H 2450 5800 50  0001 C CNN
+F 1 "GND" H 2455 5877 50  0000 C CNN
+F 2 "" H 2450 6050 50  0001 C CNN
+F 3 "" H 2450 6050 50  0001 C CNN
+	1    2450 6050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5F14EFA8
+P 2450 5350
+F 0 "#PWR?" H 2450 5200 50  0001 C CNN
+F 1 "+3.3V" V 2465 5478 50  0000 L CNN
+F 2 "" H 2450 5350 50  0001 C CNN
+F 3 "" H 2450 5350 50  0001 C CNN
+	1    2450 5350
+	0    1    1    0   
+$EndComp
+Text GLabel 2000 5650 0    39   Input ~ 0
+DCC_IN
+Wire Wire Line
+	2050 5650 2000 5650
+Text GLabel 1760 3940 2    39   Input ~ 0
+DCC_IN
+Wire Wire Line
+	1595 3940 1760 3940
+$Comp
+L power:GND #PWR?
+U 1 1 5F15CC4B
+P 1710 5890
+F 0 "#PWR?" H 1710 5640 50  0001 C CNN
+F 1 "GND" H 1715 5717 50  0000 C CNN
+F 2 "" H 1710 5890 50  0001 C CNN
+F 3 "" H 1710 5890 50  0001 C CNN
+	1    1710 5890
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 5F15D987
+P 1900 5850
+F 0 "R?" V 1790 5755 50  0000 C CNN
+F 1 "0" V 1814 5842 50  0000 C CNN
+F 2 "Resistor_SMD:R_1206_3216Metric" V 1830 5850 50  0001 C CNN
+F 3 "~" H 1900 5850 50  0001 C CNN
+	1    1900 5850
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	1750 5850 1710 5850
+Wire Wire Line
+	1710 5850 1710 5890
+NoConn ~ 2050 5750
+NoConn ~ 2050 5550
+Text GLabel 850  3340 0    39   Input ~ 0
+DCC_B
+Wire Wire Line
+	850  3340 1095 3340
+Text GLabel 1800 3340 2    39   Input ~ 0
+DCC_A
+Wire Wire Line
+	1595 3340 1800 3340
 $EndSCHEMATC
