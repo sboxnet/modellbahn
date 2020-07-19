@@ -30,6 +30,15 @@
  * - Shortcut detection is disabled in the first half of the first DCC bit after a cutout
  */
 
+/*
+ * Port Mapping
+ * AWEXC:
+ * ------ (ATXMEGA32A4U Datasheet P 59)
+ * PC0 10 OC0ALS
+ * PC1 11 OC0AHS
+ * PC2 12 OC0BLS
+ * PC3 13 OC0BHS
+ */
 
 /*
  * TCC0
@@ -73,13 +82,19 @@ APP_FIRMWARE_HEADER(PRODUCT_ID, VENDOR_ID, FIRMWARE_VERSION)
 #define NOTAUS_PORT PORTC
 #define NOTAUS_b    5
 
+// timer 10ms
 static struct timer g_timer_10ms;
 
+// Booster Werte im EEPROM
+// Shortcut Limit
+// Shortcut Interval
 struct booster_eeprom {
     uint16_t   shortcut_limit;
     uint16_t   shortcut_interval;
 };
 
+// DCCGEN Werte im EEPROM
+// locoaddr_scan_max Maximalwert für Locoaddr
 struct dccgen_eeprom {
     uint16_t   locoaddr_scan_max;
 };
@@ -1107,9 +1122,12 @@ void do_init_system(void) {
     // start conversions
     ADCA.CTRLA |= Bit(3)|Bit(2);
     
+    // --- AWE ---
+    // AWE nable B and A Channel
     AWEXC.CTRL = Bit(AWEX_DTICCBEN_bp)|Bit(AWEX_DTICCAEN_bp);
     AWEXC.DTBOTH = F_CPU_MHZ * 3; // 3us
     AWEXC.OUTOVEN = 0; // Bit(3)|Bit(2)|Bit(1)|Bit(0);
+    // TC C0 Off
     TCC0.CTRLA = TC_CLKSEL_OFF_gc;
     TCC0.CTRLB = /*Bit(TC0_CCAEN_bp)|Bit(TC0_CCBEN_bp)|*/ TC_WGMODE_FRQ_gc;
     TCC0.INTCTRLA = 0;
