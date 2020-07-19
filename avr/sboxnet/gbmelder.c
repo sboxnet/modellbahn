@@ -37,6 +37,18 @@
 
 APP_FIRMWARE_HEADER(PRODUCT_ID, VENDOR_ID, FIRMWARE_VERSION)
 
+#define CONCAT(A,B)        A ## B
+#define CONCAT3(A,B,C)     A ## B ## C
+#define CONCAT4(A,B,C,D)   A ## B ## C ## D
+#define CONCAT5(A,B,C,D,E) A ## B ## C ## D ## E
+// DCC Sensor Port
+#define DCCSENSE_PORT  PORTB
+// DCC Sensor Pin im DCCSENSE_PORT
+#define DCCSENSE_PIN   0
+
+#define DCCSENSE_CTRL(DCCSENSE_PIN)    CONCAT3(PIN, DCCSENSEPIN, CTRL)
+
+
 struct sensor {
     uint8_t  timer;
     uint16_t locoaddr;
@@ -277,7 +289,7 @@ void do_init_system(void) {
             // PORTB als PullDown
             PORTB.PIN0CTRL = PORT_OPC_PULLDOWN_gc;
 
-            port_dirout(PORTB, Bit(2));
+            //port_dirout(PORTB, Bit(2));
 
             //PORTA als Sensor 0-7, Eingabe
             port_dirin(PORTA, 0xff);
@@ -318,10 +330,12 @@ void do_init_system(void) {
     memset(g_sensors, 0, sizeof(g_sensors));
     
     // PB0  DCC Signal Pin
+
     // PB0 PullDown, beide Flanken
-    PORTB.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
+    DCCSENSE_PORT.DCCSENSE_CTRL(DCCSENSE_PIN) = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
+    //PORTB.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
     // Decoder Init PortB0
-    dec_init(EVSYS_CHMUX_PORTB_PIN0_gc);
+    dec_init(CONCAT5(EVSYS_CHMUX_,DCCSENSE_PORT,_PIN,DCCSENSE_PIN, _gc));
     
     timer_register(&g_power_on_timer, TIMER_RESOLUTION_16MS);
     g_power_on = 0;
