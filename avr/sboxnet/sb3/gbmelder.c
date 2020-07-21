@@ -332,10 +332,11 @@ void do_init_system(void) {
     // PB0  DCC Signal Pin
 
     // PB0 PullDown, beide Flanken
-    DCCSENSE_PORT.DCCSENSE_CTRL(DCCSENSE_PIN) = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
+    DCCSENSE_PORT.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
     //PORTB.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
     // Decoder Init PortB0
-    dec_init(CONCAT5(EVSYS_CHMUX_,DCCSENSE_PORT,_PIN,DCCSENSE_PIN, _gc));
+    //dec_init(CONCAT5(EVSYS_CHMUX_,DCCSENSE_PORT,_PIN,DCCSENSE_PIN, _gc));
+	dec_init(EVSYS_CHMUX_PORTB_PIN0_gc);
     
     timer_register(&g_power_on_timer, TIMER_RESOLUTION_16MS);
     g_power_on = 0;

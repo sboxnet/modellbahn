@@ -5317,7 +5317,7 @@ _bldr_task:
 	breq .L258
 .L257:
 	.loc 3 482 0
-	ldi r24,lo8(15)
+	ldi r24,lo8(-1)
 	sts 11926,r24
 .L258:
 	.loc 3 487 0
@@ -36152,6 +36152,8 @@ sbldr_prog_page:    rjmp xsbldr_prog_page
 	.string	"M_1_PI 0.31830988618379067154"
 .LASF3610:
 	.string	"WDT_WPER0_bm (1<<2)"
+.LASF5094:
+	.string	"C:\\\\Users\\\\balagi\\\\Documents\\\\modellbahn\\\\avr\\\\sboxnet\\\\sb3\\\\Debug"
 .LASF2799:
 	.string	"PR_SPI_bp 3"
 .LASF1383:
@@ -42436,8 +42438,6 @@ sbldr_prog_page:    rjmp xsbldr_prog_page
 	.string	"TC0_CCBINTLVL1_bm (1<<3)"
 .LASF1260:
 	.string	"PORTD_INTCTRL _SFR_MEM8(0x0669)"
-.LASF5094:
-	.string	"C:\\\\Users\\\\balagi\\\\Documents\\\\git\\\\sb3\\\\sb3\\\\Debug"
 .LASF1805:
 	.string	"ADC_DMASEL1_bp 7"
 .LASF86:

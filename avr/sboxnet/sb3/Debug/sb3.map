@@ -24,7 +24,7 @@ g_holdtime          0x1               gbmelder.o
 g_power_on_timer    0x3               gbmelder.o
 g_dccdec            0x12              gbmelder.o
 g_old_holdtime      0x1               gbmelder.o
-g_sensors           0x70              gbmelder.o
+g_sensors           0x46              gbmelder.o
 g_led_timer         0x3               gbmelder.o
 
 Discarded input sections
@@ -237,6 +237,10 @@ Discarded input sections
  .data          0x00000000        0x0 gbmelder.o
  .bss           0x00000000        0x0 gbmelder.o
  .fwheader      0x00000000       0x20 gbmelder.o
+ .text.multiplex_leds
+                0x00000000        0x2 gbmelder.o
+ .bss.g_led_counter
+                0x00000000        0x1 gbmelder.o
  .debug_macro   0x00000000       0x16 gbmelder.o
  .debug_macro   0x00000000      0x16d gbmelder.o
  .debug_macro   0x00000000      0x1c9 gbmelder.o
@@ -452,7 +456,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000     0x173e
+.text           0x00000000     0x137e
  *(.vectors)
  .vectors       0x00000000      0x1fc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2/crtatxmega32a4u.o
                 0x00000000                __vector_default
@@ -468,7 +472,7 @@ END GROUP
  *libprintf_flt.a:*(.progmem.data)
  *libc.a:*(.progmem.data)
  *(.progmem*)
- .progmem.data.__c.4573
+ .progmem.data.__c.4562
                 0x000001fc        0xa gbmelder.o
                 0x00000206                . = ALIGN (0x2)
  *(.jumptables)
@@ -653,65 +657,57 @@ END GROUP
                 0x0000038c                __vector_86
  .text.main     0x00000418      0x342 common.o
                 0x00000418                main
- .text.read_sensors
-                0x0000075a      0x1f8 gbmelder.o
  .text.__vector_85
-                0x00000952      0x23c gbmelder.o
-                0x00000952                __vector_85
+                0x0000075a      0x242 gbmelder.o
+                0x0000075a                __vector_85
  .text.__vector_81
-                0x00000b8e      0x11e gbmelder.o
-                0x00000b8e                __vector_81
- .text.multiplex_leds
-                0x00000cac       0x4e gbmelder.o
-                0x00000cac                multiplex_leds
+                0x0000099c       0xba gbmelder.o
+                0x0000099c                __vector_81
  .text.get_next_transmit_seq
-                0x00000cfa       0x70 gbmelder.o
-                0x00000cfa                get_next_transmit_seq
+                0x00000a56       0x56 gbmelder.o
+                0x00000a56                get_next_transmit_seq
  .text.do_init_system
-                0x00000d6a      0x20e gbmelder.o
-                0x00000d6a                do_init_system
- .text.do_msg   0x00000f78       0xb8 gbmelder.o
-                0x00000f78                do_msg
+                0x00000aac      0x1f0 gbmelder.o
+                0x00000aac                do_init_system
+ .text.do_msg   0x00000c9c       0x90 gbmelder.o
+                0x00000c9c                do_msg
  .text.do_reg_read
-                0x00001030       0xc6 gbmelder.o
-                0x00001030                do_reg_read
+                0x00000d2c       0xb8 gbmelder.o
+                0x00000d2c                do_reg_read
  .text.do_reg_write
-                0x000010f6       0x7a gbmelder.o
-                0x000010f6                do_reg_write
+                0x00000de4       0x7a gbmelder.o
+                0x00000de4                do_reg_write
  .text.do_setup
-                0x00001170       0x22 gbmelder.o
-                0x00001170                do_setup
- .text.show_occuppy_leds
-                0x00001192       0x54 gbmelder.o
-                0x00001192                show_occuppy_leds
- .text.do_main  0x000011e6      0x49a gbmelder.o
-                0x000011e6                do_main
+                0x00000e5e       0x22 gbmelder.o
+                0x00000e5e                do_setup
+ .text.do_main  0x00000e80      0x440 gbmelder.o
+                0x00000e80                do_main
  .text.do_before_bldr_activate
-                0x00001680       0x12 gbmelder.o
-                0x00001680                do_before_bldr_activate
+                0x000012c0       0x12 gbmelder.o
+                0x000012c0                do_before_bldr_activate
  .text.avr-libc
-                0x00001692       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
-                0x00001692                eeprom_update_block
+                0x000012d2       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
+                0x000012d2                eeprom_update_block
  .text.avr-libc
-                0x000016b2       0x16 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
-                0x000016b2                eeprom_update_byte
-                0x000016b4                eeprom_update_r18
+                0x000012f2       0x16 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
+                0x000012f2                eeprom_update_byte
+                0x000012f4                eeprom_update_r18
  .text.avr-libc
-                0x000016c8        0xc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
-                0x000016c8                eeprom_update_word
+                0x00001308        0xc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
+                0x00001308                eeprom_update_word
  .text.avr-libc
-                0x000016d4       0x46 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
-                0x000016d4                eeprom_write_byte
-                0x000016d6                eeprom_write_r18
+                0x00001314       0x46 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
+                0x00001314                eeprom_write_byte
+                0x00001316                eeprom_write_r18
  .text.avr-libc
-                0x0000171a       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
-                0x0000171a                eeprom_read_byte
-                0x00001722                eeprom_mapen
-                0x0000173a                . = ALIGN (0x2)
+                0x0000135a       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
+                0x0000135a                eeprom_read_byte
+                0x00001362                eeprom_mapen
+                0x0000137a                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x0000173a        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega2\libgcc.a(_exit.o)
-                0x0000173a                _exit
-                0x0000173a                exit
+ .fini9         0x0000137a        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega2\libgcc.a(_exit.o)
+                0x0000137a                _exit
+                0x0000137a                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -730,11 +726,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x0000173a        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega2\libgcc.a(_exit.o)
+ .fini0         0x0000137a        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avrxmega2\libgcc.a(_exit.o)
  *(.fini0)
-                0x0000173e                _etext = .
+                0x0000137e                _etext = .
 
-.data           0x00802000        0x0 load address 0x0000173e
+.data           0x00802000        0x0 load address 0x0000137e
                 [!provide]                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -746,58 +742,53 @@ END GROUP
                 0x00802000                _edata = .
                 [!provide]                PROVIDE (__data_end, .)
 
-.bss            0x00802000       0xea
+.bss            0x00802000       0xbe
                 0x00802000                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
  .bss.g_com     0x00802000       0x11 common.o
                 0x00802000                g_com
- .bss.selftest.4631
-                0x00802011        0x1 gbmelder.o
  .bss.hardwaretyp
-                0x00802012        0x1 gbmelder.o
-                0x00802012                hardwaretyp
+                0x00802011        0x1 gbmelder.o
+                0x00802011                hardwaretyp
  .bss.g_dec_lastaddr
-                0x00802013        0x2 gbmelder.o
-                0x00802013                g_dec_lastaddr
+                0x00802012        0x2 gbmelder.o
+                0x00802012                g_dec_lastaddr
  .bss.g_transmit_seq
-                0x00802015        0x1 gbmelder.o
-                0x00802015                g_transmit_seq
- .bss.g_led_counter
-                0x00802016        0x1 gbmelder.o
-                0x00802016                g_led_counter
+                0x00802014        0x1 gbmelder.o
+                0x00802014                g_transmit_seq
  .bss.g_sensor_bits_1
-                0x00802017        0x2 gbmelder.o
-                0x00802017                g_sensor_bits_1
+                0x00802015        0x2 gbmelder.o
+                0x00802015                g_sensor_bits_1
  .bss.g_sensor_bits
-                0x00802019        0x2 gbmelder.o
-                0x00802019                g_sensor_bits
+                0x00802017        0x2 gbmelder.o
+                0x00802017                g_sensor_bits
  *(COMMON)
- COMMON         0x0080201b       0xcf gbmelder.o
-                0x0080201b                g_locoaddr_pipe
-                0x0080205f                g_power_on
-                0x00802060                g_holdtime
-                0x00802061                g_power_on_timer
-                0x00802064                g_dccdec
-                0x00802076                g_old_holdtime
-                0x00802077                g_sensors
-                0x008020e7                g_led_timer
-                0x008020ea                PROVIDE (__bss_end, .)
-                0x0000173e                __data_load_start = LOADADDR (.data)
-                0x0000173e                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x00802019       0xa5 gbmelder.o
+                0x00802019                g_locoaddr_pipe
+                0x0080205d                g_power_on
+                0x0080205e                g_holdtime
+                0x0080205f                g_power_on_timer
+                0x00802062                g_dccdec
+                0x00802074                g_old_holdtime
+                0x00802075                g_sensors
+                0x008020bb                g_led_timer
+                0x008020be                PROVIDE (__bss_end, .)
+                0x0000137e                __data_load_start = LOADADDR (.data)
+                0x0000137e                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x008020ea        0x0
+.noinit         0x008020be        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x008020ea                _end = .
+                0x008020be                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
-.eeprom         0x00810000      0x101
+.eeprom         0x00810000       0xa1
  *(.eeprom*)
- .eeprom        0x00810000      0x101 gbmelder.o
+ .eeprom        0x00810000       0xa1 gbmelder.o
                 0x00810000                g_eeprom
-                0x00810101                __eeprom_end = .
+                0x008100a1                __eeprom_end = .
 
 .fuse
  *(.fuse)
@@ -860,7 +851,7 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x338
+.debug_aranges  0x00000000      0x328
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x20 bootloader-crt0.o
@@ -869,85 +860,85 @@ END GROUP
  .debug_aranges
                 0x00000178       0x98 common.o
  .debug_aranges
-                0x00000210       0x88 gbmelder.o
+                0x00000210       0x78 gbmelder.o
  .debug_aranges
-                0x00000298       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
+                0x00000288       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
  .debug_aranges
-                0x000002b8       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
+                0x000002a8       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
  .debug_aranges
-                0x000002d8       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
+                0x000002c8       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
  .debug_aranges
-                0x000002f8       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
+                0x000002e8       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
  .debug_aranges
-                0x00000318       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
+                0x00000308       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0xb4a8
+.debug_info     0x00000000     0xaf26
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000     0x284f C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2/crtatxmega32a4u.o
  .debug_info    0x0000284f      0x1a2 bootloader-crt0.o
  .debug_info    0x000029f1     0x3d61 bootloader-fw.o
  .debug_info    0x00006752     0x1f11 common.o
- .debug_info    0x00008663     0x2b1c gbmelder.o
- .debug_info    0x0000b17f       0xa3 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
- .debug_info    0x0000b222       0xa2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
- .debug_info    0x0000b2c4       0xa2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
- .debug_info    0x0000b366       0xa1 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
- .debug_info    0x0000b407       0xa1 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
+ .debug_info    0x00008663     0x259a gbmelder.o
+ .debug_info    0x0000abfd       0xa3 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
+ .debug_info    0x0000aca0       0xa2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
+ .debug_info    0x0000ad42       0xa2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
+ .debug_info    0x0000ade4       0xa1 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
+ .debug_info    0x0000ae85       0xa1 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
 
-.debug_abbrev   0x00000000     0x372f
+.debug_abbrev   0x00000000     0x36e3
  *(.debug_abbrev)
  .debug_abbrev  0x00000000     0x262c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2/crtatxmega32a4u.o
  .debug_abbrev  0x0000262c       0xa2 bootloader-crt0.o
  .debug_abbrev  0x000026ce      0x5b3 bootloader-fw.o
  .debug_abbrev  0x00002c81      0x53e common.o
- .debug_abbrev  0x000031bf      0x50c gbmelder.o
- .debug_abbrev  0x000036cb       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
- .debug_abbrev  0x000036df       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
- .debug_abbrev  0x000036f3       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
- .debug_abbrev  0x00003707       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
- .debug_abbrev  0x0000371b       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
+ .debug_abbrev  0x000031bf      0x4c0 gbmelder.o
+ .debug_abbrev  0x0000367f       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
+ .debug_abbrev  0x00003693       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
+ .debug_abbrev  0x000036a7       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
+ .debug_abbrev  0x000036bb       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
+ .debug_abbrev  0x000036cf       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
 
-.debug_line     0x00000000     0x46e1
+.debug_line     0x00000000     0x4321
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x391 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2/crtatxmega32a4u.o
  .debug_line    0x00000391      0x3f7 bootloader-crt0.o
  .debug_line    0x00000788     0x2049 bootloader-fw.o
  .debug_line    0x000027d1      0x9f0 common.o
- .debug_line    0x000031c1     0x11d5 gbmelder.o
- .debug_line    0x00004396       0xa5 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
- .debug_line    0x0000443b       0x80 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
- .debug_line    0x000044bb       0x62 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
- .debug_line    0x0000451d      0x11b C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
- .debug_line    0x00004638       0xa9 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
+ .debug_line    0x000031c1      0xe15 gbmelder.o
+ .debug_line    0x00003fd6       0xa5 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_block.o)
+ .debug_line    0x0000407b       0x80 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_byte.o)
+ .debug_line    0x000040fb       0x62 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eeupd_word.o)
+ .debug_line    0x0000415d      0x11b C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eewr_byte.o)
+ .debug_line    0x00004278       0xa9 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2\libatxmega32a4u.a(eerd_byte.o)
 
-.debug_frame    0x00000000      0x89c
+.debug_frame    0x00000000      0x870
  *(.debug_frame)
  .debug_frame   0x00000000       0x24 bootloader-crt0.o
  .debug_frame   0x00000024      0x514 bootloader-fw.o
  .debug_frame   0x00000538      0x16c common.o
- .debug_frame   0x000006a4      0x1f8 gbmelder.o
+ .debug_frame   0x000006a4      0x1cc gbmelder.o
 
-.debug_str      0x00000000    0x226b2
+.debug_str      0x00000000    0x2274b
  *(.debug_str)
  .debug_str     0x00000000     0x1aa8 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/Atmel/XMEGAA_DFP/1.1.136/gcc/dev/atxmega32a4u/avrxmega2/crtatxmega32a4u.o
- .debug_str     0x00001aa8    0x1cac7 bootloader-crt0.o
-                              0x1d110 (size before relaxing)
- .debug_str     0x0001e56f     0x2b7e bootloader-fw.o
-                              0x1fdff (size before relaxing)
- .debug_str     0x000210ed      0x2bc common.o
-                              0x1e1f1 (size before relaxing)
- .debug_str     0x000213a9     0x1309 gbmelder.o
-                              0x1f182 (size before relaxing)
+ .debug_str     0x00001aa8    0x1cad7 bootloader-crt0.o
+                              0x1d120 (size before relaxing)
+ .debug_str     0x0001e57f     0x2b7e bootloader-fw.o
+                              0x1fe0f (size before relaxing)
+ .debug_str     0x000210fd      0x2bc common.o
+                              0x1e201 (size before relaxing)
+ .debug_str     0x000213b9     0x1392 gbmelder.o
+                              0x1f220 (size before relaxing)
 
-.debug_loc      0x00000000     0x42d8
+.debug_loc      0x00000000     0x3df1
  *(.debug_loc)
  .debug_loc     0x00000000       0x33 bootloader-crt0.o
  .debug_loc     0x00000033     0x2961 bootloader-fw.o
  .debug_loc     0x00002994      0x84f common.o
- .debug_loc     0x000031e3     0x10f5 gbmelder.o
+ .debug_loc     0x000031e3      0xc0e gbmelder.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -967,14 +958,14 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000      0x6b8
+.debug_ranges   0x00000000      0x660
  *(.debug_ranges)
  .debug_ranges  0x00000000       0x10 bootloader-crt0.o
  .debug_ranges  0x00000010      0x3a8 bootloader-fw.o
  .debug_ranges  0x000003b8      0x1a8 common.o
- .debug_ranges  0x00000560      0x158 gbmelder.o
+ .debug_ranges  0x00000560      0x100 gbmelder.o
 
-.debug_macro    0x00000000     0xa22c
+.debug_macro    0x00000000     0xa24a
  *(.debug_macro)
  .debug_macro   0x00000000      0xcfd bootloader-crt0.o
  .debug_macro   0x00000cfd       0x16 bootloader-crt0.o
@@ -1009,8 +1000,8 @@ END GROUP
  .debug_macro   0x00007940      0xe7b bootloader-fw.o
  .debug_macro   0x000087bb       0x12 bootloader-fw.o
  .debug_macro   0x000087cd      0xd07 common.o
- .debug_macro   0x000094d4      0xd2a gbmelder.o
- .debug_macro   0x0000a1fe       0x2e gbmelder.o
+ .debug_macro   0x000094d4      0xd48 gbmelder.o
+ .debug_macro   0x0000a21c       0x2e gbmelder.o
 OUTPUT(sb3.elf elf32-avr)
 LOAD linker stubs
 

@@ -1,5 +1,5 @@
 # 1 ".././bootloader-fw.c"
-# 1 "C:\\Users\\balagi\\Documents\\git\\sb3\\sb3\\Debug//"
+# 1 "C:\\Users\\balagi\\Documents\\modellbahn\\avr\\sboxnet\\sb3\\Debug//"
 # 1 "<built-in>"
 #define __STDC__ 1
 #define __STDC_VERSION__ 199901L
@@ -12102,7 +12102,7 @@ static void bldr_leds_task(void) {
 # 482 ".././bootloader-fw.c" 3
            ((0x2000U) + (4096U) - 1) 
 # 482 ".././bootloader-fw.c"
-           - sizeof(struct bldr_ram) - 1)).led_rt = 0x0f;
+           - sizeof(struct bldr_ram) - 1)).led_rt = 0xff;
         }
 
 

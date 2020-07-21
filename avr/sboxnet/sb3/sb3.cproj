@@ -177,9 +177,9 @@
     <Compile Include="common.h">
       <SubType>compile</SubType>
     </Compile>
-    <None Include="gbmelder.c">
+    <Compile Include="gbmelder.c">
       <SubType>compile</SubType>
-    </None>
+    </Compile>
     <None Include="mtester.c">
       <SubType>compile</SubType>
     </None>

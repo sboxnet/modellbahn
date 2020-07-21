@@ -23263,6 +23263,8 @@ g_com:
 	.string	"M_1_PI 0.31830988618379067154"
 .LASF3609:
 	.string	"WDT_WPER0_bm (1<<2)"
+.LASF4772:
+	.string	"C:\\\\Users\\\\balagi\\\\Documents\\\\modellbahn\\\\avr\\\\sboxnet\\\\sb3\\\\Debug"
 .LASF2798:
 	.string	"PR_SPI_bp 3"
 .LASF4418:
@@ -29137,8 +29139,6 @@ g_com:
 	.string	"TC0_CCBINTLVL1_bm (1<<3)"
 .LASF1259:
 	.string	"PORTD_INTCTRL _SFR_MEM8(0x0669)"
-.LASF4772:
-	.string	"C:\\\\Users\\\\balagi\\\\Documents\\\\git\\\\sb3\\\\sb3\\\\Debug"
 .LASF1804:
 	.string	"ADC_DMASEL1_bp 7"
 .LASF2062:
