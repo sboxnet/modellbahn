@@ -57,16 +57,26 @@ static void dec_init(uint8_t evmux) { // e.g.: EVSYS_CHMUX_PORTC_PIN4_gc
     g_dccdec.xor = 0;
     g_dccdec.cutout = 0;
     
+	// setze Event System Multiplexer EVSYS_CHMUX_PORTC_PIN4_gc
     EVSYS.CH0MUX = evmux;
+	
     EVSYS.CH0CTRL = 0;
     
+	// Timer D1 off
     TCD1.CTRLA = TC_CLKSEL_OFF_gc;
+	// Timer D1 CCA Enable, Normal WG Mode
     TCD1.CTRLB = Bit(TC1_CCAEN_bp)|TC_WGMODE_NORMAL_gc;
+	// Timer D1 Event Action Input Capture, Event Channel 0
     TCD1.CTRLD = TC_EVACT_CAPT_gc|TC_EVSEL_CH0_gc;
+	// Upper Counter to Byte Mode
     TCD1.CTRLE = TC1_BYTEM_bm;
+	// TCD1 Kein OVF oder ERR Interrupt
     TCD1.INTCTRLA = 0;
+	// TCD1 Kein CC Interrupt
     TCD1.INTCTRLB = 0;
+	// Interrupt Flags zurücksetzen
     TCD1.INTFLAGS = 0xff;
+	// TCD1 Periode auf 0xffff
     TCD1.PER = 0xffff;
 }
 
