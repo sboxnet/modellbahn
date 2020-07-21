@@ -46,7 +46,8 @@ APP_FIRMWARE_HEADER(PRODUCT_ID, VENDOR_ID, FIRMWARE_VERSION)
 // DCC Sensor Pin im DCCSENSE_PORT
 #define DCCSENSE_PIN   0
 
-#define DCCSENSE_CTRL(DCCSENSE_PIN)    CONCAT3(PIN, DCCSENSEPIN, CTRL)
+#define DCCSENSE_CTRL(DCCSENSEPIN)    CONCAT3(PIN, DCCSENSEPIN, CTRL)
+#define C5(dccsense_port,dccsense_pin) CONCAT5(EVSYS_CHMUX_,dccsense_port,_PIN,dccsense_pin, _gc)
 
 
 struct sensor {
@@ -331,11 +332,11 @@ void do_init_system(void) {
     
     // PB0  DCC Signal Pin
 
-    // PB0 PullDown, beide Flanken
-    DCCSENSE_PORT.DCCSENSE_CTRL(DCCSENSE_PIN) = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
-    //PORTB.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
-    // Decoder Init PortB0
-    dec_init(CONCAT5(EVSYS_CHMUX_,DCCSENSE_PORT,_PIN,DCCSENSE_PIN, _gc));
+    // PB0 PullDown, beide Flanken: PORTB.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
+    DCCSENSE_PORT.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
+    
+    // Decoder Init PortB0: EVSYS_CHMUX_PORTB_PIN0_gc
+    dec_init(EVSYS_CHMUX_PORTB_PIN0_gc);
     
     timer_register(&g_power_on_timer, TIMER_RESOLUTION_16MS);
     g_power_on = 0;
