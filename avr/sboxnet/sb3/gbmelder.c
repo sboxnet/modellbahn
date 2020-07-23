@@ -24,14 +24,9 @@
 
 #include "common.h"
 
-#define GBM2 1
-#if defined(GBM2)
+
 #define PRODUCT_ID   0x000b
 #define DEVICE_DESC "gbmelder2"
-#else
-#define PRODUCT_ID   0x0002
-#define DEVICE_DESC  "gbmelder:1"
-#endif
 #define VENDOR_ID    0x9999
 #define FIRMWARE_VERSION 0x0200
 
@@ -62,19 +57,17 @@ struct sensor {
     uint8_t  retry_timer;
 };
 
+uint8_t hardwaretyp = 0; // alte Hardware
+
 
 #define DEFAULT_HOLDTIME 200
-#ifdef GBM2
-# define NUM_SENSORS   10
-#else
-# define NUM_SENSORS   16
-#endif
+#define NUM_SENSORS (hardwaretyp == 1 : 10 ? 16)
 
 uint8_t g_holdtime;
 uint8_t g_old_holdtime;
 uint16_t g_sensor_bits = 0;
 uint16_t g_sensor_bits_1 = 0;
-struct sensor g_sensors[NUM_SENSORS];
+struct sensor g_sensors[16];
 uint8_t  g_led_counter = 0;
 
 uint8_t  g_transmit_seq = 0;
@@ -99,11 +92,10 @@ struct Eeprom {
     struct {
         uint8_t  holdtime;
         uint8_t  reserved[15];
-    }    sensors[NUM_SENSORS];
+    }    sensors[16];
 };
 struct Eeprom g_eeprom EEMEM;
 
-uint8_t hardwaretyp = 0; // alte Hardware
 
 static void do_dec_parse_packet(void) {
     if (!g_power_on || !timer_timedout(&g_power_on_timer)) {
@@ -137,7 +129,7 @@ ISR(TCD0_CCC_vect) {
     port_setbit(PORTB, 2);
     uint8_t sens1 = ~port_in(PORTA);
     uint8_t sens2 = ~port_in(PORTC);
-    
+    // sensoren lesen
     uint16_t sens = ((uint16_t)sens2 << 8 | sens1) & g_sensor_bits;
     if (pipe_getfree(&g_locoaddr_pipe.pipe) >= 4) {
         pipe_write(&g_locoaddr_pipe.pipe, lowbyte(g_dec_lastaddr));
@@ -193,10 +185,8 @@ static void read_sensors(void) {
     }
 }
 
+// only for old hardware
 void multiplex_leds(void) {
-#if defined(GBM2)
-    
-#else
     uint8_t ledrow = (g_led_counter++) & 0x03;
     uint16_t inp = g_sensor_bits;
     uint8_t b;
@@ -208,7 +198,6 @@ void multiplex_leds(void) {
     }
     // all leds off
     port_out(PORTD) = ledrow | (b & 0x0f);
-#endif
 }
 
 uint8_t get_next_transmit_seq(void) {
@@ -245,7 +234,7 @@ void do_init_system(void) {
 	switch(hardwaretyp) {
 		case 1: {
             // Port für LEDs: im Gegensatz zur alten Hardware wird hier nicht multiplexed, sondern direkt LEDs angesteuert
-            // PD0..PD7(Bit 1 .. 9)
+            // PD0..PD7(Bit 2 .. 9)
 			port_out(PORTD) = 0; // PORTD = 0
 			port_dirout(PORTD, 0); // PORTD as output
 			PORTCFG_MPCMASK = 0xff; // Alle Pins
@@ -432,13 +421,43 @@ void do_setup(void) {
     dec_start();
 }
 
+void show_besetzt_leds(void) {
+	// PC6 (Bit 0) und PC7 (Bit 1)
+	// PD0..PD7(Bit 2 .. 9)
+	// zuerst mal alles aus
+	port_clr(PORTC, Bit(0)|Bit(1));
+	port_out(PORTD);
+	uint16_t inp = g_sensor_bits;
+	for (uint8_t i = 0; i < NUM_SENSORS; i++) {
+		// if sensor is on -> led ON
+		uint16_t mask = 1 << i;
+		if (inp & mask) {
+			if (i == 0) {
+				port_set(PORTC, Bit(6));
+			} else if (i == 1 ) {
+				port_set(PORTC, Bit(7));
+			} else {
+				uint8_t n = i << 2;
+				
+			}
+		}
+		
+	}
+}
+
 void do_main(void) {    
     if (timer_timedout(&g_led_timer)) {
         timer_set(&g_led_timer, 5); // 5ms
 
         read_sensors();
         
-        multiplex_leds();
+		if (hardwaretyp == 1) {
+			// neue Hardware
+			show_besetzt_leds();
+		} else {
+			//alte hardware
+			multiplex_leds();
+		}
     }
         
     uint8_t canread = 0;

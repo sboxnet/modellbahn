@@ -159,6 +159,9 @@
     <None Include="dccdec.c">
       <SubType>compile</SubType>
     </None>
+    <Compile Include="defines.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="iox32a4u.h">
       <SubType>compile</SubType>
     </Compile>
