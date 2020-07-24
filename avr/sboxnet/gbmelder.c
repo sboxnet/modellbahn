@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 /*
+ * Benutzt den Standard Timer TCD0 aus common.c
  * TCD0
  * - general timer 500 kHz / 2us, normal mode, 16bit
  * - CCC: dcc decoder cutout channel 2 timer
@@ -185,7 +186,32 @@ static void read_sensors(void) {
     }
 }
 
-// only for old hardware
+// für neue Hardware!
+void show_besetzt_leds(void) {
+    // PC6 (Bit 0) und PC7 (Bit 1)
+    // PD0..PD7(Bit 2 .. 9)
+    // zuerst mal alles aus
+    port_clr(PORTC, Bit(0)|Bit(1));
+    port_out(PORTD);
+    uint16_t inp = g_sensor_bits;
+    for (uint8_t i = 0; i < NUM_SENSORS; i++) {
+        // if sensor is on -> led ON
+        uint16_t mask = 1 << i;
+        if (inp & mask) {
+            if (i == 0) {
+                port_set(PORTC, Bit(6));
+            } else if (i == 1 ) {
+                port_set(PORTC, Bit(7));
+            } else {
+                uint8_t n = i << 2;
+                
+            }
+        }
+        
+    }
+}
+
+// für alte Hardware
 void multiplex_leds(void) {
     uint8_t ledrow = (g_led_counter++) & 0x03;
     uint16_t inp = g_sensor_bits;
@@ -421,29 +447,6 @@ void do_setup(void) {
     dec_start();
 }
 
-void show_besetzt_leds(void) {
-	// PC6 (Bit 0) und PC7 (Bit 1)
-	// PD0..PD7(Bit 2 .. 9)
-	// zuerst mal alles aus
-	port_clr(PORTC, Bit(0)|Bit(1));
-	port_out(PORTD);
-	uint16_t inp = g_sensor_bits;
-	for (uint8_t i = 0; i < NUM_SENSORS; i++) {
-		// if sensor is on -> led ON
-		uint16_t mask = 1 << i;
-		if (inp & mask) {
-			if (i == 0) {
-				port_set(PORTC, Bit(6));
-			} else if (i == 1 ) {
-				port_set(PORTC, Bit(7));
-			} else {
-				uint8_t n = i << 2;
-				
-			}
-		}
-		
-	}
-}
 
 void do_main(void) {    
     if (timer_timedout(&g_led_timer)) {
