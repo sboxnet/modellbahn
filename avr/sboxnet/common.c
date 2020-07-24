@@ -474,16 +474,16 @@ static void com_init_system(void) {
     do_init_system();
     
     // standard timer
-    // timer D1
-    TCD1.CTRLB = TC_WGMODE_NORMAL_gc; // Normal Mode
-    TCD1.CTRLD = 0; // Event Action off
-    TCD1.CTRLE = 0; // normal mode
-    TCD1.INTCTRLA = 0;  // err and ov disabled
-    TCD1.INTCTRLB = TC_CCBINTLVL_LO_gc; // CCD interupt level auf LOW
-    TCD1.INTFLAGS = 0xff; // clear interupt TCD0 flags
-    TCD1.PER = 0xffff; // D1 periode
-    //TCD1.CCB = TCD1.CNT + TIMER_PERIOD;
-    TCD1.CTRLA = TC_CLKSEL_DIV64_gc; // TCD0 clock divider /64
+    // timer D0
+    TCD0.CTRLB = TC_WGMODE_NORMAL_gc; // Normal Mode
+    TCD0.CTRLD = 0; // Event Action off
+    TCD0.CTRLE = 0; // normal mode
+    TCD0.INTCTRLA = 0;  // err and ov disabled
+    TCD0.INTCTRLB = TC_CCBINTLVL_LO_gc; // CCD interupt level auf LOW
+    TCD0.INTFLAGS = 0xff; // clear interupt TCD0 flags
+    TCD0.PER = 0xffff; // D1 periode
+    //TCD0.CCB = TCD0.CNT + TIMER_PERIOD;
+    TCD0.CTRLA = TC_CLKSEL_DIV64_gc; // TCD0 clock divider /64
 
     // schreibe Product und Vendor ID in das EEPROM
     eeprom_update_word(&bldr_eeprom.productid, g_com.productid);
@@ -505,10 +505,10 @@ static void com_init_system(void) {
 /* Timer D1 CCB Interrupt vector
  * every 1ms
  */
-ISR(TCD1_CCB_vect) {
+ISR(TCD0_CCB_vect) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         // CCB neu setzen. addieren TIMER_PERIOD
-        TCD1.CCBBUF = TCD1.CNT + TIMER_PERIOD;
+        TCD0.CCBBUF = TCD0.CNT + TIMER_PERIOD;
     }
     
     // common timer erhöhen

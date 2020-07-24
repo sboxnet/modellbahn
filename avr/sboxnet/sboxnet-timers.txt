@@ -4,7 +4,7 @@ Sboxnet Timer:
     timer TCE0: OVF, CCA
     
 common:
-    TCD1: CCB
+    TCD0: CCB
     
 mtester:
     TCC1: OVF
