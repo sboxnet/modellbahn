@@ -24,14 +24,9 @@
 
 #include "common.h"
 
-#define GBM2 1
-#if defined(GBM2)
+
 #define PRODUCT_ID   0x000b
 #define DEVICE_DESC "gbmelder2"
-#else
-#define PRODUCT_ID   0x0002
-#define DEVICE_DESC  "gbmelder:1"
-#endif
 #define VENDOR_ID    0x9999
 #define FIRMWARE_VERSION 0x0200
 
@@ -46,8 +41,7 @@ APP_FIRMWARE_HEADER(PRODUCT_ID, VENDOR_ID, FIRMWARE_VERSION)
 // DCC Sensor Pin im DCCSENSE_PORT
 #define DCCSENSE_PIN   0
 
-#define DCCSENSE_CTRL(DCCSENSEPIN)    CONCAT3(PIN, DCCSENSEPIN, CTRL)
-#define C5(dccsense_port,dccsense_pin) CONCAT5(EVSYS_CHMUX_,dccsense_port,_PIN,dccsense_pin, _gc)
+#define DCCSENSE_CTRL(DCCSENSE_PIN)    CONCAT3(PIN, DCCSENSEPIN, CTRL)
 
 
 struct sensor {
@@ -63,19 +57,17 @@ struct sensor {
     uint8_t  retry_timer;
 };
 
+uint8_t hardwaretyp = 0; // alte Hardware
+
 
 #define DEFAULT_HOLDTIME 200
-#ifdef GBM2
-# define NUM_SENSORS   10
-#else
-# define NUM_SENSORS   16
-#endif
+#define NUM_SENSORS (hardwaretyp == 1 : 10 ? 16)
 
 uint8_t g_holdtime;
 uint8_t g_old_holdtime;
 uint16_t g_sensor_bits = 0;
 uint16_t g_sensor_bits_1 = 0;
-struct sensor g_sensors[NUM_SENSORS];
+struct sensor g_sensors[16];
 uint8_t  g_led_counter = 0;
 
 uint8_t  g_transmit_seq = 0;
@@ -91,7 +83,7 @@ struct timer g_led_timer;
 struct timer g_power_on_timer;
 uint8_t g_power_on;
 
-#include "dccdec.hh"
+#include "dccdec.c"
 
 uint16_t g_dec_lastaddr = 0;
 
@@ -100,11 +92,10 @@ struct Eeprom {
     struct {
         uint8_t  holdtime;
         uint8_t  reserved[15];
-    }    sensors[NUM_SENSORS];
+    }    sensors[16];
 };
 struct Eeprom g_eeprom EEMEM;
 
-uint8_t hardwaretyp = 0; // alte Hardware
 
 static void do_dec_parse_packet(void) {
     if (!g_power_on || !timer_timedout(&g_power_on_timer)) {
@@ -135,10 +126,10 @@ static void do_dec_parse_packet(void) {
 ISR(TCD0_CCC_vect) {
     TCD0.INTCTRLB = (TCD0.INTCTRLB & ~TC0_CCCINTLVL_gm)|TC_CCCINTLVL_OFF_gc;
     
-    port_setbit(PORTB, 2);
+    //port_setbit(PORTB, 2);
     uint8_t sens1 = ~port_in(PORTA);
     uint8_t sens2 = ~port_in(PORTC);
-    
+    // sensoren lesen
     uint16_t sens = ((uint16_t)sens2 << 8 | sens1) & g_sensor_bits;
     if (pipe_getfree(&g_locoaddr_pipe.pipe) >= 4) {
         pipe_write(&g_locoaddr_pipe.pipe, lowbyte(g_dec_lastaddr));
@@ -194,10 +185,8 @@ static void read_sensors(void) {
     }
 }
 
+// only for old hardware
 void multiplex_leds(void) {
-#if defined(GBM2)
-    
-#else
     uint8_t ledrow = (g_led_counter++) & 0x03;
     uint16_t inp = g_sensor_bits;
     uint8_t b;
@@ -209,7 +198,6 @@ void multiplex_leds(void) {
     }
     // all leds off
     port_out(PORTD) = ledrow | (b & 0x0f);
-#endif
 }
 
 uint8_t get_next_transmit_seq(void) {
@@ -246,7 +234,7 @@ void do_init_system(void) {
 	switch(hardwaretyp) {
 		case 1: {
             // Port für LEDs: im Gegensatz zur alten Hardware wird hier nicht multiplexed, sondern direkt LEDs angesteuert
-            // PD0..PD7(Bit 1 .. 9)
+            // PD0..PD7(Bit 2 .. 9)
 			port_out(PORTD) = 0; // PORTD = 0
 			port_dirout(PORTD, 0); // PORTD as output
 			PORTCFG_MPCMASK = 0xff; // Alle Pins
@@ -332,11 +320,12 @@ void do_init_system(void) {
     
     // PB0  DCC Signal Pin
 
-    // PB0 PullDown, beide Flanken: PORTB.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
+    // PB0 PullDown, beide Flanken
     DCCSENSE_PORT.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
-    
-    // Decoder Init PortB0: EVSYS_CHMUX_PORTB_PIN0_gc
-    dec_init(EVSYS_CHMUX_PORTB_PIN0_gc);
+    //PORTB.PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
+    // Decoder Init PortB0
+    //dec_init(CONCAT5(EVSYS_CHMUX_,DCCSENSE_PORT,_PIN,DCCSENSE_PIN, _gc));
+	dec_init(EVSYS_CHMUX_PORTB_PIN0_gc);
     
     timer_register(&g_power_on_timer, TIMER_RESOLUTION_16MS);
     g_power_on = 0;
@@ -432,13 +421,43 @@ void do_setup(void) {
     dec_start();
 }
 
+void show_besetzt_leds(void) {
+	// PC6 (Bit 0) und PC7 (Bit 1)
+	// PD0..PD7(Bit 2 .. 9)
+	// zuerst mal alles aus
+	port_clr(PORTC, Bit(0)|Bit(1));
+	port_out(PORTD);
+	uint16_t inp = g_sensor_bits;
+	for (uint8_t i = 0; i < NUM_SENSORS; i++) {
+		// if sensor is on -> led ON
+		uint16_t mask = 1 << i;
+		if (inp & mask) {
+			if (i == 0) {
+				port_set(PORTC, Bit(6));
+			} else if (i == 1 ) {
+				port_set(PORTC, Bit(7));
+			} else {
+				uint8_t n = i << 2;
+				
+			}
+		}
+		
+	}
+}
+
 void do_main(void) {    
     if (timer_timedout(&g_led_timer)) {
         timer_set(&g_led_timer, 5); // 5ms
 
         read_sensors();
         
-        multiplex_leds();
+		if (hardwaretyp == 1) {
+			// neue Hardware
+			show_besetzt_leds();
+		} else {
+			//alte hardware
+			multiplex_leds();
+		}
     }
         
     uint8_t canread = 0;
