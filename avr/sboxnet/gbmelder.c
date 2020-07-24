@@ -61,7 +61,7 @@ uint8_t hardwaretyp = 0; // alte Hardware
 
 
 #define DEFAULT_HOLDTIME 200
-#define NUM_SENSORS (hardwaretyp == 1 : 10 ? 16)
+#define NUM_SENSORS (hardwaretyp == 1 ? 10 : 16)
 
 uint8_t g_holdtime;
 uint8_t g_old_holdtime;
