@@ -126,7 +126,7 @@ static void do_dec_parse_packet(void) {
 ISR(TCD0_CCC_vect) {
     TCD0.INTCTRLB = (TCD0.INTCTRLB & ~TC0_CCCINTLVL_gm)|TC_CCCINTLVL_OFF_gc;
     
-    port_setbit(PORTB, 2);
+    //port_setbit(PORTB, 2);
     uint8_t sens1 = ~port_in(PORTA);
     uint8_t sens2 = ~port_in(PORTC);
     // sensoren lesen
