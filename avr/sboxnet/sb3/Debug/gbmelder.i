@@ -9942,14 +9942,9 @@ extern uint8_t do_reg_write(uint16_t reg, uint16_t data, uint16_t mask);
 #define EOSC 0xe1
 # 26 ".././gbmelder.c" 2
 
-#define GBM2 1
 
 #define PRODUCT_ID 0x000b
 #define DEVICE_DESC "gbmelder2"
-
-
-
-
 #define VENDOR_ID 0x9999
 #define FIRMWARE_VERSION 0x0200
 
@@ -9980,19 +9975,17 @@ struct sensor {
     uint8_t retry_timer;
 };
 
+uint8_t hardwaretyp = 0;
+
 
 #define DEFAULT_HOLDTIME 200
-
-#define NUM_SENSORS 10
-
-
-
+#define NUM_SENSORS (hardwaretyp == 1 ? 10 : 16)
 
 uint8_t g_holdtime;
 uint8_t g_old_holdtime;
 uint16_t g_sensor_bits = 0;
 uint16_t g_sensor_bits_1 = 0;
-struct sensor g_sensors[10];
+struct sensor g_sensors[16];
 uint8_t g_led_counter = 0;
 
 uint8_t g_transmit_seq = 0;
@@ -10338,7 +10331,7 @@ void __vector_85 (void) __attribute__ ((signal,used, externally_visible)) ; void
         dec_halfbit(hb);
     }
 }
-# 94 ".././gbmelder.c" 2
+# 87 ".././gbmelder.c" 2
 
 uint16_t g_dec_lastaddr = 0;
 
@@ -10347,15 +10340,14 @@ struct Eeprom {
     struct {
         uint8_t holdtime;
         uint8_t reserved[15];
-    } sensors[10];
+    } sensors[16];
 };
 struct Eeprom g_eeprom 
-# 104 ".././gbmelder.c" 3
+# 97 ".././gbmelder.c" 3
                       __attribute__((section(".eeprom")))
-# 104 ".././gbmelder.c"
+# 97 ".././gbmelder.c"
                            ;
 
-uint8_t hardwaretyp = 0;
 
 static void do_dec_parse_packet(void) {
     if (!g_power_on || !timer_timedout(&g_power_on_timer)) {
@@ -10373,85 +10365,81 @@ static void do_dec_parse_packet(void) {
         }
         if (g_dec_lastaddr) {
             
-# 123 ".././gbmelder.c" 3
+# 115 ".././gbmelder.c" 3
            for ( uint8_t sreg_save __attribute__((__cleanup__(__iRestore))) = (*(volatile uint8_t *)(0x003F)), __ToDo = __iCliRetVal(); __ToDo ; __ToDo = 0 ) 
-# 123 ".././gbmelder.c"
+# 115 ".././gbmelder.c"
                                              {
                 
-# 124 ".././gbmelder.c" 3
+# 116 ".././gbmelder.c" 3
                (*(TC0_t *) 0x0900)
-# 124 ".././gbmelder.c"
+# 116 ".././gbmelder.c"
                    .CCC = 
-# 124 ".././gbmelder.c" 3
+# 116 ".././gbmelder.c" 3
                           (*(TC0_t *) 0x0900)
-# 124 ".././gbmelder.c"
+# 116 ".././gbmelder.c"
                               .CNT + (290/2);
             }
             
-# 126 ".././gbmelder.c" 3
+# 118 ".././gbmelder.c" 3
            (*(TC0_t *) 0x0900)
-# 126 ".././gbmelder.c"
+# 118 ".././gbmelder.c"
                .INTFLAGS = (1<<(
-# 126 ".././gbmelder.c" 3
+# 118 ".././gbmelder.c" 3
                            6
-# 126 ".././gbmelder.c"
+# 118 ".././gbmelder.c"
                            ));
             
-# 127 ".././gbmelder.c" 3
+# 119 ".././gbmelder.c" 3
            (*(TC0_t *) 0x0900)
-# 127 ".././gbmelder.c"
+# 119 ".././gbmelder.c"
                .INTCTRLB = (
-# 127 ".././gbmelder.c" 3
+# 119 ".././gbmelder.c" 3
                             (*(TC0_t *) 0x0900)
-# 127 ".././gbmelder.c"
+# 119 ".././gbmelder.c"
                                 .INTCTRLB & ~
-# 127 ".././gbmelder.c" 3
+# 119 ".././gbmelder.c" 3
                                              0x30
-# 127 ".././gbmelder.c"
+# 119 ".././gbmelder.c"
                                                              )|TC_CCCINTLVL_LO_gc;
 
             (
-# 129 ".././gbmelder.c" 3
+# 121 ".././gbmelder.c" 3
            (*(PORT_t *) 0x0620)
-# 129 ".././gbmelder.c"
+# 121 ".././gbmelder.c"
            ).OUTCLR = ((1<<(2)));
         }
     }
 }
 
 
-# 134 ".././gbmelder.c" 3
+# 126 ".././gbmelder.c" 3
 void __vector_81 (void) __attribute__ ((signal,used, externally_visible)) ; void __vector_81 (void) 
-# 134 ".././gbmelder.c"
+# 126 ".././gbmelder.c"
                   {
     
-# 135 ".././gbmelder.c" 3
+# 127 ".././gbmelder.c" 3
    (*(TC0_t *) 0x0900)
-# 135 ".././gbmelder.c"
+# 127 ".././gbmelder.c"
        .INTCTRLB = (
-# 135 ".././gbmelder.c" 3
+# 127 ".././gbmelder.c" 3
                     (*(TC0_t *) 0x0900)
-# 135 ".././gbmelder.c"
+# 127 ".././gbmelder.c"
                         .INTCTRLB & ~
-# 135 ".././gbmelder.c" 3
+# 127 ".././gbmelder.c" 3
                                      0x30
-# 135 ".././gbmelder.c"
+# 127 ".././gbmelder.c"
                                                      )|TC_CCCINTLVL_OFF_gc;
 
-    (
-# 137 ".././gbmelder.c" 3
-   (*(PORT_t *) 0x0620)
-# 137 ".././gbmelder.c"
-   ).OUTSET = ((1<<(2)));
+
     uint8_t sens1 = ~(
-# 138 ".././gbmelder.c" 3
+# 130 ".././gbmelder.c" 3
                     (*(PORT_t *) 0x0600)
-# 138 ".././gbmelder.c"
+# 130 ".././gbmelder.c"
                     ).IN;
     uint8_t sens2 = ~(
-# 139 ".././gbmelder.c" 3
+# 131 ".././gbmelder.c" 3
                     (*(PORT_t *) 0x0640)
-# 139 ".././gbmelder.c"
+# 131 ".././gbmelder.c"
                     ).IN;
 
     uint16_t sens = ((uint16_t)sens2 << 8 | sens1) & g_sensor_bits;
@@ -10467,14 +10455,14 @@ void __vector_81 (void) __attribute__ ((signal,used, externally_visible)) ; void
 
 static void read_sensors(void) {
     uint8_t sens1 = ~(
-# 153 ".././gbmelder.c" 3
+# 145 ".././gbmelder.c" 3
                     (*(PORT_t *) 0x0600)
-# 153 ".././gbmelder.c"
+# 145 ".././gbmelder.c"
                     ).IN;
     uint8_t sens2 = ~(
-# 154 ".././gbmelder.c" 3
+# 146 ".././gbmelder.c" 3
                     (*(PORT_t *) 0x0640)
-# 154 ".././gbmelder.c"
+# 146 ".././gbmelder.c"
                     ).IN;
 
     uint16_t sensors = (uint16_t)sens2 << 8 | sens1;
@@ -10482,7 +10470,7 @@ static void read_sensors(void) {
     debounce_16(&g_sensor_bits, &g_sensor_bits_1, sensors);
 
     uint16_t mask = 0x01;
-    for (uint8_t i = 0; i < 10; i++, mask <<= 1) {
+    for (uint8_t i = 0; i < (hardwaretyp == 1 ? 10 : 16); i++, mask <<= 1) {
         if (sensors & mask) {
             if (!g_sensors[i].flags.on) {
                 g_sensors[i].flags.notack = 1;
@@ -10517,8 +10505,108 @@ static void read_sensors(void) {
     }
 }
 
+
+void show_besetzt_leds(void) {
+
+
+
+ (
+# 193 ".././gbmelder.c" 3
+(*(PORT_t *) 0x0640)
+# 193 ".././gbmelder.c"
+).OUTCLR = ((1<<(0))|(1<<(1)));
+ (
+# 194 ".././gbmelder.c" 3
+(*(PORT_t *) 0x0660)
+# 194 ".././gbmelder.c"
+).OUT = 0;
+ uint16_t inp = g_sensor_bits;
+ for (uint8_t i = 0; i < (hardwaretyp == 1 ? 10 : 16); i++) {
+
+  uint16_t mask = 1 << i;
+  if (inp & mask) {
+   if (i == 0) {
+    (
+# 201 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0640)
+# 201 ".././gbmelder.c"
+   ).OUTSET = ((1<<(6)));
+    } else if (i == 1 ) {
+    (
+# 203 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0640)
+# 203 ".././gbmelder.c"
+   ).OUTSET = ((1<<(7)));
+    } else if (i == 2) {
+    (
+# 205 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0660)
+# 205 ".././gbmelder.c"
+   ).OUTSET = ((1<<(0)));
+    } else if (i == 3) {
+    (
+# 207 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0660)
+# 207 ".././gbmelder.c"
+   ).OUTSET = ((1<<(1)));
+    } else if (i == 4) {
+    (
+# 209 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0660)
+# 209 ".././gbmelder.c"
+   ).OUTSET = ((1<<(2)));
+    } else if (i == 5) {
+    (
+# 211 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0660)
+# 211 ".././gbmelder.c"
+   ).OUTSET = ((1<<(3)));
+    } else if (i == 6) {
+    (
+# 213 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0660)
+# 213 ".././gbmelder.c"
+   ).OUTSET = ((1<<(4)));
+    } else if (i == 7) {
+    (
+# 215 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0660)
+# 215 ".././gbmelder.c"
+   ).OUTSET = ((1<<(5)));
+    } else if (i == 8) {
+    (
+# 217 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0660)
+# 217 ".././gbmelder.c"
+   ).OUTSET = ((1<<(6)));
+    } else if (i == 9) {
+    (
+# 219 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0660)
+# 219 ".././gbmelder.c"
+   ).OUTSET = ((1<<(7)));
+   }
+  }
+ }
+}
+
+
 void multiplex_leds(void) {
-# 212 ".././gbmelder.c"
+    uint8_t ledrow = (g_led_counter++) & 0x03;
+    uint16_t inp = g_sensor_bits;
+    uint8_t b;
+    switch (ledrow) {
+        case 0: ledrow = ~(1<<(4)) & 0xf0; b = inp; break;
+        case 1: ledrow = ~(1<<(5)) & 0xf0; b = (inp >> 4); break;
+        case 2: ledrow = ~(1<<(6)) & 0xf0; b = (inp >> 8); break;
+        default: ledrow = ~(1<<(7)) & 0xf0; b = (inp >> 12); break;
+    }
+
+    (
+# 237 ".././gbmelder.c" 3
+   (*(PORT_t *) 0x0660)
+# 237 ".././gbmelder.c"
+   ).OUT = ledrow | (b & 0x0f);
 }
 
 uint8_t get_next_transmit_seq(void) {
@@ -10527,7 +10615,7 @@ uint8_t get_next_transmit_seq(void) {
         seq = 10;
     }
 
-    for (uint8_t i = 0; i < 10; i++) {
+    for (uint8_t i = 0; i < (hardwaretyp == 1 ? 10 : 16); i++) {
         if (g_sensors[i].flags.notack && seq == g_sensors[i].last_seq) {
             seq++;
             i = 0;
@@ -10542,53 +10630,53 @@ void do_init_system(void) {
 
 
  (
-# 234 ".././gbmelder.c" 3
+# 260 ".././gbmelder.c" 3
 (*(PORT_t *) 0x0620)
-# 234 ".././gbmelder.c"
+# 260 ".././gbmelder.c"
 ).DIRCLR = (0x0f);
 
  uint8_t pbin = (
-# 236 ".././gbmelder.c" 3
+# 262 ".././gbmelder.c" 3
                (*(PORT_t *) 0x0620)
-# 236 ".././gbmelder.c"
+# 262 ".././gbmelder.c"
                ).IN;
 
  if (
-# 238 ".././gbmelder.c" 3
+# 264 ".././gbmelder.c" 3
     ((*(volatile uint8_t *)(((uint16_t) &(
-# 238 ".././gbmelder.c"
+# 264 ".././gbmelder.c"
     pbin
-# 238 ".././gbmelder.c" 3
+# 264 ".././gbmelder.c" 3
     )))) & (1 << (
-# 238 ".././gbmelder.c"
+# 264 ".././gbmelder.c"
     2
-# 238 ".././gbmelder.c" 3
+# 264 ".././gbmelder.c" 3
     ))) 
-# 238 ".././gbmelder.c"
+# 264 ".././gbmelder.c"
                         && 
-# 238 ".././gbmelder.c" 3
+# 264 ".././gbmelder.c" 3
                            (!((*(volatile uint8_t *)(((uint16_t) &(
-# 238 ".././gbmelder.c"
+# 264 ".././gbmelder.c"
                            pbin
-# 238 ".././gbmelder.c" 3
+# 264 ".././gbmelder.c" 3
                            )))) & (1 << (
-# 238 ".././gbmelder.c"
+# 264 ".././gbmelder.c"
                            1
-# 238 ".././gbmelder.c" 3
+# 264 ".././gbmelder.c" 3
                            )))) 
-# 238 ".././gbmelder.c"
+# 264 ".././gbmelder.c"
                                                  && 
-# 238 ".././gbmelder.c" 3
+# 264 ".././gbmelder.c" 3
                                                     (!((*(volatile uint8_t *)(((uint16_t) &(
-# 238 ".././gbmelder.c"
+# 264 ".././gbmelder.c"
                                                     pbin
-# 238 ".././gbmelder.c" 3
+# 264 ".././gbmelder.c" 3
                                                     )))) & (1 << (
-# 238 ".././gbmelder.c"
+# 264 ".././gbmelder.c"
                                                     3
-# 238 ".././gbmelder.c" 3
+# 264 ".././gbmelder.c" 3
                                                     ))))
-# 238 ".././gbmelder.c"
+# 264 ".././gbmelder.c"
                                                                          ) {
 
   hardwaretyp = 1;
@@ -10601,53 +10689,53 @@ void do_init_system(void) {
 
 
    (
-# 249 ".././gbmelder.c" 3
+# 275 ".././gbmelder.c" 3
   (*(PORT_t *) 0x0660)
-# 249 ".././gbmelder.c"
+# 275 ".././gbmelder.c"
   ).OUT = 0;
    (
-# 250 ".././gbmelder.c" 3
+# 276 ".././gbmelder.c" 3
   (*(PORT_t *) 0x0660)
-# 250 ".././gbmelder.c"
+# 276 ".././gbmelder.c"
   ).DIRSET = (0);
    
-# 251 ".././gbmelder.c" 3
+# 277 ".././gbmelder.c" 3
   (*(volatile uint8_t *)(0x00B0)) 
-# 251 ".././gbmelder.c"
+# 277 ".././gbmelder.c"
                   = 0xff;
    
-# 252 ".././gbmelder.c" 3
+# 278 ".././gbmelder.c" 3
   (*(PORT_t *) 0x0660)
-# 252 ".././gbmelder.c"
+# 278 ".././gbmelder.c"
        .PIN0CTRL = PORT_OPC_TOTEM_gc;
 
    (
-# 254 ".././gbmelder.c" 3
+# 280 ".././gbmelder.c" 3
   (*(PORT_t *) 0x0640)
-# 254 ".././gbmelder.c"
+# 280 ".././gbmelder.c"
   ).DIRSET = ((1<<(6)) | (1<<(7)));
             
-# 255 ".././gbmelder.c" 3
+# 281 ".././gbmelder.c" 3
            (*(volatile uint8_t *)(0x00B0)) 
-# 255 ".././gbmelder.c"
+# 281 ".././gbmelder.c"
                            = 0xc0;
             
-# 256 ".././gbmelder.c" 3
+# 282 ".././gbmelder.c" 3
            (*(PORT_t *) 0x0640)
-# 256 ".././gbmelder.c"
+# 282 ".././gbmelder.c"
                 .PIN0CTRL = PORT_OPC_TOTEM_gc;
 
 
             (
-# 259 ".././gbmelder.c" 3
+# 285 ".././gbmelder.c" 3
            (*(PORT_t *) 0x0600)
-# 259 ".././gbmelder.c"
+# 285 ".././gbmelder.c"
            ).DIRCLR = (0xff);
 
             (
-# 261 ".././gbmelder.c" 3
+# 287 ".././gbmelder.c" 3
            (*(PORT_t *) 0x0640)
-# 261 ".././gbmelder.c"
+# 287 ".././gbmelder.c"
            ).DIRCLR = (0x3);
 
    break;
@@ -10660,84 +10748,84 @@ void do_init_system(void) {
 
 
    (
-# 272 ".././gbmelder.c" 3
+# 298 ".././gbmelder.c" 3
   (*(PORT_t *) 0x0660)
-# 272 ".././gbmelder.c"
+# 298 ".././gbmelder.c"
   ).OUT = 0;
 
    (
-# 274 ".././gbmelder.c" 3
+# 300 ".././gbmelder.c" 3
   (*(PORT_t *) 0x0660)
-# 274 ".././gbmelder.c"
+# 300 ".././gbmelder.c"
   ).DIRSET = (0xff);
 
    
-# 276 ".././gbmelder.c" 3
+# 302 ".././gbmelder.c" 3
   (*(volatile uint8_t *)(0x00B0)) 
-# 276 ".././gbmelder.c"
+# 302 ".././gbmelder.c"
                   = 0xff;
    
-# 277 ".././gbmelder.c" 3
+# 303 ".././gbmelder.c" 3
   (*(PORT_t *) 0x0660)
-# 277 ".././gbmelder.c"
+# 303 ".././gbmelder.c"
        .PIN0CTRL = PORT_OPC_TOTEM_gc;
 
 
    (
-# 280 ".././gbmelder.c" 3
+# 306 ".././gbmelder.c" 3
   (*(PORT_t *) 0x0640)
-# 280 ".././gbmelder.c"
+# 306 ".././gbmelder.c"
   ).DIRCLR = (0xff);
 
    
-# 282 ".././gbmelder.c" 3
+# 308 ".././gbmelder.c" 3
   (*(volatile uint8_t *)(0x00B0)) 
-# 282 ".././gbmelder.c"
+# 308 ".././gbmelder.c"
                   = 0xff;
    
-# 283 ".././gbmelder.c" 3
+# 309 ".././gbmelder.c" 3
   (*(PORT_t *) 0x0640)
-# 283 ".././gbmelder.c"
+# 309 ".././gbmelder.c"
        .PIN0CTRL = PORT_OPC_PULLUP_gc;
 
 
             (
-# 286 ".././gbmelder.c" 3
+# 312 ".././gbmelder.c" 3
            (*(PORT_t *) 0x0620)
-# 286 ".././gbmelder.c"
+# 312 ".././gbmelder.c"
            ).DIRCLR = (0xff);
 
             
-# 288 ".././gbmelder.c" 3
+# 314 ".././gbmelder.c" 3
            (*(volatile uint8_t *)(0x00B0)) 
-# 288 ".././gbmelder.c"
+# 314 ".././gbmelder.c"
                            = 0xff;
 
             
-# 290 ".././gbmelder.c" 3
+# 316 ".././gbmelder.c" 3
            (*(PORT_t *) 0x0620)
-# 290 ".././gbmelder.c"
+# 316 ".././gbmelder.c"
                 .PIN0CTRL = PORT_OPC_PULLDOWN_gc;
 
 
 
 
             (
-# 295 ".././gbmelder.c" 3
+# 321 ".././gbmelder.c" 3
            (*(PORT_t *) 0x0600)
-# 295 ".././gbmelder.c"
+# 321 ".././gbmelder.c"
            ).DIRCLR = (0xff);
 
             
-# 297 ".././gbmelder.c" 3
+# 323 ".././gbmelder.c" 3
            (*(volatile uint8_t *)(0x00B0)) 
-# 297 ".././gbmelder.c"
+# 323 ".././gbmelder.c"
                            = 0xff;
 
             
-# 299 ".././gbmelder.c" 3
+# 325 ".././gbmelder.c" 3
            (*(PORT_t *) 0x0600)
-# 299 ".././gbmelder.c"
+# 325 ".././gbmelder.c"
                 .PIN0CTRL = PORT_OPC_PULLUP_gc;
 
    break;
@@ -10746,15 +10834,15 @@ void do_init_system(void) {
 
 
     
-# 306 ".././gbmelder.c" 3
+# 332 ".././gbmelder.c" 3
    (*(SLEEP_t *) 0x0048)
-# 306 ".././gbmelder.c"
+# 332 ".././gbmelder.c"
         .CTRL = SLEEP_SMODE_IDLE_gc|(1<<(
-# 306 ".././gbmelder.c" 3
+# 332 ".././gbmelder.c" 3
                                     0
-# 306 ".././gbmelder.c"
+# 332 ".././gbmelder.c"
                                     ));
-# 315 ".././gbmelder.c"
+# 341 ".././gbmelder.c"
     g_com.productid = 0x000b;
     g_com.vendorid = 0x9999;
     g_com.firmware_version = 0x0200;
@@ -10762,13 +10850,13 @@ void do_init_system(void) {
     g_com.capabilities = 0x0008;
     g_com.cap_class = 0;
     g_com.dev_desc_P = 
-# 321 ".././gbmelder.c" 3
+# 347 ".././gbmelder.c" 3
                       (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 321 ".././gbmelder.c"
+# 347 ".././gbmelder.c"
                       "gbmelder2"
-# 321 ".././gbmelder.c" 3
+# 347 ".././gbmelder.c" 3
                       ); &__c[0];}))
-# 321 ".././gbmelder.c"
+# 347 ".././gbmelder.c"
                                        ;
 
 
@@ -10784,9 +10872,9 @@ void do_init_system(void) {
 
 
     
-# 335 ".././gbmelder.c" 3
+# 361 ".././gbmelder.c" 3
    (*(PORT_t *) 0x0620)
-# 335 ".././gbmelder.c"
+# 361 ".././gbmelder.c"
                 .PIN0CTRL = PORT_OPC_PULLDOWN_gc|PORT_ISC_BOTHEDGES_gc;
 
 
@@ -10797,43 +10885,43 @@ void do_init_system(void) {
     g_power_on = 0;
 
     g_holdtime = ({ ({ while (
-# 344 ".././gbmelder.c" 3
+# 370 ".././gbmelder.c" 3
                 ((*(volatile uint8_t *)(((uint16_t) &((*(volatile uint8_t *)(0x01CF)))))) & (1 << (7)))
-# 344 ".././gbmelder.c"
+# 370 ".././gbmelder.c"
                 ); }); ((
-# 344 ".././gbmelder.c" 3
+# 370 ".././gbmelder.c" 3
                 (*(volatile uint8_t *)(0x01CC))
-# 344 ".././gbmelder.c"
+# 370 ".././gbmelder.c"
                 ) |= (1<<(
-# 344 ".././gbmelder.c" 3
+# 370 ".././gbmelder.c" 3
                 3
-# 344 ".././gbmelder.c"
+# 370 ".././gbmelder.c"
                 ))); *((uint8_t*)(
-# 344 ".././gbmelder.c" 3
+# 370 ".././gbmelder.c" 3
                 (0x1000U) 
-# 344 ".././gbmelder.c"
+# 370 ".././gbmelder.c"
                 + (uint16_t)(&g_eeprom.holdtime))); });
     if (g_holdtime == 0xff) {
         g_holdtime = 200;
     }
     g_old_holdtime = g_holdtime;
-    for (uint8_t i = 0; i < 10; i++) {
+    for (uint8_t i = 0; i < (hardwaretyp == 1 ? 10 : 16); i++) {
         uint8_t ht = ({ ({ while (
-# 350 ".././gbmelder.c" 3
+# 376 ".././gbmelder.c" 3
                     ((*(volatile uint8_t *)(((uint16_t) &((*(volatile uint8_t *)(0x01CF)))))) & (1 << (7)))
-# 350 ".././gbmelder.c"
+# 376 ".././gbmelder.c"
                     ); }); ((
-# 350 ".././gbmelder.c" 3
+# 376 ".././gbmelder.c" 3
                     (*(volatile uint8_t *)(0x01CC))
-# 350 ".././gbmelder.c"
+# 376 ".././gbmelder.c"
                     ) |= (1<<(
-# 350 ".././gbmelder.c" 3
+# 376 ".././gbmelder.c" 3
                     3
-# 350 ".././gbmelder.c"
+# 376 ".././gbmelder.c"
                     ))); *((uint8_t*)(
-# 350 ".././gbmelder.c" 3
+# 376 ".././gbmelder.c" 3
                     (0x1000U) 
-# 350 ".././gbmelder.c"
+# 376 ".././gbmelder.c"
                     + (uint16_t)(&g_eeprom.sensors[i].holdtime))); });
         if (ht == 0xff) {
             ht = g_holdtime;
@@ -10851,7 +10939,7 @@ uint8_t do_msg(struct sboxnet_msg_header *pmsg) {
             if (pmsg->opt.len != 0) {
                 return 3;
             }
-            for (uint8_t i = 0; i < 10; i++) {
+            for (uint8_t i = 0; i < (hardwaretyp == 1 ? 10 : 16); i++) {
                 if (g_sensors[i].flags.notack && pmsg->seq == g_sensors[i].last_seq) {
                     g_sensors[i].flags.notack = 0;
                     g_sensors[i].last_seq = 0;
@@ -10865,7 +10953,7 @@ uint8_t do_msg(struct sboxnet_msg_header *pmsg) {
 
 uint8_t do_reg_read(uint16_t reg, uint16_t* pdata) {
     switch(reg) {
-        case R_FB_NUM: *pdata = 10; return 0;
+        case R_FB_NUM: *pdata = (hardwaretyp == 1 ? 10 : 16); return 0;
         case R_FB_VALUE0: *pdata = g_sensor_bits; return 0;
 
         case R_GBM_HOLDTIME: *pdata = g_holdtime; return 0;
@@ -10925,14 +11013,20 @@ void do_main(void) {
 
         read_sensors();
 
-        multiplex_leds();
+  if (hardwaretyp == 1) {
+
+   show_besetzt_leds();
+  } else {
+
+   multiplex_leds();
+  }
     }
 
     uint8_t canread = 0;
     
-# 445 ".././gbmelder.c" 3
+# 477 ".././gbmelder.c" 3
    for ( uint8_t sreg_save __attribute__((__cleanup__(__iRestore))) = (*(volatile uint8_t *)(0x003F)), __ToDo = __iCliRetVal(); __ToDo ; __ToDo = 0 ) 
-# 445 ".././gbmelder.c"
+# 477 ".././gbmelder.c"
                                      {
         canread = pipe_count(&g_locoaddr_pipe.pipe);
     }
@@ -10940,24 +11034,24 @@ void do_main(void) {
         uint16_t sens = 0;
         uint16_t lastaddr = 0;
         
-# 451 ".././gbmelder.c" 3
+# 483 ".././gbmelder.c" 3
        for ( uint8_t sreg_save __attribute__((__cleanup__(__iRestore))) = (*(volatile uint8_t *)(0x003F)), __ToDo = __iCliRetVal(); __ToDo ; __ToDo = 0 ) 
-# 451 ".././gbmelder.c"
+# 483 ".././gbmelder.c"
                                          { lastaddr = pipe_read(&g_locoaddr_pipe.pipe); }
         
-# 452 ".././gbmelder.c" 3
+# 484 ".././gbmelder.c" 3
        for ( uint8_t sreg_save __attribute__((__cleanup__(__iRestore))) = (*(volatile uint8_t *)(0x003F)), __ToDo = __iCliRetVal(); __ToDo ; __ToDo = 0 ) 
-# 452 ".././gbmelder.c"
+# 484 ".././gbmelder.c"
                                          { lastaddr |= ((uint16_t)pipe_read(&g_locoaddr_pipe.pipe) << 8); }
         
-# 453 ".././gbmelder.c" 3
+# 485 ".././gbmelder.c" 3
        for ( uint8_t sreg_save __attribute__((__cleanup__(__iRestore))) = (*(volatile uint8_t *)(0x003F)), __ToDo = __iCliRetVal(); __ToDo ; __ToDo = 0 ) 
-# 453 ".././gbmelder.c"
+# 485 ".././gbmelder.c"
                                          { sens = pipe_read(&g_locoaddr_pipe.pipe); }
         
-# 454 ".././gbmelder.c" 3
+# 486 ".././gbmelder.c" 3
        for ( uint8_t sreg_save __attribute__((__cleanup__(__iRestore))) = (*(volatile uint8_t *)(0x003F)), __ToDo = __iCliRetVal(); __ToDo ; __ToDo = 0 ) 
-# 454 ".././gbmelder.c"
+# 486 ".././gbmelder.c"
                                          { sens |= ((uint16_t)pipe_read(&g_locoaddr_pipe.pipe) << 8); }
 
         uint16_t mask = 0x01;
@@ -10973,15 +11067,15 @@ void do_main(void) {
     }
 
     if (
-# 468 ".././gbmelder.c" 3
+# 500 ".././gbmelder.c" 3
        (!((*(volatile uint8_t *)(((uint16_t) &((*(volatile uint8_t *)(0x0000)))))) & (1 << (
-# 468 ".././gbmelder.c"
+# 500 ".././gbmelder.c"
        5
-# 468 ".././gbmelder.c" 3
+# 500 ".././gbmelder.c" 3
        ))))
-# 468 ".././gbmelder.c"
+# 500 ".././gbmelder.c"
                                                           ) {
-        for (uint8_t i = 0; i < 10; i++) {
+        for (uint8_t i = 0; i < (hardwaretyp == 1 ? 10 : 16); i++) {
             if (g_sensors[i].retry_timer == 0 && g_sensors[i].flags.notack) {
                 g_sensors[i].retry_timer = 50;
 
@@ -11006,18 +11100,18 @@ void do_main(void) {
 
 
     if (g_holdtime != g_old_holdtime && 
-# 493 ".././gbmelder.c" 3
+# 525 ".././gbmelder.c" 3
                                        (!((*(volatile uint8_t *)(((uint16_t) &((*(volatile uint8_t *)(0x01CF)))))) & (1 << (7))))
-# 493 ".././gbmelder.c"
+# 525 ".././gbmelder.c"
                                                         ) {
         eeprom_update_byte(&g_eeprom.holdtime, g_holdtime);
         g_old_holdtime = g_holdtime;
     }
-    for (uint8_t i = 0; i < 10; i++) {
+    for (uint8_t i = 0; i < (hardwaretyp == 1 ? 10 : 16); i++) {
         if (g_sensors[i].flags.holdtime_changed && 
-# 498 ".././gbmelder.c" 3
+# 530 ".././gbmelder.c" 3
                                                   (!((*(volatile uint8_t *)(((uint16_t) &((*(volatile uint8_t *)(0x01CF)))))) & (1 << (7))))
-# 498 ".././gbmelder.c"
+# 530 ".././gbmelder.c"
                                                                    ) {
             eeprom_update_byte(&g_eeprom.sensors[i].holdtime, g_sensors[i].holdtime);
             g_sensors[i].flags.holdtime_changed = 0;
@@ -11025,9 +11119,9 @@ void do_main(void) {
     }
 
     
-# 504 ".././gbmelder.c" 3
+# 536 ".././gbmelder.c" 3
    do { __asm__ __volatile__ ( "sleep" "\n\t" :: ); } while(0)
-# 504 ".././gbmelder.c"
+# 536 ".././gbmelder.c"
               ;
 }
 

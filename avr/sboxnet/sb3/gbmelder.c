@@ -61,7 +61,7 @@ uint8_t hardwaretyp = 0; // alte Hardware
 
 
 #define DEFAULT_HOLDTIME 200
-#define NUM_SENSORS (hardwaretyp == 1 : 10 ? 16)
+#define NUM_SENSORS (hardwaretyp == 1 ? 10 : 16)
 
 uint8_t g_holdtime;
 uint8_t g_old_holdtime;
@@ -183,6 +183,43 @@ static void read_sensors(void) {
     } else if (g_power_on) {
         g_power_on = 0;
     }
+}
+
+// für neue Hardware!
+void show_besetzt_leds(void) {
+	// PC6 (Bit 0) und PC7 (Bit 1)
+	// PD0..PD7(Bit 2 .. 9)
+	// zuerst mal alles aus
+	port_clr(PORTC, Bit(0)|Bit(1));
+	port_out(PORTD) = 0;
+	uint16_t inp = g_sensor_bits;
+	for (uint8_t i = 0; i < NUM_SENSORS; i++) {
+		// if sensor is on -> led ON
+		uint16_t mask = 1 << i;
+		if (inp & mask) {
+			if (i == 0) {
+				port_set(PORTC, Bit(6));
+				} else if (i == 1 ) {
+				port_set(PORTC, Bit(7));
+				} else if (i == 2) {
+				port_set(PORTD, Bit(0));
+				} else if (i == 3) {
+				port_set(PORTD, Bit(1));
+				} else if (i == 4) {
+				port_set(PORTD, Bit(2));
+				} else if (i == 5) {
+				port_set(PORTD, Bit(3));
+				} else if (i == 6) {
+				port_set(PORTD, Bit(4));
+				} else if (i == 7) {
+				port_set(PORTD, Bit(5));
+				} else if (i == 8) {
+				port_set(PORTD, Bit(6));
+				} else if (i == 9) {
+				port_set(PORTD, Bit(7));
+			}
+		}
+	}
 }
 
 // only for old hardware
@@ -419,30 +456,6 @@ uint8_t do_reg_write(uint16_t reg, uint16_t data, uint16_t mask) {
 
 void do_setup(void) {
     dec_start();
-}
-
-void show_besetzt_leds(void) {
-	// PC6 (Bit 0) und PC7 (Bit 1)
-	// PD0..PD7(Bit 2 .. 9)
-	// zuerst mal alles aus
-	port_clr(PORTC, Bit(0)|Bit(1));
-	port_out(PORTD);
-	uint16_t inp = g_sensor_bits;
-	for (uint8_t i = 0; i < NUM_SENSORS; i++) {
-		// if sensor is on -> led ON
-		uint16_t mask = 1 << i;
-		if (inp & mask) {
-			if (i == 0) {
-				port_set(PORTC, Bit(6));
-			} else if (i == 1 ) {
-				port_set(PORTC, Bit(7));
-			} else {
-				uint8_t n = i << 2;
-				
-			}
-		}
-		
-	}
 }
 
 void do_main(void) {    
