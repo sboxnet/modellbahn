@@ -192,7 +192,7 @@ void show_besetzt_leds(void) {
     // PD0..PD7(Bit 2 .. 9)
     // zuerst mal alles aus
     port_clr(PORTC, Bit(0)|Bit(1));
-    port_out(PORTD);
+    port_out(PORTD) = 0;
     uint16_t inp = g_sensor_bits;
     for (uint8_t i = 0; i < NUM_SENSORS; i++) {
         // if sensor is on -> led ON
@@ -202,12 +202,24 @@ void show_besetzt_leds(void) {
                 port_set(PORTC, Bit(6));
             } else if (i == 1 ) {
                 port_set(PORTC, Bit(7));
-            } else {
-                uint8_t n = i << 2;
-                
+            } else if (i == 2) {
+                port_set(PORTD, Bit(0));
+            } else if (i == 3) {
+                port_set(PORTD, Bit(1));
+            } else if (i == 4) {
+                port_set(PORTD, Bit(2));
+            } else if (i == 5) {
+                port_set(PORTD, Bit(3));
+            } else if (i == 6) {
+                port_set(PORTD, Bit(4));
+            } else if (i == 7) {
+                port_set(PORTD, Bit(5));
+            } else if (i == 8) {
+                port_set(PORTD, Bit(6));
+            } else if (i == 9) {
+                port_set(PORTD, Bit(7));
             }
         }
-        
     }
 }
 
