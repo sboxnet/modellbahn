@@ -199,23 +199,23 @@ void show_besetzt_leds(void) {
 		if (inp & mask) {
 			if (i == 0) {
 				port_set(PORTC, Bit(6));
-				} else if (i == 1 ) {
+			} else if (i == 1 ) {
 				port_set(PORTC, Bit(7));
-				} else if (i == 2) {
+			} else if (i == 2) {
 				port_set(PORTD, Bit(0));
-				} else if (i == 3) {
+			} else if (i == 3) {
 				port_set(PORTD, Bit(1));
-				} else if (i == 4) {
+			} else if (i == 4) {
 				port_set(PORTD, Bit(2));
-				} else if (i == 5) {
+			} else if (i == 5) {
 				port_set(PORTD, Bit(3));
-				} else if (i == 6) {
+			} else if (i == 6) {
 				port_set(PORTD, Bit(4));
-				} else if (i == 7) {
+			} else if (i == 7) {
 				port_set(PORTD, Bit(5));
-				} else if (i == 8) {
+			} else if (i == 8) {
 				port_set(PORTD, Bit(6));
-				} else if (i == 9) {
+			} else if (i == 9) {
 				port_set(PORTD, Bit(7));
 			}
 		}
