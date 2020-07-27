@@ -267,10 +267,16 @@ class Sboxnet(object):
         #self._init_fb.add(PuidRoc(puid=0xa, roca=6, senscnt=[1] * 16, reports_locoaddr=True))
         #self._init_fb.add(PuidRoc(puid=0x7, roca=7, senscnt=[1] * 16, reports_locoaddr=True))
         #print(""+self._init_dccgen+", ")#+self._init_booster)
-                
-        self._sbnm = sboxnet.SboxnetMaster(serialn="modellbahn", cbobj=self)
-        self._sbnm.start()
-        self._seq = 10
+        devices = sboxnet.SboxnetUSB.find_devices()
+        dev = devices[0]
+        
+        sbnusb=sboxnet.SboxnetUSB(dev=dev)
+        if sbnusb.getserialnumber() in ['modellbahn','test2','test3']:
+            self._sbnm = sboxnet.SboxnetMaster(sbnusb=sbnusb, cbobj=self)
+            self._sbnm.start()
+            self._seq = 10
+        else:
+            print("ERROR: serialnumber not modellbahn, test2 or test3")
         
     def print_dbginfo(self, d):
         print("recv_byte        %d" % (d.recv_byte))
@@ -829,19 +835,19 @@ class Srcpd(object):
         self._port = port
         self._server = None
         self._serverthread = None
-        self._sbnusb = None
+        self.sbnusb = None
         logInfo("Starting Srcpd-sboxnet...")
     
     def run(self):
-        self._sbnusb = Sboxnet(self)
+        self.sbnusb = Sboxnet(self)
 
         self._server = ThreadedTCPServer((self._host, self._port), SrcpRequestHandler)
-        self._server.set_sboxnet(self._sbnusb)
+        self._server.set_sboxnet(self.sbnusb)
         self._serverthread = threading.Thread(target=self._server.serve_forever)
         self._serverthread.daemon = False
         self._serverthread.start()
         
-        self._sbnusb.run()
+        self.sbnusb.run()
         logInfo("Sboxnet stopped")
         
         self._server.shutdown()
@@ -851,7 +857,7 @@ class Srcpd(object):
     def shutdown(self):
         logInfo("Srcpd-sboxnet shutdown request.")
         self._server.shutdown()
-        self._sbnusb.shutdown()
+        self.sbnusb.shutdown()
         
 
 # --- main ---
