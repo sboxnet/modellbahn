@@ -190,7 +190,7 @@ void show_besetzt_leds(void) {
 	// PC6 (Bit 0) und PC7 (Bit 1)
 	// PD0..PD7(Bit 2 .. 9)
 	// zuerst mal alles aus
-	port_clr(PORTC, Bit(0)|Bit(1));
+	port_clr(PORTC, Bit(6)|Bit(7));
 	port_out(PORTD) = 0;
 	uint16_t inp = g_sensor_bits;
 	for (uint8_t i = 0; i < NUM_SENSORS; i++) {
