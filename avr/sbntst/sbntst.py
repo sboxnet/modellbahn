@@ -81,11 +81,12 @@ def logDebug(o, s):
 def logError(o, s):
     log(o, 'ERROR', s)
 
-class Sbntst(object):
+class sbntst(object):
     _prdid = sboxnet.SboxnetUSB.PRODUCTID
     _seq = 0
     
     # Sbntst.__init__
+    #  dccmap 
     def __init__(self, dccmap, debug):
         print("--- SboxnetTester ---")
         print("creating SboxnetUSB:...")
