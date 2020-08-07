@@ -76,8 +76,13 @@ def logInfo(o, s):
     log(o, 'INFO', s)
 
 def logDebug(o, s):
-    if o.debug:
-        log(o, 'DEBUG', s)
+    try:
+        o.debug
+    except NameError:
+        pass
+    else:
+        if o.debug:
+            log(o, 'DEBUG', s)
 
 def logError(o, s):
     log(o, 'ERROR', s)
@@ -96,7 +101,7 @@ class sbntst(object):
     def __init__(self, dccmap, debug, sniffer):
         print(f"--- SboxnetTester(debug={debug}, sniffer={sniffer}) ---")
         self.debug = debug
-        self._sniffer = sniffer
+        self.sniffer = sniffer
         logDebug(self, "init")
         print("creating SboxnetUSB:...")
 
@@ -132,6 +137,7 @@ def init_dccmap():
     with open('moba-dcc.csv') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
+            #print(row['DCC']+row['Artikel'])
             dcc = int(row['DCC'])
             m = dict()
             m['dcc'] = dcc;
