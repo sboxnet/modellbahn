@@ -76,7 +76,8 @@ def logInfo(o, s):
     log(o, 'INFO', s)
 
 def logDebug(o, s):
-    log(o, 'DEBUG', s)
+    if o.debug:
+        log(o, 'DEBUG', s)
 
 def logError(o, s):
     log(o, 'ERROR', s)
@@ -86,7 +87,86 @@ class sbntst(object):
     _seq = 0
     
     # Sbntst.__init__
-    #  dccmap 
-    def __init__(self, dccmap, debug):
-        print("--- SboxnetTester ---")
+    #  dccmap
+    #    Artikel, Lok, Epoche, DCC (Adresse), L/G, Schittstelle, Decoder, Funktionen, Sound, Beschreibung
+    #  debug 
+    #   if it should be run with debug
+    #  sniffer
+    #    run as sniffer
+    def __init__(self, dccmap, debug, sniffer):
+        print(f"--- SboxnetTester(debug={debug}, sniffer={sniffer}) ---")
+        self.debug = debug
+        self._sniffer = sniffer
+        logDebug(self, "init")
         print("creating SboxnetUSB:...")
+
+# --- main ---
+
+def init_signals():
+    # ignore SIGINT
+    def signal_sigint(sig, frame):
+        pass
+    # set SIGINT handler to signal_sidint 
+    signal.signal(signal.SIGINT, signal_sigint)
+
+def init_readline():
+    # --- Readline history management ---
+    
+    # set history path to ~/.sboxnet-tester.history
+    historyPath = os.path.expanduser("~/.sboxnet-tester.history")
+    
+    # method to save history at exit
+    def save_history(historyPath=historyPath):
+        readline.write_history_file(historyPath)
+    
+    # if ~/.sboxnet-tester.history exists set as readline history path
+    if os.path.exists(historyPath):
+        # read readline history from historyPath if exists
+        readline.read_history_file(historyPath)
+    
+    # atexit handler: save_history: save Readline history at exit
+    atexit.register(save_history)
+
+def init_dccmap():
+    dccmap = dict()
+    with open('moba-dcc.csv') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            dcc = int(row['DCC'])
+            m = dict()
+            m['dcc'] = dcc;
+            m['lok'] = row['Lok']
+            m['artikel'] = row['Artikel']
+            dccmap[dcc] = m
+    return dccmap
+
+
+if __name__ == "__main__":
+    logInfo(None, "Init Signals")
+    init_signals()
+    logInfo(None, "Init Readline")
+    init_readline()
+    logInfo(None, "Init DCC Map")
+    dccmap = init_dccmap()
+    
+    logInfo(None, "Parse Arguments...")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--debug", help="run with debug output", action="store_true")
+    parser.add_argument("-s", "--sniffer", help="run as sniffer", action="store_true")
+    args = parser.parse_args()
+    #debug = False
+    #sniffer = False
+    #if args.debug:
+    #    debug = True
+    #if args.sniffer:
+    #    sniffer = True
+    print(f"----- debug={args.debug} sniffer={args.sniffer} ++++++")
+    
+    # create SboxnetTester: 
+    sbntest = sbntst(dccmap, args.debug, args.sniffer)
+    
+    # SboxnetTester.main()
+    #sbntest.main()
+    
+
+

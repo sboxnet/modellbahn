@@ -825,7 +825,7 @@ class SboxnetMaster(threading.Thread):
             #print(self._sbnusb)
             #self._sbnusb = None
             if self._sbnusb is None:
-                #logInfo(self, "SboxnetUSB initialising...")
+                logInfo(self, "SboxnetUSB initialising...")
                 if self._debug: logDebug(self, f"serialNR={self._serialn} dev={self._sbnusb}")
                 try:
                     self._sbnusb = SboxnetUSB(serialn=self._serialn)

@@ -111,8 +111,10 @@ Hob 246045,V 60 157,Ep 3,139,-,nem651,DH10C,F4,,,3.06,x
 Hob 246047,V 260 417-3,Ep 4,140,-,nem651,DH10C,F4,,,3.06,x
 Flm 741101,Gläsener Zug ET91 01,Ep 3,141,Lwr,n,DH05C,"F0,2,3,4,5",,,3.06,x
 Flm 736680,ÖBB Rh 1044,Ep 4,142,Lwr,ab Werk,Zimo?,"F0,F1,F2,….",,,,
+,,,,,,,,,,,
 Hob 319674,Lokomotion ES 64 U2 – 001 (Taurus),Ep 5,144,Lwr,löt,DH10C,F0,,,,
-Hob 246048,360-159-8,,145,wr,nem651,DH10C,,,,,
-Hob 246044,V60.129,,146,wr,nem651,DH10C,,,,,
+Hob ,360-159-8,,145,wr,nem651,DH10C,,,,,
+Hob ,V60.129,,146,wr,nem651,DH10C,,,,,
 Mtx 12197,ICE3 MF,,147,Lwr,nem651,DH10C,,,,,
-Lil 161561,BR 56 444,Ep 3,148,Lwr,Next18,DH18,,,,,
+Lil 161561,BR 56 444,,148,Lwr,Next 18,DH18,"F0,…",,,,
+Flm 739478,E94 044,,149,Lwr,ab Werk,eingebaut mit Sound,"F0,…",Ab Werk.,,,
