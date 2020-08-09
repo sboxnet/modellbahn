@@ -1,3 +1,5 @@
+#!/usr/bin/python3 -tt
+
 import sys
 import time
 import re
@@ -14,6 +16,8 @@ import inspect
 import traceback
 import argparse
 import threading
+import time
+from threading import Thread
 
 import sboxnet
 import usb.core
@@ -87,6 +91,26 @@ def logDebug(o, s):
 def logError(o, s):
     log(o, 'ERROR', s)
 
+class SboxnetReceiver(threading.Thread):
+    def __init__(self):
+        super().__init__(name="Sboxnet Receiver")
+        logInfo(self, "start "+self.name+" ...")
+        
+    def run(self):
+        logInfo(self, "run "+self.name)
+        time.sleep(2)
+        logInfo(self, "End "+self.name)
+        
+class SboxnetTransmitter(Thread):
+    def __init__(self):
+        super().__init__(name="Sboxnet Transmitter")
+        logInfo(self, "start "+ self.name+" ...")
+        
+    def run(self):
+        logInfo(self, "run "+self.name)
+        time.sleep(2)
+        logInfo(self, "End "+self.name)
+        
 class sbntst(object):
     _prdid = sboxnet.SboxnetUSB.PRODUCTID
     _seq = 0
@@ -104,6 +128,11 @@ class sbntst(object):
         self.sniffer = sniffer
         logDebug(self, "init")
         print("creating SboxnetUSB:...")
+        self.sbnreiver = SboxnetReceiver()
+        self.sbntransmitter = SboxnetTransmitter()
+        self.sbnreiver.start()
+        self.sbntransmitter.start()
+        
 
 # --- main ---
 
@@ -147,7 +176,9 @@ def init_dccmap():
     return dccmap
 
 
+
 if __name__ == "__main__":
+
     logInfo(None, "Init Signals")
     init_signals()
     logInfo(None, "Init Readline")
@@ -173,6 +204,7 @@ if __name__ == "__main__":
     
     # SboxnetTester.main()
     #sbntest.main()
+
     
 
 
