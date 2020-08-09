@@ -92,7 +92,7 @@ def logError(o, s):
     log(o, 'ERROR', s)
 
 class SboxnetReceiver(threading.Thread):
-    def __init__(self):
+    def __init__(self, sbntst):
         super().__init__(name="Sboxnet Receiver")
         logInfo(self, "start "+self.name+" ...")
         
@@ -102,15 +102,23 @@ class SboxnetReceiver(threading.Thread):
         logInfo(self, "End "+self.name)
         
 class SboxnetTransmitter(Thread):
-    def __init__(self):
+    def __init__(self, sbntst):
         super().__init__(name="Sboxnet Transmitter")
         logInfo(self, "start "+ self.name+" ...")
+        self.tmitmsglist = []
+        self.tmsglistlock = threading.Lock()
         
     def run(self):
         logInfo(self, "run "+self.name)
         time.sleep(2)
         logInfo(self, "End "+self.name)
-        
+    
+    def send_netReset:
+        resetmsg = sboxnet.SboxnetMsg.new(255, SBOXNET_CMD_NET_RESET, 0)
+        with self.tmsglistlock:
+            self.tmitmsglist.append(resetmsg)
+            
+
 class sbntst(object):
     _prdid = sboxnet.SboxnetUSB.PRODUCTID
     _seq = 0
@@ -123,16 +131,129 @@ class sbntst(object):
     #  sniffer
     #    run as sniffer
     def __init__(self, dccmap, debug, sniffer):
-        print(f"--- SboxnetTester(debug={debug}, sniffer={sniffer}) ---")
+        logInfo(self, f"--- SboxnetTester(debug={debug}, sniffer={sniffer}) ---")
+        # run with debug?
         self.debug = debug
+        # run as sniffer?
         self.sniffer = sniffer
         logDebug(self, "init")
-        print("creating SboxnetUSB:...")
-        self.sbnreiver = SboxnetReceiver()
-        self.sbntransmitter = SboxnetTransmitter()
+        logInfo(self, "creating SboxnetUSB:...")
+        # receiver object
+        self.sbnreiver = SboxnetReceiver(self)
+        # transmitter object
+        self.sbntransmitter = SboxnetTransmitter(self)
+        # start receiver
         self.sbnreiver.start()
+        # start transmitter
         self.sbntransmitter.start()
-        
+    
+    def main(self):
+        logInfo(self, "type 'help' for help.")
+        cmdlist = [ self.cmd_help,
+                    """self.cmd_reset,
+                    self.cmd_dbginfo,
+                    self.cmd_dbgstate,
+                    self.cmd_devsbndbg,
+                    self.cmd_getfwversion,
+                    self.cmd_getserialnumber,
+                    self.cmd_setserialnumber,
+                    self.cmd_tobootloader,
+                    self.cmd_list,
+                    self.cmd_dbgrecvbuf,
+                    self.cmd_dbgtmitbuf,
+                    self.cmd_dbgstack,
+                    self.cmd_devgetdesc,
+                    self.cmd_devsetdesc,
+                    self.cmd_devidentify,
+                    self.cmd_devreset,
+                    self.cmd_regread,
+                    self.cmd_regreadm,
+                    self.cmd_regwrite,
+                    self.cmd_regwritebit,
+                    self.cmd_locopower,
+                    self.cmd_locodrive,
+                    self.cmd_locofunc,
+                    self.cmd_locoadd,
+                    self.cmd_locodel,
+                    self.cmd_locopom,
+                    self.cmd_fwupd,
+                    self.cmd_avrgetbootloader """]
+        try:
+            logDebug(self, "find devices")
+            # find devices...
+            devices = sboxnet.SboxnetUSB.find_devices()
+            logDebug(self, f"found devices: {devices}")
+            for d in devices:
+                sn = sboxnet.SboxnetUSB(dev=d).getserialnumber()
+                logDebug(self, f"device {d} -> {sn}")
+            if devices is None or len(devices)==0:
+                logError(self, "no sboxnet2usb devices found!")
+                return
+            if len(devices) == 1:
+                # only one device found, use it
+                logDebug(self, "only one found, use it")
+                # first found device
+                self.dev = devices[0]
+                self.sbnusb = sboxnet.SboxnetUSB(dev=self.dev, debug=self.debug, sniffer=self.sniffer)
+                logDebug(self, f"using device with serialnumber: {self.sbnusb.getserialnumber()}")
+            else:
+                logInfo(self, "select sboxnet2usb device:")
+                idx = 0
+                for dev in devices:
+                    sb = sboxnet.SboxnetUSB(dev=dev)
+                    print(f"{idx}: serialnumber={sb.getserialnumber()}")
+                    idx = idx + 1
+                while 1:
+                    sel = input("select: ")
+                    if sel.isdigit():
+                        i = int(sel)
+                        if i >= 0 and i < idx:
+                            self.dev = devices[i]
+                            break
+            sn = self.sbnusb.getserialnumber()
+            if sn not in ['modellbahn','test2','test3']:
+                logError(self, f"serialnumber of device is not modellbahn or test2 or test3, but |{sn}|")
+                return
+            # begin sboxnet-tester...
+            
+        except Exception as e:
+            logInfo(self, "\nEXCEPTION: "+str(e))
+        #
+    # SboxnetTester.cmd_help(toks)
+    # print the help message
+    def cmd_help(self, toks):
+        if toks[0] != "help":
+            return 0
+        print("exit|quit|q")
+        """print("reset")
+        print("dbgstate|ds")
+        print("dbginfo|di")
+        print("dbgrecvbuf|dr")
+        print("dbgtmitbuf|dt")
+        print("dbgstack|dst")
+        print("getfwversion")
+        print("getserialnumber")
+        print("setserialnumber s")
+        print("tobootloader")
+        print("list")
+        print("regread|rr addr reg [num]")
+        print("regreadm|rrm addr reg0 ...")
+        print("regwrite|rw addr reg data")
+        print("regwritebit|rwb addr reg(31..) bit val")
+        print("devgetdesc addr [1..id]")
+        print("devsetdesc addr [1..id] text")
+        print("devreset addr")
+        print("identify addr on")
+        print("devsbndbg addr")
+        print("avrgetbootloader")
+        print("fwupd addr flag file")
+        print("locopower|lp addr flags")
+        print("locodrive|ld addr locaddr locspeed [fnkeys]")
+        print("locofunc|lf addr locaddr fnkeys")
+        print("locoadd|la addr locaddr flags")
+        print("locodel addr locaddr")
+        print("locopom addr locaddr cv data")"""
+        return 1
 
 # --- main ---
 
@@ -203,7 +324,7 @@ if __name__ == "__main__":
     sbntest = sbntst(dccmap, args.debug, args.sniffer)
     
     # SboxnetTester.main()
-    #sbntest.main()
+    sbntest.main()
 
     
 

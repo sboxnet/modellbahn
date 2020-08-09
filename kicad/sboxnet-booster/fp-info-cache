@@ -1,4 +1,4 @@
-18363655530470488
+18363655532610488
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -80826,8 +80826,8 @@ HSOP-36-1EP_11.0x15.9mm_P0.65mm_SlugDown_ThermalVias
 HSOP 11.0x15.9mm Pitch 0.65mm Slug Down Thermal Vias (PowerSO-36) [JEDEC MO-166] (http://www.st.com/resource/en/datasheet/vn808cm-32-e.pdf, http://www.st.com/resource/en/application_note/cd00003801.pdf)
 HSOP 11.0 x 15.9mm Pitch 0.65mm
 0
-64
-40
+111
+87
 sboxnet
 JTP-1130
 
