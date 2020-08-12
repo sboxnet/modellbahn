@@ -312,8 +312,10 @@ class SboxnetMsg(object):
         s = cmd_to_str(self.cmd&0x7f) + " ("+ cmd_to_str(self.cmd&0x7f)+ f"  is_answer {self.cmd&0x80 == 0x80}) {('--> SEND' if (self.cmd&0x80== 0) else '<-- RECEIVE ')}| dstaddr={self.dstaddr} srcaddr={self.srcaddr} seq={self.seq} dlen={self.dlen} cmd={self.cmd} cmd_hex={self.cmd:x} data={self.data} crc={self.crc}"
         if o._debug: logDebug(self, s)
 
-
-
+    def __str__(self):
+        s = cmd_to_str(self.cmd&0x7f) + " ("+ cmd_to_str(self.cmd&0x7f)+ f"  is_answer {self.cmd&0x80 == 0x80}) {('--> SEND' if (self.cmd&0x80== 0) else '<-- RECEIVE ')}| dstaddr={self.dstaddr} srcaddr={self.srcaddr} seq={self.seq} dlen={self.dlen} cmd={self.cmd} cmd_hex={self.cmd:x} data={self.data} crc={self.crc}"
+        print(s)
+        
 class SboxnetError(Exception):
     pass
         

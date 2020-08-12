@@ -23,6 +23,8 @@ import sboxnet
 import usb.core
 import usb.util
 
+#import pdb; pdb.set_trace()
+
 def getint(v):
     if v.startswith("0x"):
         return int(v, 16)
@@ -95,6 +97,8 @@ class SboxnetReceiver(threading.Thread):
     def __init__(self, sbntst):
         super().__init__(name="Sboxnet Receiver")
         logInfo(self, "start "+self.name+" ...")
+        self.sbntst = sbntst
+        self.debug = self.sbntst.debug
         
     def run(self):
         logInfo(self, "run "+self.name)
@@ -105,18 +109,27 @@ class SboxnetTransmitter(Thread):
     def __init__(self, sbntst):
         super().__init__(name="Sboxnet Transmitter")
         logInfo(self, "start "+ self.name+" ...")
+        self.sbntst = sbntst
+        self.debug = self.sbntst.debug
         self.tmitmsglist = []
         self.tmsglistlock = threading.Lock()
+        self.sbnusb = sbntst.sbnusb
         
     def run(self):
         logInfo(self, "run "+self.name)
         time.sleep(2)
         logInfo(self, "End "+self.name)
     
-    def send_netReset:
-        resetmsg = sboxnet.SboxnetMsg.new(255, SBOXNET_CMD_NET_RESET, 0)
+    def send_net_reset(self):
+        resetmsg = sboxnet.SboxnetMsg.new(255, sboxnet.SBOXNET_CMD_NET_RESET, 0)
         with self.tmsglistlock:
-            self.tmitmsglist.append(resetmsg)
+            logDebug(self, f"Send {resetmsg}")
+            #self.tmitmsglist.append(resetmsg)
+            x = self.sbntst
+            logDebug(self, f"{self.sbntst.sbnusb.getstatus()}")
+            if self.sbntst.sbnusb.getstatus() and sboxnet.SboxnetUSB.SBOXNET_STATUS_TX_CANSEND:
+                logDebug(self, f"Send it")
+                self.sbntst.sbnusb().sendmsg(resetmsg)
             
 
 class sbntst(object):
@@ -146,6 +159,9 @@ class sbntst(object):
         self.sbnreiver.start()
         # start transmitter
         self.sbntransmitter.start()
+    
+    def sbnusb():
+        return self.sbnusb
     
     def main(self):
         logInfo(self, "type 'help' for help.")
@@ -214,7 +230,9 @@ class sbntst(object):
             if sn not in ['modellbahn','test2','test3']:
                 logError(self, f"serialnumber of device is not modellbahn or test2 or test3, but |{sn}|")
                 return
+            
             # begin sboxnet-tester...
+            self.sbntransmitter.send_net_reset()
             
         except Exception as e:
             logInfo(self, "\nEXCEPTION: "+str(e))
