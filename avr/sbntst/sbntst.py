@@ -102,8 +102,9 @@ class SboxnetReceiver(threading.Thread):
         
     def run(self):
         logInfo(self, "run "+self.name)
-        time.sleep(2)
-        logInfo(self, "End "+self.name)
+        while True:
+            time.sleep(2)
+        #logInfo(self, "End "+self.name)
         
 class SboxnetTransmitter(Thread):
     def __init__(self, sbntst):
@@ -117,24 +118,39 @@ class SboxnetTransmitter(Thread):
         
     def run(self):
         logInfo(self, "run "+self.name)
-        time.sleep(2)
-        logInfo(self, "End "+self.name)
+        while True:
+            time.sleep(1)
     
+#    def sbnusb():
+#        return self.sbntst.sbnusb
+    
+    def init_conn(self):
+        try:
+            logDebug(self, "disable SboxnetUSB...")
+            self.sbntst.sbnusb.disable()
+            logDebug(self, "enable SboxnetUSB...")
+            self.sbntst.sbnusb.enable(devaddr=0, flags=0)
+        except Exception as e:
+            raise e
+        
     def send_net_reset(self):
         resetmsg = sboxnet.SboxnetMsg.new(255, sboxnet.SBOXNET_CMD_NET_RESET, 0)
-        with self.tmsglistlock:
-            logDebug(self, f"Send {resetmsg}")
-            #self.tmitmsglist.append(resetmsg)
-            x = self.sbntst
-            logDebug(self, f"{self.sbntst.sbnusb.getstatus()}")
-            if self.sbntst.sbnusb.getstatus() and sboxnet.SboxnetUSB.SBOXNET_STATUS_TX_CANSEND:
-                logDebug(self, f"Send it")
-                self.sbntst.sbnusb().sendmsg(resetmsg)
+        while True:
+            with self.tmsglistlock:
+                logDebug(self, f"Send {resetmsg}")
+                #self.tmitmsglist.append(resetmsg)
+                #x = self.sbntst
+                #logDebug(self, f"{self.sbntst.sbnusb.getstatus()}: can send: {self.sbntst.sbnusb.getstatus() and sboxnet.SboxnetUSB.SBOXNET_STATUS_TX_CANSEND}")
+                if self.sbntst.sbnusb.getstatus() and sboxnet.SboxnetUSB.SBOXNET_STATUS_TX_CANSEND:
+                    logDebug(self, f"Send it")
+                    self.sbntst.sbnusb.sendmsg(resetmsg)
+            time.sleep(0.1)
             
 
 class sbntst(object):
     _prdid = sboxnet.SboxnetUSB.PRODUCTID
     _seq = 0
+    sbnusb = None
     
     # Sbntst.__init__
     #  dccmap
@@ -159,9 +175,6 @@ class sbntst(object):
         self.sbnreiver.start()
         # start transmitter
         self.sbntransmitter.start()
-    
-    def sbnusb():
-        return self.sbnusb
     
     def main(self):
         logInfo(self, "type 'help' for help.")
@@ -230,9 +243,12 @@ class sbntst(object):
             if sn not in ['modellbahn','test2','test3']:
                 logError(self, f"serialnumber of device is not modellbahn or test2 or test3, but |{sn}|")
                 return
+            #x = self.get_sbnusb()
             
+            self.sbntransmitter.init_conn()
             # begin sboxnet-tester...
-            self.sbntransmitter.send_net_reset()
+            while True:
+                self.sbntransmitter.send_net_reset()
             
         except Exception as e:
             logInfo(self, "\nEXCEPTION: "+str(e))
@@ -277,10 +293,11 @@ class sbntst(object):
 
 def init_signals():
     # ignore SIGINT
-    def signal_sigint(sig, frame):
-        pass
+    #def signal_sigint(sig, frame):
+    #    pass
     # set SIGINT handler to signal_sidint 
-    signal.signal(signal.SIGINT, signal_sigint)
+    #signal.signal(signal.SIGINT, signal_sigint)
+    pass
 
 def init_readline():
     # --- Readline history management ---
