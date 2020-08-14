@@ -507,6 +507,9 @@ class AddrMapEntry(object):
     addr = None
     desc0 = ""
     desc1 = ""
+    
+    def __str__(self):
+        return f"PUID: {self.puid} |PRODUCTID: {self.productid} |VENDORID: {self.vendorid} |ADDR: {self.addr} |DESC0: {self.desc0} |DESC1: {self.desc1}"
 
 # Eine Map der Devices mit PUID (puid) und Adresse
 class AddrMap(object):
@@ -582,7 +585,7 @@ class AddrMap(object):
                 if e.addr == addr:
                     return e.puid
         return None
-
+        
 class SboxnetMaster(threading.Thread):
     # SboxnetMaster.
     def __init__(self, debug=None, serialn=None, sbnusb=None, cbobj=None):

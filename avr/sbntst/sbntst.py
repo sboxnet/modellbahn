@@ -99,21 +99,51 @@ class SboxnetReceiver(threading.Thread):
         logInfo(self, "start "+self.name+" ...")
         self.sbntst = sbntst
         self.debug = self.sbntst.debug
+        self.rmsglock = threading.Lock()
+        self.sbnusb = sbntst.sbnusb
         
+    #def process_msg(self, msg):
+    #    pass #logDebug(self, f"{msg}")
+    def process_msg(self, msg):
+        logDebug(self, f"{msg}")
+        if msg.cmd == sboxnet.SBOXNET_CMD_DEV_REQ_ADDR:
+            logDebug(self, f"process SBOXNET_CMD_DEV_REQ_ADDR")
+            if msg.dlen != 8:
+                logError(self, "ERROR: SBOXNET_CMD_DEV_REQ_ADDR wrong message format!")
+                return True
+            # create addr map entry
+            ame = sboxnet.AddrMapEntry()
+            # add puid
+            ame.puid = sboxnet.makelonga(msg.data, 0)
+            # add productid
+            ame.productid =sboxnet.makeworda(msg.data, 4)
+            # add vendorid
+            ame.vendorid = sboxnet.makeworda(msg.data, 6)
+            logDebug(self, f"{ame}")
+            
     def run(self):
         logInfo(self, "run "+self.name)
+        logInfo(self, "Receiver loop")
         while True:
-            time.sleep(2)
-        #logInfo(self, "End "+self.name)
-        
+            time.sleep(0.02)
+            with self.rmsglock:
+                logDebug(self, "Can we receive?")
+                if (self.sbntst.get_sbnusb().getstatus() and sboxnet.SboxnetUSB.SBOXNET_STATUS_RX_CANREAD):
+                    logDebug(self, "yes -> receive")
+                    (st, rmsg) = self.sbntst.sbnusb.recvmsg()
+                    logDebug(self, f"RECV: status:{st} {rmsg}")
+                    if rmsg[0]["msglen"] > 0:
+                        logDebug(self, f"{rmsg[0].get('msg')}")
+                        self.process_msg(rmsg[0].get('msg'))
+                        
 class SboxnetTransmitter(Thread):
     def __init__(self, sbntst):
         super().__init__(name="Sboxnet Transmitter")
         logInfo(self, "start "+ self.name+" ...")
         self.sbntst = sbntst
         self.debug = self.sbntst.debug
-        self.tmitmsglist = []
-        self.tmsglistlock = threading.Lock()
+        #self.tmitmsglist = []
+        self.tmsglock = threading.Lock()
         self.sbnusb = sbntst.sbnusb
         
     def run(self):
@@ -121,30 +151,17 @@ class SboxnetTransmitter(Thread):
         while True:
             time.sleep(1)
     
-#    def sbnusb():
-#        return self.sbntst.sbnusb
-    
-    def init_conn(self):
-        try:
-            logDebug(self, "disable SboxnetUSB...")
-            self.sbntst.sbnusb.disable()
-            logDebug(self, "enable SboxnetUSB...")
-            self.sbntst.sbnusb.enable(devaddr=0, flags=0)
-        except Exception as e:
-            raise e
+    def send(self, msg):
+        logDebug(self, f"try to send msg: {msg}")
+        with self.tmsglock:
+            logDebug(self, "can a msg be sent?")
+            if (self.sbntst.sbnusb.getstatus() and sboxnet.SboxnetUSB.SBOXNET_STATUS_TX_CANSEND):
+                logDebug(self, f"send msg: {msg}")
+                self.sbntst.sbnusb.sendmsg(msg)
+        #time.sleep(0.01)
         
-    def send_net_reset(self):
-        resetmsg = sboxnet.SboxnetMsg.new(255, sboxnet.SBOXNET_CMD_NET_RESET, 0)
-        while True:
-            with self.tmsglistlock:
-                logDebug(self, f"Send {resetmsg}")
-                #self.tmitmsglist.append(resetmsg)
-                #x = self.sbntst
-                #logDebug(self, f"{self.sbntst.sbnusb.getstatus()}: can send: {self.sbntst.sbnusb.getstatus() and sboxnet.SboxnetUSB.SBOXNET_STATUS_TX_CANSEND}")
-                if self.sbntst.sbnusb.getstatus() and sboxnet.SboxnetUSB.SBOXNET_STATUS_TX_CANSEND:
-                    logDebug(self, f"Send it")
-                    self.sbntst.sbnusb.sendmsg(resetmsg)
-            time.sleep(0.1)
+        
+
             
 
 class sbntst(object):
@@ -172,9 +189,12 @@ class sbntst(object):
         # transmitter object
         self.sbntransmitter = SboxnetTransmitter(self)
         # start receiver
-        self.sbnreiver.start()
+        #self.sbnreiver.start()
         # start transmitter
         self.sbntransmitter.start()
+    
+    def get_sbnusb(self):
+        return self.sbnusb
     
     def main(self):
         logInfo(self, "type 'help' for help.")
@@ -243,16 +263,36 @@ class sbntst(object):
             if sn not in ['modellbahn','test2','test3']:
                 logError(self, f"serialnumber of device is not modellbahn or test2 or test3, but |{sn}|")
                 return
-            #x = self.get_sbnusb()
             
-            self.sbntransmitter.init_conn()
-            # begin sboxnet-tester...
-            while True:
-                self.sbntransmitter.send_net_reset()
+            self.sbnreiver.start()
+            self.init_conn()
+            self.send_net_reset()
             
+                        
         except Exception as e:
             logInfo(self, "\nEXCEPTION: "+str(e))
         #
+    
+    def init_conn(self):
+        try:
+            logInfo(self, "inititalize Sboxnet USB Connection...")
+            logDebug(self,"first disable Sboxnet USB")
+            self.sbnusb.disable()
+            logDebug(self, "Sboxnet USB enable(devaddr=0, flags=0) ...")
+            self.sbnusb.enable(devaddr=0, flags=0)
+        except Exception as e:
+            logError(self, "-------------------")
+            logError(self, "EXCEPTION: "+str(e))
+            logError(self, "-------------------")
+            raise e
+            
+    def send_net_reset(self):
+        resetmsg = sboxnet.SboxnetMsg.new(255, sboxnet.SBOXNET_CMD_NET_RESET, 0)
+        #while True:
+        self.sbntransmitter.send(resetmsg)
+        time.sleep(0.01)
+    
+   
     # SboxnetTester.cmd_help(toks)
     # print the help message
     def cmd_help(self, toks):
