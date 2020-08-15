@@ -101,6 +101,7 @@ class SboxnetReceiver(threading.Thread):
         self.debug = self.sbntst.debug
         self.rmsglock = threading.Lock()
         self.sbnusb = sbntst.sbnusb
+        self.addrmap = sboxnet.AddrMap()
         
     #def process_msg(self, msg):
     #    pass #logDebug(self, f"{msg}")
@@ -119,7 +120,27 @@ class SboxnetReceiver(threading.Thread):
             ame.productid =sboxnet.makeworda(msg.data, 4)
             # add vendorid
             ame.vendorid = sboxnet.makeworda(msg.data, 6)
-            logDebug(self, f"{ame}")
+            
+            logDebug(self, f"RECV SBOXNET_CMD_DEV_REQ_ADDR puid:{ame.puid} productid:{ame.productid} vendorid:{ame.vendorid}")
+            # ist der eintrag schon da?
+            f = self.addrmap.find(ame)
+            logDebug(self, f"entry in addrmap? {f}")
+            if not f:
+                logDebug(self, f"no add it...")
+                # add () uses next free address in self.addrmap._freeaddrlist
+                if self.addrmap.add(ame):
+                    f = ame
+                else:
+                    logError(self, "ERROR: failed to add a new Sboxnet Logon Entry!")
+                    return True
+            # sende SBOXNET_CMD_DEV_SET_ADDR
+            # use values of SBOXNET_CMD_DEV_REQ_ADDR (puid, productid, vendorid)
+            x = msg.data[0:8]
+            # add the address
+            x.append(f.addr)
+            # src ist die Broadcast Adresse (255)
+            nmsg = sboxnet.SboxnetMsg.new(255, sboxnet.SBOXNET_CMD_DEV_SET_ADDR, 0, x)
+            self.sbntst.sbntransmitter.send(nmsg)
             
     def run(self):
         logInfo(self, "run "+self.name)
