@@ -492,7 +492,7 @@ class SboxnetUSB(object):
     # SboxnetUSB.getserialnumber(): get the serialnumber as string
     def getserialnumber(self):
         #if self._debug: logDebug(self, "getserialnumber")
-        return usb.util.get_string(self._dev, 32, self._dev.iSerialNumber)
+        return usb.util.get_string(self._dev, self._dev.iSerialNumber, 0x0409) #32, 0x0409) # """""")
 
     @staticmethod
     def find_devices():

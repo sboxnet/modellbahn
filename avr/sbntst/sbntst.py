@@ -23,8 +23,6 @@ import sboxnet
 import usb.core
 import usb.util
 
-#import pdb; pdb.set_trace()
-
 def getint(v):
     if v.startswith("0x"):
         return int(v, 16)
@@ -254,9 +252,13 @@ class sbntst(object):
             devices = sboxnet.SboxnetUSB.find_devices()
             logDebug(self, f"found devices: {devices}")
             for d in devices:
-                sn = sboxnet.SboxnetUSB(dev=d).getserialnumber()
+                #d._langids = (1033,)
+                sn = sboxnet.SboxnetUSB(dev=d)
+                #(x1,b) = d.langids()
+                sn = sn.getserialnumber()
                 logDebug(self, f"device {d} -> {sn}")
-            if devices is None or len(devices)==0:
+            l = len(list(devices))
+            if devices is None or l==0:
                 logError(self, "no sboxnet2usb devices found!")
                 return
             if len(devices) == 1:
@@ -265,6 +267,7 @@ class sbntst(object):
                 # first found device
                 self.dev = devices[0]
                 self.sbnusb = sboxnet.SboxnetUSB(dev=self.dev, debug=self.debug, sniffer=self.sniffer)
+                #l = self.sbnusb.langids()
                 logDebug(self, f"using device with serialnumber: {self.sbnusb.getserialnumber()}")
             else:
                 logInfo(self, "select sboxnet2usb device:")
@@ -291,6 +294,7 @@ class sbntst(object):
             
                         
         except Exception as e:
+            traceback.print_exc()
             logInfo(self, "\nEXCEPTION: "+str(e))
         #
     
