@@ -566,7 +566,7 @@ class AddrMap(object):
     # AddrMap Einträge listen
     def print_entries(self):
         for e in self._addrmap.values():
-            logInfo(self, "ADDR=%d PUID=0x%x PRODUCTID=0x%x VENDORID=0x%x  %s, %s" % (e.addr, e.puid, e.productid, e.vendorid, e.desc0, e.desc1))
+            logInfo(self, f"ADDR={e.addr} PUID=0x{e.puid:x} PRODUCTID=0x{e.productid:x} VENDORID=0x{e.vendorid:x}  {e.desc0},{e.desc1}")
     
     # AddrMap.get_puid_addr(puid)
     # Den AddrMap eintrag liefern für die PUID puid.

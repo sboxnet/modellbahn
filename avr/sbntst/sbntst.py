@@ -257,24 +257,29 @@ class sbntst(object):
     def main(self):
         logInfo(self, "type 'help' for help.")
         cmdlist = [ self.cmd_help,
-                    self.cmd_getserialnumber, ]
-        """
+                    self.cmd_getserialnumber,
+                    self.cmd_setserialnumber,
+                    self.cmd_list,
                     self.cmd_reset,
+                    self.cmd_devreset, ]
+                    
+        """
+                    
                     self.cmd_dbginfo,
                     self.cmd_dbgstate,
                     self.cmd_devsbndbg,
                     self.cmd_getfwversion,
                     
-                    self.cmd_setserialnumber,
+                    
                     self.cmd_tobootloader,
-                    self.cmd_list,
+                    
                     self.cmd_dbgrecvbuf,
                     self.cmd_dbgtmitbuf,
                     self.cmd_dbgstack,
                     self.cmd_devgetdesc,
                     self.cmd_devsetdesc,
                     self.cmd_devidentify,
-                    self.cmd_devreset,
+                    
                     self.cmd_regread,
                     self.cmd_regreadm,
                     self.cmd_regwrite,
@@ -357,6 +362,8 @@ class sbntst(object):
                     
         except EOFError as e:
             pass
+        except KeyboardInterrupt as e:
+            pass
         except Exception as e:
             traceback.print_exc()
             logInfo(self, "\nEXCEPTION: "+str(e))
@@ -384,25 +391,42 @@ class sbntst(object):
         self.sbntransmitter.send(resetmsg)
         time.sleep(0.01)
     
+    #
+    # SboxnetTester.execmsg(addr, cmd, data = [], printit = True)
+    # create a sboxnet msg and send it
+    def execmsg(self, addr, cmd, data = [], printit = True):
+        rmsg = self.sbntransmitter.send(sboxnet.SboxnetMsg.new(addr, cmd, self._seq, data))
+        seq = (self._seq + 1) & 255
+        if seq < 10:
+            seq = 10
+        self.seq = seq
+        #if printit:
+        #    self.printmsg(rmsg, sys.stdout)
+        return rmsg    
+    
    
-    # SboxnetTester.cmd_help(toks)
+    # sbntst.cmd_help(toks)
     # print the help message
     def cmd_help(self, toks):
         if toks[0] != "help":
             return 0
         print("exit|quit|q")
         print("getserialnumber")
-        """print("reset")
+        print("setserialnumber s")
+        print("list")
+        print("reset")
+        print("devreset")
+        """
         print("dbgstate|ds")
         print("dbginfo|di")
         print("dbgrecvbuf|dr")
         print("dbgtmitbuf|dt")
         print("dbgstack|dst")
         print("getfwversion")
-        print("getserialnumber")
-        print("setserialnumber s")
+        
+        
         print("tobootloader")
-        print("list")
+       
         print("regread|rr addr reg [num]")
         print("regreadm|rrm addr reg0 ...")
         print("regwrite|rw addr reg data")
@@ -421,18 +445,32 @@ class sbntst(object):
         print("locodel addr locaddr")
         print("locopom addr locaddr cv data")"""
         return 1
-    
     #
-    # SboxnetTester.cmd_reset(toks)
-    # sboxnet net reset
+    # sbntst.cmd_reset(toks)
+    # sboxnet net reset    
     def cmd_reset(self, toks):
         if toks[0] != "reset":
             return 0
         if len(toks) != 1:
             print("ERROR: usage: reset")
         else:
-            pass
-    #
+            self.send_net_reset()
+        return 1    
+    # SboxnetTester.cmd_devreset(toks)
+    # sboxnet dev reset
+    # [sboxnet-addr]
+    # if no addr is given, do a net reset
+    def cmd_devreset(self, toks):
+        if toks[0] not in ["devreset"]:
+            return 0
+        addr = None
+        if len(toks) == 2:
+            addr = checkbyte(toks[1], "addr")
+        if (addr is not None):
+            self.execmsg(addr, sboxnet.SBOXNET_CMD_DEV_RESET)
+        else:
+            self.send_net_reset()
+        return 1   #
     # SboxnetTester.cmd_getserialnumber(toks)
     # get the sboxnet USB serial number (string)
     # getserialnumber
@@ -441,7 +479,30 @@ class sbntst(object):
             return 0
         sn = self.sbnusb.getserialnumber()
         print("serial number: %s" % (sn))
-        return 1    
+        return 1
+    
+    #
+    # SboxnetTester.setserialnumber(toks)
+    # set the sboxnet USB serial number (string)
+    # setserialnumber udesc
+    def cmd_setserialnumber(self, toks):
+        if toks[0] not in ['setserialnumber']:
+            return 0
+        if len(toks) == 2:
+            udesc = toks[1]
+            self.sbnusb.setserialnumber(udesc)
+        else:
+            print("ERROR: no serialnumber given!")
+        return 1
+    
+    #
+    # SboxnetTester.cmd_list(toks)
+    # list all registered devices
+    def cmd_list(self, toks):
+        if toks[0] not in ["list"]:
+            return 0
+        self.sbnreiver.addrmap.print_entries()
+        return 1
 
 # --- main ---
 
