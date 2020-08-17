@@ -139,7 +139,26 @@ class SboxnetReceiver(threading.Thread):
             # src ist die Broadcast Adresse (255)
             nmsg = sboxnet.SboxnetMsg.new(255, sboxnet.SBOXNET_CMD_DEV_SET_ADDR, 0, x)
             self.sbntst.sbntransmitter.send(nmsg)
-            
+            return True
+        elif msg.cmd == (sboxnet.SBOXNET_CMD_DEV_SET_ADDR|0x80):
+            # device description 0
+            logDebug(self, f"request device description with seq=2 idx=0")
+            desc0 = sboxnet.SboxnetMsg.new(msg.srcaddr, sboxnet.SBOXNET_CMD_DEV_GET_DESC, 2, [0])
+            self.sbntst.sbntransmitter.send(desc0)
+            time.sleep(0.01)
+            desc1 = sboxnet.SboxnetMsg.new(msg.srcaddr, sboxnet.SBOXNET_CMD_DEV_GET_DESC, 3, [1])
+            self.sbntst.sbntransmitter.send(desc1)
+        elif msg.cmd == (sboxnet.SBOXNET_CMD_DEV_GET_DESC|0x80):
+            # answer of SBOXNET_CMD_DEV_GET_DESC
+            desc = bytes(msg.data[0:msg.dlen]).decode(encoding="ascii")
+            ame = self.addrmap.find_addr(msg.srcaddr)
+            if ame:
+                if msg.seq == 2:
+                    ame.desc0 = desc
+                if msg.seq == 3:
+                    ame.desc1 = desc
+                    logInfo(self, f"LOGON  {ame}")
+                    
     def run(self):
         logInfo(self, "run "+self.name)
         logInfo(self, "Receiver loop")
@@ -151,9 +170,10 @@ class SboxnetReceiver(threading.Thread):
                     logDebug(self, "yes -> receive")
                     (st, rmsg) = self.sbntst.sbnusb.recvmsg()
                     logDebug(self, f"RECV: status:{st} {rmsg}")
-                    if rmsg[0]["msglen"] > 0:
-                        logDebug(self, f"{rmsg[0].get('msg')}")
-                        self.process_msg(rmsg[0].get('msg'))
+                    for msg in rmsg:
+                        if msg['msglen'] > 0:
+                            logDebug(self, msg['msg'])
+                            self.process_msg(msg['msg'])
                         
 class SboxnetTransmitter(Thread):
     def __init__(self, sbntst):
@@ -248,26 +268,24 @@ class sbntst(object):
                     self.cmd_avrgetbootloader """]
         try:
             logDebug(self, "find devices")
+            l = 0
+            devices = []
             # find devices...
-            devices = sboxnet.SboxnetUSB.find_devices()
-            logDebug(self, f"found devices: {devices}")
-            for d in devices:
-                #d._langids = (1033,)
-                sn = sboxnet.SboxnetUSB(dev=d)
-                #(x1,b) = d.langids()
-                sn = sn.getserialnumber()
-                logDebug(self, f"device {d} -> {sn}")
-            l = len(list(devices))
-            if devices is None or l==0:
+            for d in  sboxnet.SboxnetUSB.find_devices():
+                sn = sboxnet.SboxnetUSB(dev=d).getserialnumber()
+                logDebug(self, f"device {l} -> {sn}")
+                devices.append(d)
+                l = l + 1
+            
+            if l == 0:
                 logError(self, "no sboxnet2usb devices found!")
                 return
-            if len(devices) == 1:
+            if l == 1:
                 # only one device found, use it
                 logDebug(self, "only one found, use it")
                 # first found device
                 self.dev = devices[0]
                 self.sbnusb = sboxnet.SboxnetUSB(dev=self.dev, debug=self.debug, sniffer=self.sniffer)
-                #l = self.sbnusb.langids()
                 logDebug(self, f"using device with serialnumber: {self.sbnusb.getserialnumber()}")
             else:
                 logInfo(self, "select sboxnet2usb device:")
