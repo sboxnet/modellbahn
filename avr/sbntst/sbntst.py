@@ -23,6 +23,8 @@ import sboxnet
 import usb.core
 import usb.util
 
+import select
+
 def getint(v):
     if v.startswith("0x"):
         return int(v, 16)
@@ -100,6 +102,7 @@ class SboxnetReceiver(threading.Thread):
         self.rmsglock = threading.Lock()
         self.sbnusb = sbntst.sbnusb
         self.addrmap = sboxnet.AddrMap()
+        self.term = False
         
     #def process_msg(self, msg):
     #    pass #logDebug(self, f"{msg}")
@@ -157,23 +160,31 @@ class SboxnetReceiver(threading.Thread):
                     ame.desc0 = desc
                 if msg.seq == 3:
                     ame.desc1 = desc
-                    logInfo(self, f"LOGON  {ame}")
+                    print("-------------------------------------")
+                    print(f"LOGON  {ame}")
+                    print("+++++++++++++++++++++++++++++++++++++")
                     
     def run(self):
         logInfo(self, "run "+self.name)
         logInfo(self, "Receiver loop")
-        while True:
+        while not self.term:
             time.sleep(0.02)
+            with self.sbntst.readlock:
+                pass            
             with self.rmsglock:
-                logDebug(self, "Can we receive?")
+                #logDebug(self, "Can we receive?")
                 if (self.sbntst.get_sbnusb().getstatus() and sboxnet.SboxnetUSB.SBOXNET_STATUS_RX_CANREAD):
-                    logDebug(self, "yes -> receive")
+                    #logDebug(self, "yes -> receive")
                     (st, rmsg) = self.sbntst.sbnusb.recvmsg()
-                    logDebug(self, f"RECV: status:{st} {rmsg}")
+                    #logDebug(self, f"RECV: status:{st} {rmsg}")
                     for msg in rmsg:
                         if msg['msglen'] > 0:
                             logDebug(self, msg['msg'])
                             self.process_msg(msg['msg'])
+        logDebug(self, f"TERMINATE {self}")
+        
+    def terminate(self):
+        self.term = True
                         
 class SboxnetTransmitter(Thread):
     def __init__(self, sbntst):
@@ -184,11 +195,15 @@ class SboxnetTransmitter(Thread):
         #self.tmitmsglist = []
         self.tmsglock = threading.Lock()
         self.sbnusb = sbntst.sbnusb
+        self.term = False
         
     def run(self):
         logInfo(self, "run "+self.name)
-        while True:
+        while not self.term:
+            with self.sbntst.readlock:
+                pass
             time.sleep(1)
+        logDebug(self, f"TERMINATE {self}")
     
     def send(self, msg):
         logDebug(self, f"try to send msg: {msg}")
@@ -198,6 +213,9 @@ class SboxnetTransmitter(Thread):
                 logDebug(self, f"send msg: {msg}")
                 self.sbntst.sbnusb.sendmsg(msg)
         #time.sleep(0.01)
+    
+    def terminate(self):
+        self.term = True    
         
         
 
@@ -213,7 +231,7 @@ class sbntst(object):
     #    Artikel, Lok, Epoche, DCC (Adresse), L/G, Schittstelle, Decoder, Funktionen, Sound, Beschreibung
     #  debug 
     #   if it should be run with debug
-    #  sniffer
+    #  snifferss
     #    run as sniffer
     def __init__(self, dccmap, debug, sniffer):
         logInfo(self, f"--- SboxnetTester(debug={debug}, sniffer={sniffer}) ---")
@@ -223,6 +241,7 @@ class sbntst(object):
         self.sniffer = sniffer
         logDebug(self, "init")
         logInfo(self, "creating SboxnetUSB:...")
+        self.readlock = threading.Lock()
         # receiver object
         self.sbnreiver = SboxnetReceiver(self)
         # transmitter object
@@ -238,12 +257,14 @@ class sbntst(object):
     def main(self):
         logInfo(self, "type 'help' for help.")
         cmdlist = [ self.cmd_help,
-                    """self.cmd_reset,
+                    self.cmd_getserialnumber, ]
+        """
+                    self.cmd_reset,
                     self.cmd_dbginfo,
                     self.cmd_dbgstate,
                     self.cmd_devsbndbg,
                     self.cmd_getfwversion,
-                    self.cmd_getserialnumber,
+                    
                     self.cmd_setserialnumber,
                     self.cmd_tobootloader,
                     self.cmd_list,
@@ -265,7 +286,7 @@ class sbntst(object):
                     self.cmd_locodel,
                     self.cmd_locopom,
                     self.cmd_fwupd,
-                    self.cmd_avrgetbootloader """]
+                    self.cmd_avrgetbootloader """
         try:
             logDebug(self, "find devices")
             l = 0
@@ -309,11 +330,39 @@ class sbntst(object):
             self.sbnreiver.start()
             self.init_conn()
             self.send_net_reset()
-            
-                        
+            # wait 2 secs to let init
+            time.sleep(2)
+            while True:
+                rline = ""
+                with self.readlock:
+                    # do read actions
+                    rline = input("> ")
+                #print(rline)    
+                tokens = shlex.split(rline, comments=True, posix=True)
+                if len(tokens) == 0:
+                    continue
+                if tokens[0] in ["exit","quit","q"]:
+                    break
+                found = False
+                for cmd in cmdlist:
+                    try:
+                        if cmd(tokens):
+                            found = True
+                            break
+                    except (sboxnet.SboxnetError, usb.core.USBError) as e:
+                        logError(self, f"{e}")
+                        found = True
+                if not found:
+                    logError(self, f"unknown command {tokens[0]}")
+                    
+        except EOFError as e:
+            pass
         except Exception as e:
             traceback.print_exc()
             logInfo(self, "\nEXCEPTION: "+str(e))
+        # do terminate
+        self.sbntransmitter.terminate()
+        self.sbnreiver.terminate()
         #
     
     def init_conn(self):
@@ -342,6 +391,7 @@ class sbntst(object):
         if toks[0] != "help":
             return 0
         print("exit|quit|q")
+        print("getserialnumber")
         """print("reset")
         print("dbgstate|ds")
         print("dbginfo|di")
@@ -371,6 +421,27 @@ class sbntst(object):
         print("locodel addr locaddr")
         print("locopom addr locaddr cv data")"""
         return 1
+    
+    #
+    # SboxnetTester.cmd_reset(toks)
+    # sboxnet net reset
+    def cmd_reset(self, toks):
+        if toks[0] != "reset":
+            return 0
+        if len(toks) != 1:
+            print("ERROR: usage: reset")
+        else:
+            pass
+    #
+    # SboxnetTester.cmd_getserialnumber(toks)
+    # get the sboxnet USB serial number (string)
+    # getserialnumber
+    def cmd_getserialnumber(self, toks):
+        if toks[0] not in ['getserialnumber']:
+            return 0
+        sn = self.sbnusb.getserialnumber()
+        print("serial number: %s" % (sn))
+        return 1    
 
 # --- main ---
 
