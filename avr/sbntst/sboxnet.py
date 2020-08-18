@@ -326,14 +326,14 @@ class SboxnetUSB(object):
     #
     CMD_SBOXNET_SET_MODE = 0x30
     CMD_SBOXNET_GET_STATUS = 0x31
-    CMD_SBOXNET_RECEIVE = 0x32
-    CMD_SBOXNET_TRANSMIT = 0x33
-    CMD_SBOXNET_GET_DBGINFO = 0x3a
-    CMD_SBOXNET_GET_DBGSTATE = 0x3b
-    CMD_SBOXNET_GET_DBGRECVBUF = 0x3c
-    CMD_SBOXNET_GET_DBGTMITBUF = 0x3d
-    CMD_DBG_STACK = 0x40
-    CMD_SET_SERIALNUMBER = 0x51
+    CMD_SBOXNET_RECEIVE = 0x32 # 50
+    CMD_SBOXNET_TRANSMIT = 0x33 # 51
+    CMD_SBOXNET_GET_DBGINFO = 0x3a # 58
+    CMD_SBOXNET_GET_DBGSTATE = 0x3b # 59
+    CMD_SBOXNET_GET_DBGRECVBUF = 0x3c # 60
+    CMD_SBOXNET_GET_DBGTMITBUF = 0x3d # 61
+    CMD_DBG_STACK = 0x40 # 64
+    CMD_SET_SERIALNUMBER = 0x51 # 81
     #
     SBOXNET_FLG_ENABLED = 0x01
     SBOXNET_FLG_SNIFFER = 0x02
@@ -509,7 +509,7 @@ class AddrMapEntry(object):
     desc1 = ""
     
     def __str__(self):
-        return f"PUID: {self.puid} |PRODUCTID: {self.productid} |VENDORID: {self.vendorid} |ADDR: {self.addr} |DESC0: {self.desc0} |DESC1: {self.desc1}"
+        return f"PUID: 0x{self.puid:x} |PRODUCTID: 0x{self.productid:x} |VENDORID: 0x{self.vendorid:x} |ADDR: {self.addr} |DESC0: {self.desc0} |DESC1: {self.desc1}"
 
 # Eine Map der Devices mit PUID (puid) und Adresse
 class AddrMap(object):

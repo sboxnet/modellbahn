@@ -109,6 +109,7 @@ class SboxnetReceiver(threading.Thread):
     def process_msg(self, msg):
         logDebug(self, f"{msg}")
         if msg.cmd == sboxnet.SBOXNET_CMD_DEV_REQ_ADDR:
+            self.sbntst.resetdone = True
             logDebug(self, f"process SBOXNET_CMD_DEV_REQ_ADDR")
             if msg.dlen != 8:
                 logError(self, "ERROR: SBOXNET_CMD_DEV_REQ_ADDR wrong message format!")
@@ -154,15 +155,21 @@ class SboxnetReceiver(threading.Thread):
         elif msg.cmd == (sboxnet.SBOXNET_CMD_DEV_GET_DESC|0x80):
             # answer of SBOXNET_CMD_DEV_GET_DESC
             desc = bytes(msg.data[0:msg.dlen]).decode(encoding="ascii")
-            ame = self.addrmap.find_addr(msg.srcaddr)
-            if ame:
-                if msg.seq == 2:
-                    ame.desc0 = desc
-                if msg.seq == 3:
-                    ame.desc1 = desc
-                    print("-------------------------------------")
-                    print(f"LOGON  {ame}")
-                    print("+++++++++++++++++++++++++++++++++++++")
+            if self.sbntst.lastcmd == sboxnet.SBOXNET_CMD_DEV_GET_DESC:
+                time.sleep(0.01)
+                print(f"answer of {sboxnet.cmd_to_str(self.sbntst.lastcmd)}({msg.srcaddr}): {desc}", flush=True)
+                self.sbntst.lastcmd = None
+                #time.sleep(0.01)
+            else:
+                ame = self.addrmap.find_addr(msg.srcaddr)
+                if ame:
+                    if msg.seq == 2:
+                        ame.desc0 = desc
+                    if msg.seq == 3:
+                        ame.desc1 = desc
+                        print("-------------------------------------")
+                        print(f"LOGON  {ame}")
+                        print("+++++++++++++++++++++++++++++++++++++")
                     
     def run(self):
         logInfo(self, "run "+self.name)
@@ -224,8 +231,9 @@ class SboxnetTransmitter(Thread):
 class sbntst(object):
     _prdid = sboxnet.SboxnetUSB.PRODUCTID
     _seq = 0
+    resetdone = False
     sbnusb = None
-    
+    lastcmd = None
     # Sbntst.__init__
     #  dccmap
     #    Artikel, Lok, Epoche, DCC (Adresse), L/G, Schittstelle, Decoder, Funktionen, Sound, Beschreibung
@@ -261,7 +269,8 @@ class sbntst(object):
                     self.cmd_setserialnumber,
                     self.cmd_list,
                     self.cmd_reset,
-                    self.cmd_devreset, ]
+                    self.cmd_devreset,
+                    self.cmd_devgetdesc,]
                     
         """
                     
@@ -276,7 +285,7 @@ class sbntst(object):
                     self.cmd_dbgrecvbuf,
                     self.cmd_dbgtmitbuf,
                     self.cmd_dbgstack,
-                    self.cmd_devgetdesc,
+                    
                     self.cmd_devsetdesc,
                     self.cmd_devidentify,
                     
@@ -387,23 +396,75 @@ class sbntst(object):
             
     def send_net_reset(self):
         resetmsg = sboxnet.SboxnetMsg.new(255, sboxnet.SBOXNET_CMD_NET_RESET, 0)
-        #while True:
-        self.sbntransmitter.send(resetmsg)
-        time.sleep(0.01)
+        while not self.resetdone:
+            self.sbntransmitter.send(resetmsg)
+            time.sleep(1)
     
     #
     # SboxnetTester.execmsg(addr, cmd, data = [], printit = True)
     # create a sboxnet msg and send it
     def execmsg(self, addr, cmd, data = [], printit = True):
-        rmsg = self.sbntransmitter.send(sboxnet.SboxnetMsg.new(addr, cmd, self._seq, data))
-        seq = (self._seq + 1) & 255
-        if seq < 10:
-            seq = 10
-        self.seq = seq
-        #if printit:
+        self.lastcmd = cmd
+        self.sbntransmitter.send(sboxnet.SboxnetMsg.new(addr, cmd, 250, data))
+        #f printit:
         #    self.printmsg(rmsg, sys.stdout)
-        return rmsg    
+        return
     
+    #
+    # SboxnetTester.printmsg(msg, fh): msg as an array (see SboxnetMsg). fh if true log to file sboxnet.log
+    # user readable msg as string
+    """
+    def printmsg(self, msg, fh=None):
+        if msg is None:
+            return None
+        logDebug(self, f'~~~~~ PRINT MSG ')
+        outstr = f"%s srcaddr=%d destaddr=%d seq=%d len=%d %scmd=%s (0x%x) crc=0x%x" % (("-->" if (msg.cmd & 0x80==0x80) else "<--"), 
+                                                                    msg.srcaddr, msg.dstaddr, msg.seq, msg.dlen,
+                                                                    (">" if (msg.cmd & 0x80) else " "), sboxnet.cmd_to_str(msg.cmd & 0x7f), msg.cmd, msg.crc)
+        logDebug(self, f"Outstr: {outstr}")
+        
+        if msg.cmd == (0x80|sboxnet.SBOXNET_CMD_DEV_GET_DESC):
+            logDebug(self, f'---- device description ----')
+            desc = bytes(msg.data[0:msg.dlen]).decode(encoding="ascii")
+            outstr = outstr + " DEV DESC: %s" % (desc)
+        
+        elif msg.cmd == (0x80|sboxnet.SBOXNET_CMD_REG_READ) or msg.cmd == (0x80|sboxnet.SBOXNET_CMD_REG_READ_MULTI):
+            outstr = outstr + ":"
+            i = 0
+            while i < msg.dlen/2:
+                w = makeworda(msg.data, 2*i)
+                outstr = outstr + " 0x%x (%d)," % (w, w)
+                i = i + 1
+        
+        elif msg.cmd == sboxnet.SBOXNET_CMD_FB_LOCOADDR:
+            dcc = makeworda(msg.data, 1)
+            lok = None
+            if dcc in self.dccmap:
+                lok = self.dccmap[dcc]
+            outstr = outstr + ": sensor %d = %d, locoaddr=%d %s" % (int(msg.data[0] & 0x7f), int((msg.data[0] >> 7) & 1),
+                                                    dcc, lok if lok else "Unknown-DCC-Address")
+            
+        elif msg.cmd == 0x80:
+            rcmd = msg.data[0]
+            rc = msg.data[1]
+            outstr = outstr +": ackrc: %s (%d)  cmd: %s (0x%x)" % (sboxnet.ackrc_to_str(rc), rc,
+                                                                    sboxnet.cmd_to_str(rcmd), rcmd)
+        else:
+            i = 0
+            while i < msg.dlen:
+                w = msg.data[i]
+                outstr = outstr + " 0x%x (%d)," % (w, w)
+                i = i + 1
+        #if fh is None:
+            #with open("sboxnet.log", "a") as fh:
+            #    logInfo(self, outstr, fh)
+        #else:
+        #logInfo(self, outstr, fh)
+        #logInfo(self, outstr)
+        print(outstr)
+        #if self._debug: logDebug(self, outstr)
+        return msg    
+    """
    
     # sbntst.cmd_help(toks)
     # print the help message
@@ -416,6 +477,7 @@ class sbntst(object):
         print("list")
         print("reset")
         print("devreset")
+        print("devgetdesc addr [1..id]")
         """
         print("dbgstate|ds")
         print("dbginfo|di")
@@ -431,7 +493,7 @@ class sbntst(object):
         print("regreadm|rrm addr reg0 ...")
         print("regwrite|rw addr reg data")
         print("regwritebit|rwb addr reg(31..) bit val")
-        print("devgetdesc addr [1..id]")
+        
         print("devsetdesc addr [1..id] text")
         print("devreset addr")
         print("identify addr on")
@@ -503,6 +565,22 @@ class sbntst(object):
             return 0
         self.sbnreiver.addrmap.print_entries()
         return 1
+    
+    #
+    # SboxnetTester.cmd_devgetdesc(toks)
+    # sboxnet get device description
+    # sboxnet-addr stridx (1..id)
+    def cmd_devgetdesc(self, toks):
+        if toks[0] != "devgetdesc":
+            return 0
+        if len(toks) != 3:
+            print("ERROR: usage: devgetdesc addr [1..id]")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            did = checkbyte(toks[2], "id");
+            if addr is not None and did is not None:
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_DEV_GET_DESC, [did])
+        return 1    
 
 # --- main ---
 
