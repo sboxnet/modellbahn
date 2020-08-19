@@ -580,6 +580,7 @@ class sbntst(object):
             did = checkbyte(toks[2], "id");
             if addr is not None and did is not None:
                 self.execmsg(addr, sboxnet.SBOXNET_CMD_DEV_GET_DESC, [did])
+                time.sleep(0.5)
         return 1    
 
 # --- main ---
