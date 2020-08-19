@@ -238,7 +238,8 @@ class SboxnetWatchdog(Thread):
     def run(self):
         while not self.term:
             time.sleep(1)
-            self.sbntst.sbntransmitter.send(sboxnet.SboxnetMsg.new(255, sboxnet.SBOXNET_CMD_NET_WATCHDOG, 0))
+            if self.sbntst.sbnusb:
+                self.sbntst.sbntransmitter.send(sboxnet.SboxnetMsg.new(255, sboxnet.SBOXNET_CMD_NET_WATCHDOG, 0))
         logDebug(self, f"TERMINATE {self}")
         
     def terminate(self):
@@ -267,6 +268,7 @@ class sbntst(object):
         self.debug = debug
         # run as sniffer?
         self.sniffer = sniffer
+        self.dccmap = dccmap
         logDebug(self, "init")
         logInfo(self, "creating SboxnetUSB:...")
         self.readlock = threading.Lock()
@@ -294,21 +296,26 @@ class sbntst(object):
                     self.cmd_devreset,
                     self.cmd_devgetdesc,
                     self.cmd_devsetdesc,
-                    self.cmd_dbgstate, ]
+                    self.cmd_dbgstate,
+                    self.cmd_dbginfo,
+                    self.cmd_dbgrecvbuf,
+                    self.cmd_dbgtmitbuf,
+                    self.cmd_dbgstack,
+                    self.cmd_getfwversion,]
                     
         """
                     
-                    self.cmd_dbginfo,
+                    
                     
                     self.cmd_devsbndbg,
-                    self.cmd_getfwversion,
+                    
                     
                     
                     self.cmd_tobootloader,
                     
-                    self.cmd_dbgrecvbuf,
-                    self.cmd_dbgtmitbuf,
-                    self.cmd_dbgstack,
+                    
+                    
+                    
                     
                     
                     self.cmd_devidentify,
@@ -510,14 +517,20 @@ class sbntst(object):
         print("devgetdesc addr [1..id]")
         print("devsetdesc addr [1..id] text")
         print("dbgstate|ds")
-        
-        """
-        
         print("dbginfo|di")
         print("dbgrecvbuf|dr")
         print("dbgtmitbuf|dt")
         print("dbgstack|dst")
         print("getfwversion")
+        
+        
+        """
+        
+        
+        
+        
+        
+        
         
         
         print("tobootloader")
@@ -654,6 +667,54 @@ class sbntst(object):
         print(f"backoff_bits  {ds.backoff_bits}")
         print(f"recv_len      {ds.recv_len}")
         print(f"prng_seed     {ds.prng_seed}")
+        return 1
+    
+    def cmd_dbginfo(self, toks):
+        if toks[0] not in ["dbginfo", "di"]:
+            return 0
+        d = self.sbnusb.getdbginfo()
+        print(f"{d}")
+        return 1
+    
+    #
+    # SboxnetTester.cmd_dbgrecvbuf(toks)
+    # print receive buffer
+    def cmd_dbgrecvbuf(self, toks):
+        if toks[0] not in ["dbgrecvbuf", "dr"]:
+            return 0
+        b = self.sbnusb.getdbgrecvbuf()
+        print(f"{b}")
+        return 1
+    
+    #
+    # SboxnetTester.cmd_dbgtmitbuf(toks)
+    # print transmit buffer
+    def cmd_dbgtmitbuf(self, toks):
+        if toks[0] not in ["dbgtmitbuf", "dt"]:
+            return 0
+        b = self.sbnusb.getdbgtmitbuf()
+        print(f"{b}")
+        return 1
+    
+    #
+    # SboxnetTester.cmd_dbgstack(toks)
+    # debug stack: size, free
+    def cmd_dbgstack(self, toks):
+        if toks[0] not in ["dbgstack", "dst"]:
+            return 0
+        b = self.sbnusb.getdbgstack()
+        print(f"stack size: {b.size}")
+        print(f"stack free: {b.free}")
+        return 1
+    #
+    # SboxnetTester.getfwversion()
+    # print the sboxnet USB firmware version (hex string)
+    def cmd_getfwversion(self, toks):
+        if toks[0] not in ['getfwversion']:
+            return 0
+        #fwv = self._sbnm.sboxnet().getfwversion()
+        fwv = self.sbnusb.getfwversion()
+        print(f"firmware version: 0x{fwv}")
         return 1    
 
 # --- main ---

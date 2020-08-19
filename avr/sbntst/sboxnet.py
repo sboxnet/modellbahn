@@ -243,6 +243,27 @@ class SboxnetDebugInfo(object):
         self.recverr_size = makeworda(arr, 32)
         self.crcerrors = makeworda(arr, 34)
         self.tmiterrors = makeworda(arr, 36)
+    
+    def __str__(self):
+        return "".join([f"recv_byte: {self.recv_byte}\n",
+        f"recv_msg_got: {self.recv_msg_got}\n",
+        f"recv_msg_fetched: {self.recv_msg_fetched}\n",
+        f"tmit_byte: {self.tmit_byte}\n",
+        f"tmit_msg_tosend: {self.tmit_msg_tosend}\n",
+        f"tmit_msg_sent: {self.tmit_msg_sent}\n",
+        f"collisions: {self.collisions}\n",
+        f"coll_rxc: {self.coll_rxc}\n",
+        f"coll_fe: {self.coll_fe}\n",
+        f"coll_udr: {self.coll_udr}\n",
+        f"retries: {self.retries}\n",
+        f"recverrors: {self.recverrors}\n",
+        f"recverr_fe: {self.recverr_fe}\n",
+        f"recverr_pe: {self.recverr_pe}\n",
+        f"recverr_dor: {self.recverr_dor}\n",
+        f"recverr_proto: {self.recverr_proto}\n",
+        f"recverr_size: {self.recverr_size}\n",
+        f"crcerrors: {self.crcerrors}\n",
+        f"tmiterrors: {self.tmiterrors}\n"])
 
 class SboxnetDebugRingBuf(object):
     def __init__(self, arr):
@@ -255,6 +276,17 @@ class SboxnetDebugRingBuf(object):
         self.count = arr[6]
         self.size = arr[7]
         self.buf = arr[8:]
+    
+    def __str__(self):
+        return "".join([f"rd: {self.rd}\n",
+                f"rd_count: {self.rd_count}\n",
+                f"rd_rollback: {self.rd_rollback}\n",
+                f"wr: {self.wr}\n",
+                f"wr_count: {self.wr_count}\n",
+                f"wr_rollback: {self.wr_rollback}\n",
+                f"count: {self.count}\n",
+                f"size: {self.size}\n",
+                f"buf: {self.buf}\n"])
 
 class SboxnetDebugStack(object):
     def __init__(self, arr):
