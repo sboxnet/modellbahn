@@ -168,6 +168,9 @@ class SboxnetReceiver(threading.Thread):
                         print("-------------------------------------")
                         print(f"LOGON  {ame}")
                         print("+++++++++++++++++++++++++++++++++++++")
+        #elif msg.cmd == (sboxnet.SBOXNET_CMD_REG_READ|0x80):
+        #    self.sbntst.printmsg(msg)
+            
         self.sbntst.printmsg(msg)
         self.sbntst.lastcmd = None
                 
@@ -301,7 +304,13 @@ class sbntst(object):
                     self.cmd_dbgrecvbuf,
                     self.cmd_dbgtmitbuf,
                     self.cmd_dbgstack,
-                    self.cmd_getfwversion,]
+                    self.cmd_getfwversion,
+                    self.cmd_devidentify,
+                    self.cmd_regread,
+                    self.cmd_regreadm,
+                    self.cmd_regwrite,
+                    self.cmd_regwritebit,
+                    ]
                     
         """
                     
@@ -318,12 +327,12 @@ class sbntst(object):
                     
                     
                     
-                    self.cmd_devidentify,
                     
-                    self.cmd_regread,
-                    self.cmd_regreadm,
-                    self.cmd_regwrite,
-                    self.cmd_regwritebit,
+                    
+                    
+                    
+                    
+                    
                     self.cmd_locopower,
                     self.cmd_locodrive,
                     self.cmd_locofunc,
@@ -458,7 +467,9 @@ class sbntst(object):
         if msg is None:
             return None
         #logDebug(self, f'~~~~~ PRINT MSG ')
-        outstr = f"srcaddr={msg.srcaddr} destaddr={msg.dstaddr} seq={msg.seq} len={msg.dlen}"
+        outstr = f"({'--> (IN)' if (msg.cmd & 0x80==0x80) else '<-- (OUT)'}) srcaddr={msg.srcaddr} "+\
+            f"destaddr={msg.dstaddr} seq={msg.seq} len={msg.dlen} "+\
+            f"{('>' if (msg.cmd & 0x80) else ' ')} {sboxnet.cmd_to_str(msg.cmd & 0x7f)} {msg.cmd} (0x{msg.cmd:x}) CRC {msg.crc} (0x{msg.crc:x})"
         #logDebug(self, f"Outstr: {outstr}")
         
         if msg.cmd == (0x80|sboxnet.SBOXNET_CMD_DEV_GET_DESC):
@@ -506,8 +517,9 @@ class sbntst(object):
     # sbntst.cmd_help(toks)
     # print the help message
     def cmd_help(self, toks):
-        if toks[0] != "help":
+        if toks[0] not in ["help", "h"]:
             return 0
+        print("help|h")
         print("exit|quit|q")
         print("getserialnumber")
         print("setserialnumber s")
@@ -522,7 +534,11 @@ class sbntst(object):
         print("dbgtmitbuf|dt")
         print("dbgstack|dst")
         print("getfwversion")
-        
+        print("identify addr on")
+        print("regread|rr addr reg [num]")
+        print("regreadm|rrm addr reg0 ...")
+        print("regwrite|rw addr reg data")
+        print("regwritebit|rwb addr reg(31..) bit val")
         
         """
         
@@ -535,14 +551,14 @@ class sbntst(object):
         
         print("tobootloader")
        
-        print("regread|rr addr reg [num]")
-        print("regreadm|rrm addr reg0 ...")
-        print("regwrite|rw addr reg data")
-        print("regwritebit|rwb addr reg(31..) bit val")
+        
+        
+        
+        
         
         
         print("devreset addr")
-        print("identify addr on")
+        
         print("devsbndbg addr")
         print("avrgetbootloader")
         print("fwupd addr flag file")
@@ -715,16 +731,126 @@ class sbntst(object):
         #fwv = self._sbnm.sboxnet().getfwversion()
         fwv = self.sbnusb.getfwversion()
         print(f"firmware version: 0x{fwv}")
-        return 1    
-
+        return 1
+    
+    #
+    # SboxnetTester.cmd_devidentify(toks)
+    # sboxnet command: identify
+    # sboxnet-addr 1|0
+    def cmd_devidentify(self, toks):
+        if toks[0] != "identify":
+            return 0
+        if len(toks) != 3:
+            print("ERROR: usage: identify addr on")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            on = checkbyte(toks[2], "on")
+            if (addr is not None) and (on is not None):
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_DEV_IDENTIFY, [on])
+        return 1
+    #
+    # SboxnetTester.regread(toks)
+    # sboxnet read register
+    # sboxnet-addr register [count]
+    def cmd_regread(self, toks):
+        if toks[0] not in ["regread", "rr"]:
+            return 0
+        if len(toks) not in [3, 4]:
+            print("ERROR: usage: regread addr reg [count]")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            reg = checkword(toks[2], "reg")
+            count = 1
+            if len(toks) == 4:
+                count = checkbyte(toks[3], "count")
+            if addr is not None and reg is not None:
+                x = [lowbyte(reg), highbyte(reg)]
+                if count is not None:
+                    x.append(count)
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_REG_READ, x)
+        return 1
+    
+    #
+    # SboxnetTester.regeadm(toks)
+    # sboxnet regsiter read multiple
+    # sboxnet-addr register0 [register1 [register2...]]
+    def cmd_regreadm(self, toks):
+        if toks[0] not in ["regreadm", "rrm"]:
+            return 0
+        if len(toks) < 3:
+            print("ERROR: usage: regread addr reg0 ...")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            regs = []
+            i = 2
+            while i < 33:
+                if len(toks) == i:
+                    break
+                reg = checkword(toks[i], "reg%d" % i)
+                if reg is None:
+                    return 1
+                regs.append(lowbyte(reg))
+                regs.append(highbyte(reg))
+                i = i + 1
+            if addr is not None:
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_REG_READ_MULTI, regs)
+        return 1
+    
+    #
+    # SboxnetTester.cmd_regwrite(toks)
+    # sboxnet command: register write
+    # sboxnet-addr, register, value, [mask]
+    def cmd_regwrite(self, toks):
+        if toks[0] not in ["regwrite", "rw"]:
+            return 0
+        if len(toks) != 4 and len(toks) != 5:
+            print("ERROR: usage: regwrite addr reg value [mask]")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            reg = checkword(toks[2], "reg")
+            val = checkword(toks[3], "value")
+            mask = None
+            if len(toks) == 5:
+                mask = checkword(toks[4], "mask")
+                if mask is None:
+                    return 1
+            if addr is not None and reg is not None and val is not None:
+                x = [lowbyte(reg), highbyte(reg), lowbyte(val), highbyte(val)]
+                if mask is not None:
+                    x.append(lowbyte(mask))
+                    x.append(highbyte(mask))
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_REG_WRITE, x)
+        return 1
+    
+    #
+    # SboxnetTester.regwritebit(toks)
+    # sboxnet set a bit in a register
+    # sboxnet-addr register bitnumber (0-15) value
+    def cmd_regwritebit(self, toks):
+        if toks[0] not in ["regwritebit","rwb"]:
+            return 0
+        if len(toks) != 5:
+            print("ERROR: usage: regwritebit addr reg bitnr val")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            reg = checkword(toks[2], "reg")
+            bitnr = checkbyte(toks[3], "bitnr")
+            val = checkbyte(toks[4], "val")
+            if (addr is not None) and (reg is not None) and (bitnr is not None) and (val is not None):
+                if val: val = 0x80
+                else:   val = 0
+                bitnr = bitnr & 0x0f
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_REG_WRITE_BIT, [lowbyte(reg), highbyte(reg), (val | bitnr)])
+        return 1
+    
 # --- main ---
 
 def init_signals():
     # ignore SIGINT
-    #def signal_sigint(sig, frame):
-    #    pass
+    def signal_sigint(sig, frame):
+        pass
     # set SIGINT handler to signal_sidint 
-    #signal.signal(signal.SIGINT, signal_sigint)
+    signal.signal(signal.SIGINT, signal_sigint)
     pass
 
 def init_readline():
