@@ -273,7 +273,7 @@ void do_init_system(void) {
             // Port für LEDs: im Gegensatz zur alten Hardware wird hier nicht multiplexed, sondern direkt LEDs angesteuert
             // PD0..PD7(Bit 2 .. 9)
 			port_out(PORTD) = 0; // PORTD = 0
-			port_dirout(PORTD, 0); // PORTD as output
+			port_dirout(PORTD, 0xff); // PORTD as output
 			PORTCFG_MPCMASK = 0xff; // Alle Pins
 			PORTD.PIN0CTRL = PORT_OPC_TOTEM_gc; // Alle PORTD Pins auf TOTEM Pole
 			// PC6 (Bit 0) und PC7 (Bit 1)
