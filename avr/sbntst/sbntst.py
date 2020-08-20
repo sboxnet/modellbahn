@@ -310,6 +310,12 @@ class sbntst(object):
                     self.cmd_regreadm,
                     self.cmd_regwrite,
                     self.cmd_regwritebit,
+                    self.cmd_locopower,
+                    self.cmd_locodrive,
+                    self.cmd_locofunc,
+                    self.cmd_locoadd,
+                    self.cmd_locodel,
+                    self.cmd_locopom,
                     ]
                     
         """
@@ -333,12 +339,12 @@ class sbntst(object):
                     
                     
                     
-                    self.cmd_locopower,
-                    self.cmd_locodrive,
-                    self.cmd_locofunc,
-                    self.cmd_locoadd,
-                    self.cmd_locodel,
-                    self.cmd_locopom,
+                    
+                    
+                    
+                    
+                    
+                    
                     self.cmd_fwupd,
                     self.cmd_avrgetbootloader """
         try:
@@ -525,7 +531,7 @@ class sbntst(object):
         print("setserialnumber s")
         print("list")
         print("reset")
-        print("devreset")
+        print("devreset [addr]")
         print("devgetdesc addr [1..id]")
         print("devsetdesc addr [1..id] text")
         print("dbgstate|ds")
@@ -539,6 +545,12 @@ class sbntst(object):
         print("regreadm|rrm addr reg0 ...")
         print("regwrite|rw addr reg data")
         print("regwritebit|rwb addr reg(31..) bit val")
+        print("locopower|lp addr flags")
+        print("locodrive|ld addr locaddr locspeed [fnkeys]")
+        print("locofunc|lf addr locaddr fnkeys")
+        print("locoadd|la addr locaddr flags")
+        print("locodel addr locaddr")
+        print("locopom addr locaddr cv data")
         
         """
         
@@ -557,17 +569,17 @@ class sbntst(object):
         
         
         
-        print("devreset addr")
+        
         
         print("devsbndbg addr")
         print("avrgetbootloader")
         print("fwupd addr flag file")
-        print("locopower|lp addr flags")
-        print("locodrive|ld addr locaddr locspeed [fnkeys]")
-        print("locofunc|lf addr locaddr fnkeys")
-        print("locoadd|la addr locaddr flags")
-        print("locodel addr locaddr")
-        print("locopom addr locaddr cv data")
+        
+        
+        
+        
+        
+        
         """
         return 1
     #
@@ -581,7 +593,7 @@ class sbntst(object):
         else:
             self.send_net_reset()
         return 1    
-    # SboxnetTester.cmd_devreset(toks)
+    # sbntst.cmd_devreset(toks)
     # sboxnet dev reset
     # [sboxnet-addr]
     # if no addr is given, do a net reset
@@ -596,7 +608,7 @@ class sbntst(object):
         else:
             self.send_net_reset()
         return 1   #
-    # SboxnetTester.cmd_getserialnumber(toks)
+    # sbntst.cmd_getserialnumber(toks)
     # get the sboxnet USB serial number (string)
     # getserialnumber
     def cmd_getserialnumber(self, toks):
@@ -607,7 +619,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.setserialnumber(toks)
+    # sbntst.setserialnumber(toks)
     # set the sboxnet USB serial number (string)
     # setserialnumber udesc
     def cmd_setserialnumber(self, toks):
@@ -621,7 +633,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.cmd_list(toks)
+    # sbntst.cmd_list(toks)
     # list all registered devices
     def cmd_list(self, toks):
         if toks[0] not in ["list"]:
@@ -630,7 +642,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.cmd_devgetdesc(toks)
+    # sbntst.cmd_devgetdesc(toks)
     # sboxnet get device description
     # sboxnet-addr stridx (1..id)
     def cmd_devgetdesc(self, toks):
@@ -646,7 +658,7 @@ class sbntst(object):
                 time.sleep(0.5)
         return 1
     #
-    # SboxnetTester.cmd_devsetdesc(toks)
+    # sbntst.cmd_devsetdesc(toks)
     # set device description
     # sboxnet-addr stridx (1..id) string
     def cmd_devsetdesc(self, toks):
@@ -667,24 +679,18 @@ class sbntst(object):
                 time.sleep(0.5)
         return 1
     #
-    # SboxnetTester.cmd_dbgstate(toks)
+    # sbntst.cmd_dbgstate(toks)
     # print state
     def cmd_dbgstate(self, toks):
         if toks[0] not in ["dbgstate", "ds"]:
             return 0
         print(f"status        0x{self.laststatus}")
         ds = self.sbnusb.getdbgstate()
-        print(f"state         0x{ds.state}")
-        print(f"flags         0x{ds.flags}")
-        print(f"retry_counter {ds.retry_counter}")
-        print(f"tmit_cnt      {ds.tmit_cnt}")
-        print(f"tmit_bytes    {ds.tmit_bytes}")
-        print(f"tmit_lastbyte {ds.tmit_lastbyte}")
-        print(f"backoff_bits  {ds.backoff_bits}")
-        print(f"recv_len      {ds.recv_len}")
-        print(f"prng_seed     {ds.prng_seed}")
+        print(f"{ds}")
         return 1
-    
+    #
+    # sbntst.cmd_dbginfo(toks)
+    # print debug info
     def cmd_dbginfo(self, toks):
         if toks[0] not in ["dbginfo", "di"]:
             return 0
@@ -693,7 +699,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.cmd_dbgrecvbuf(toks)
+    # sbntst.cmd_dbgrecvbuf(toks)
     # print receive buffer
     def cmd_dbgrecvbuf(self, toks):
         if toks[0] not in ["dbgrecvbuf", "dr"]:
@@ -703,7 +709,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.cmd_dbgtmitbuf(toks)
+    # sbntst.cmd_dbgtmitbuf(toks)
     # print transmit buffer
     def cmd_dbgtmitbuf(self, toks):
         if toks[0] not in ["dbgtmitbuf", "dt"]:
@@ -713,7 +719,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.cmd_dbgstack(toks)
+    # sbntst.cmd_dbgstack(toks)
     # debug stack: size, free
     def cmd_dbgstack(self, toks):
         if toks[0] not in ["dbgstack", "dst"]:
@@ -723,7 +729,7 @@ class sbntst(object):
         print(f"stack free: {b.free}")
         return 1
     #
-    # SboxnetTester.getfwversion()
+    # sbntst.getfwversion()
     # print the sboxnet USB firmware version (hex string)
     def cmd_getfwversion(self, toks):
         if toks[0] not in ['getfwversion']:
@@ -734,7 +740,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.cmd_devidentify(toks)
+    # sbntst.cmd_devidentify(toks)
     # sboxnet command: identify
     # sboxnet-addr 1|0
     def cmd_devidentify(self, toks):
@@ -749,7 +755,7 @@ class sbntst(object):
                 self.execmsg(addr, sboxnet.SBOXNET_CMD_DEV_IDENTIFY, [on])
         return 1
     #
-    # SboxnetTester.regread(toks)
+    # sbntst.regread(toks)
     # sboxnet read register
     # sboxnet-addr register [count]
     def cmd_regread(self, toks):
@@ -771,7 +777,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.regeadm(toks)
+    # sbntst.regeadm(toks)
     # sboxnet regsiter read multiple
     # sboxnet-addr register0 [register1 [register2...]]
     def cmd_regreadm(self, toks):
@@ -797,7 +803,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.cmd_regwrite(toks)
+    # sbntst.cmd_regwrite(toks)
     # sboxnet command: register write
     # sboxnet-addr, register, value, [mask]
     def cmd_regwrite(self, toks):
@@ -823,7 +829,7 @@ class sbntst(object):
         return 1
     
     #
-    # SboxnetTester.regwritebit(toks)
+    # sbntst.regwritebit(toks)
     # sboxnet set a bit in a register
     # sboxnet-addr register bitnumber (0-15) value
     def cmd_regwritebit(self, toks):
@@ -842,6 +848,120 @@ class sbntst(object):
                 bitnr = bitnr & 0x0f
                 self.execmsg(addr, sboxnet.SBOXNET_CMD_REG_WRITE_BIT, [lowbyte(reg), highbyte(reg), (val | bitnr)])
         return 1
+    
+    #
+    # sbntst.cmd_locopower(toks)
+    # sboxnet set booster or dccgen on/off
+    # sboxnet-addr flags: 1 = on
+    def cmd_locopower(self, toks):
+        if toks[0] not in ["locopower", "lp"]:
+            return 0
+        if len(toks) != 3:
+            print("ERROR: usage: locopower|lp addr flags:off=0|on=1")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            flags = checkbyte(toks[2], "flags")
+            if (addr is not None) and (flags is not None):
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_LOCO_POWER, [flags])
+        return 1    
+    
+    #
+    # sbntst.cmd_locodrive(toks)
+    # sboxnet command: drive a loco
+    # sboxnet-addr dcc-addr speed [fnkeys]
+    def cmd_locodrive(self, toks):
+        if toks[0] not in ["locodrive", "ld"]:
+            return 0
+        if not len(toks) in [4,5]:
+            print("ERROR: usage: locodrive|ld addr locaddr locspeed [fnkeys]")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            locaddr = checkword(toks[2], "locaddr")
+            locspeed = checkbyte(toks[3], "locspeed")
+            data = [lowbyte(locaddr), highbyte(locaddr), locspeed]
+            if len(toks) == 5:
+                fnkeys = checkword(toks[4], "fnkeys")
+                data.append(lowbyte(fnkeys))
+                data.append(highbyte(fnkeys))
+            if (addr is not None) and (locaddr is not None) and (locspeed is not None):
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_LOCO_DRIVE, data)
+        return 1
+    
+    #
+    # sbntst.cmd_locofunc(toks)
+    # sboxnet command: enable loco funtion
+    # sboxnet-addr dcc-locaddr fnkeys
+    def cmd_locofunc(self, toks):
+        if toks[0] not in ["locofunc", "lf"]:
+            return 0
+        if len(toks) != 4:
+            print("ERROR: usage: locofunc|lf addr locaddr fnkeys")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            locaddr = checkword(toks[2], "locaddr")
+            fnkeys = checkword(toks[3], "fnkeys")
+            if (addr is not None) and (locaddr is not None) and (fnkeys is not None):
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_LOCO_FUNC, [lowbyte(locaddr), highbyte(locaddr),
+                                                             lowbyte(fnkeys), highbyte(fnkeys)])
+        return 1
+    
+    #
+    # sbntst.cmd_locoadd(toks)
+    # sboxnet command: add a loco to the dcc stack
+    # sboxnet-addr, dcc-locaddr, flags (speed-steps)
+    # flags: 0 speed-steps 14
+    #        1 speed-steps 28
+    #        2 speed-steps 128
+    def cmd_locoadd(self, toks):
+        if toks[0] not in ["locoadd", "la"]:
+            return 0
+        if len(toks) != 4:
+            print("ERROR: usage: locoadd|la addr locaddr speedflag:-14=0|-28=1|-128=2")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            locaddr = checkword(toks[2], "locaddr")
+            flags = checkbyte(toks[3], "flags")
+            if (addr is not None) and (locaddr is not None) and (flags is not None):
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_LOCO_ADD, [lowbyte(locaddr), highbyte(locaddr), flags])
+        return 1
+    
+    #
+    # sbntst.cmd_locodel(toks)
+    # sboxnet command: delete a loco from the dcc stack: sboxnet-addr, dcc-addr
+    def cmd_locodel(self, toks):
+        if toks[0] not in ["locodel"]:
+            return 0
+        if len(toks) != 3:
+            print("ERROR: usage: locodel addr locaddr")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            locaddr = checkword(toks[2], "locaddr")
+            if (addr is not None) and (locaddr is not None):
+                self.execmsg(addr, sboxnet.SBOXNET_CMD_LOCO_DEL, [lowbyte(locaddr), highbyte(locaddr)])
+        return 1
+    
+    #
+    # SboxnetTester.cmd_locopom(toks)
+    # sboxnet command: loco pom: sboxnet-addr, dcc-addr, cv, data (1 byte)
+    def cmd_locopom(self, toks):
+        if toks[0] not in ["locopom"]:
+            return 0
+        if len(toks) != 5:
+            print("ERROR: usage: locopom addr locaddr cv data")
+        else:
+            addr = checkbyte(toks[1], "addr")
+            locaddr = checkword(toks[2], "locaddr")
+            cv = checkword(toks[3], "cv")
+            cvd = checkbyte(toks[4], "data")
+            if (addr is not None) and (locaddr is not None) and (cv is not None) and (cvd is not None):
+                if cv > 0 and cv <= 0x400:
+                    cv = cv - 1
+                    self.execmsg(addr, sboxnet.SBOXNET_CMD_LOCO_POM, [lowbyte(locaddr), highbyte(locaddr),
+                                                           lowbyte(cv), highbyte(cv & 0x3ff)|0x0c,
+                                                           cvd])
+                else:
+                    print("ERROR: cv out of range")
+        return 1    
     
 # --- main ---
 

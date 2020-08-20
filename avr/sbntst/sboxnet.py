@@ -221,6 +221,18 @@ class SboxnetDebugState(object):
         self.backoff_bits = arr[6]
         self.recv_len = arr[7]
         self.prng_seed = arr[8]
+    
+    def __str__(self):
+        return "".join([f"state: {self.state}\n",
+                        f"flags: {self.flags}\n",
+                        f"retry_counter: {self.retry_counter}\n",
+                        f"tmit_cnt: {self.tmit_cnt}\n",
+                        f"tmit_bytes: {self.tmit_bytes}\n",
+                        f"tmit_lastbyte: {self.tmit_lastbyte}\n",
+                        f"backoff_bits: {self.backoff_bits}\n",
+                        f"recv_len: {self.recv_len}\n",
+                        f"prng_seed: {self.prng_seed}\n",
+                        ])
 
 class SboxnetDebugInfo(object):
     def __init__(self, arr):
