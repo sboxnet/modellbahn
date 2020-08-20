@@ -221,6 +221,18 @@ class SboxnetDebugState(object):
         self.backoff_bits = arr[6]
         self.recv_len = arr[7]
         self.prng_seed = arr[8]
+    
+    def __str__(self):
+        return "".join([f"state: {self.state}\n",
+                        f"flags: {self.flags}\n",
+                        f"retry_counter: {self.retry_counter}\n",
+                        f"tmit_cnt: {self.tmit_cnt}\n",
+                        f"tmit_bytes: {self.tmit_bytes}\n",
+                        f"tmit_lastbyte: {self.tmit_lastbyte}\n",
+                        f"backoff_bits: {self.backoff_bits}\n",
+                        f"recv_len: {self.recv_len}\n",
+                        f"prng_seed: {self.prng_seed}\n",
+                        ])
 
 class SboxnetDebugInfo(object):
     def __init__(self, arr):
@@ -243,6 +255,27 @@ class SboxnetDebugInfo(object):
         self.recverr_size = makeworda(arr, 32)
         self.crcerrors = makeworda(arr, 34)
         self.tmiterrors = makeworda(arr, 36)
+    
+    def __str__(self):
+        return "".join([f"recv_byte: {self.recv_byte}\n",
+        f"recv_msg_got: {self.recv_msg_got}\n",
+        f"recv_msg_fetched: {self.recv_msg_fetched}\n",
+        f"tmit_byte: {self.tmit_byte}\n",
+        f"tmit_msg_tosend: {self.tmit_msg_tosend}\n",
+        f"tmit_msg_sent: {self.tmit_msg_sent}\n",
+        f"collisions: {self.collisions}\n",
+        f"coll_rxc: {self.coll_rxc}\n",
+        f"coll_fe: {self.coll_fe}\n",
+        f"coll_udr: {self.coll_udr}\n",
+        f"retries: {self.retries}\n",
+        f"recverrors: {self.recverrors}\n",
+        f"recverr_fe: {self.recverr_fe}\n",
+        f"recverr_pe: {self.recverr_pe}\n",
+        f"recverr_dor: {self.recverr_dor}\n",
+        f"recverr_proto: {self.recverr_proto}\n",
+        f"recverr_size: {self.recverr_size}\n",
+        f"crcerrors: {self.crcerrors}\n",
+        f"tmiterrors: {self.tmiterrors}\n"])
 
 class SboxnetDebugRingBuf(object):
     def __init__(self, arr):
@@ -255,6 +288,17 @@ class SboxnetDebugRingBuf(object):
         self.count = arr[6]
         self.size = arr[7]
         self.buf = arr[8:]
+    
+    def __str__(self):
+        return "".join([f"rd: {self.rd}\n",
+                f"rd_count: {self.rd_count}\n",
+                f"rd_rollback: {self.rd_rollback}\n",
+                f"wr: {self.wr}\n",
+                f"wr_count: {self.wr_count}\n",
+                f"wr_rollback: {self.wr_rollback}\n",
+                f"count: {self.count}\n",
+                f"size: {self.size}\n",
+                f"buf: {self.buf}\n"])
 
 class SboxnetDebugStack(object):
     def __init__(self, arr):
@@ -311,11 +355,10 @@ class SboxnetMsg(object):
     def print(self, o):
         s = cmd_to_str(self.cmd&0x7f) + " ("+ cmd_to_str(self.cmd&0x7f)+ f"  is_answer {self.cmd&0x80 == 0x80}) {('--> SEND' if (self.cmd&0x80== 0) else '<-- RECEIVE ')}| dstaddr={self.dstaddr} srcaddr={self.srcaddr} seq={self.seq} dlen={self.dlen} cmd={self.cmd} cmd_hex={self.cmd:x} data={self.data} crc={self.crc}"
         if o._debug: logDebug(self, s)
-
+    
     def __str__(self):
-        s = cmd_to_str(self.cmd&0x7f) + " ("+ cmd_to_str(self.cmd&0x7f)+ f"  is_answer {self.cmd&0x80 == 0x80}) {('--> SEND' if (self.cmd&0x80== 0) else '<-- RECEIVE ')}| dstaddr={self.dstaddr} srcaddr={self.srcaddr} seq={self.seq} dlen={self.dlen} cmd={self.cmd} cmd_hex={self.cmd:x} data={self.data} crc={self.crc}"
-        print(s)
-        
+        return cmd_to_str(self.cmd&0x7f) + " ("+ cmd_to_str(self.cmd&0x7f) + f"  is_answer {self.cmd&0x80 == 0x80}) {('--> SEND' if (self.cmd&0x80== 0) else '<-- RECEIVE ')}| dstaddr={self.dstaddr} srcaddr={self.srcaddr} seq={self.seq} dlen={self.dlen} cmd={self.cmd} cmd_hex={self.cmd:x} data={self.data} crc={self.crc}"
+
 class SboxnetError(Exception):
     pass
         
@@ -327,14 +370,14 @@ class SboxnetUSB(object):
     #
     CMD_SBOXNET_SET_MODE = 0x30
     CMD_SBOXNET_GET_STATUS = 0x31
-    CMD_SBOXNET_RECEIVE = 0x32
-    CMD_SBOXNET_TRANSMIT = 0x33
-    CMD_SBOXNET_GET_DBGINFO = 0x3a
-    CMD_SBOXNET_GET_DBGSTATE = 0x3b
-    CMD_SBOXNET_GET_DBGRECVBUF = 0x3c
-    CMD_SBOXNET_GET_DBGTMITBUF = 0x3d
-    CMD_DBG_STACK = 0x40
-    CMD_SET_SERIALNUMBER = 0x51
+    CMD_SBOXNET_RECEIVE = 0x32 # 50
+    CMD_SBOXNET_TRANSMIT = 0x33 # 51
+    CMD_SBOXNET_GET_DBGINFO = 0x3a # 58
+    CMD_SBOXNET_GET_DBGSTATE = 0x3b # 59
+    CMD_SBOXNET_GET_DBGRECVBUF = 0x3c # 60
+    CMD_SBOXNET_GET_DBGTMITBUF = 0x3d # 61
+    CMD_DBG_STACK = 0x40 # 64
+    CMD_SET_SERIALNUMBER = 0x51 # 81
     #
     SBOXNET_FLG_ENABLED = 0x01
     SBOXNET_FLG_SNIFFER = 0x02
@@ -493,7 +536,7 @@ class SboxnetUSB(object):
     # SboxnetUSB.getserialnumber(): get the serialnumber as string
     def getserialnumber(self):
         #if self._debug: logDebug(self, "getserialnumber")
-        return usb.util.get_string(self._dev, 32, self._dev.iSerialNumber)
+        return usb.util.get_string(self._dev, self._dev.iSerialNumber, 0x0409) #32, 0x0409) # """""")
 
     @staticmethod
     def find_devices():
@@ -508,6 +551,9 @@ class AddrMapEntry(object):
     addr = None
     desc0 = ""
     desc1 = ""
+    
+    def __str__(self):
+        return f"PUID: 0x{self.puid:x} |PRODUCTID: 0x{self.productid:x} |VENDORID: 0x{self.vendorid:x} |ADDR: {self.addr} |DESC0: {self.desc0} |DESC1: {self.desc1}"
 
 # Eine Map der Devices mit PUID (puid) und Adresse
 class AddrMap(object):
@@ -564,7 +610,7 @@ class AddrMap(object):
     # AddrMap Einträge listen
     def print_entries(self):
         for e in self._addrmap.values():
-            logInfo(self, "ADDR=%d PUID=0x%x PRODUCTID=0x%x VENDORID=0x%x  %s, %s" % (e.addr, e.puid, e.productid, e.vendorid, e.desc0, e.desc1))
+            logInfo(self, f"ADDR={e.addr} PUID=0x{e.puid:x} PRODUCTID=0x{e.productid:x} VENDORID=0x{e.vendorid:x}  {e.desc0},{e.desc1}")
     
     # AddrMap.get_puid_addr(puid)
     # Den AddrMap eintrag liefern für die PUID puid.
@@ -583,7 +629,7 @@ class AddrMap(object):
                 if e.addr == addr:
                     return e.puid
         return None
-
+        
 class SboxnetMaster(threading.Thread):
     # SboxnetMaster.
     def __init__(self, debug=None, serialn=None, sbnusb=None, cbobj=None):
@@ -827,7 +873,7 @@ class SboxnetMaster(threading.Thread):
             #print(self._sbnusb)
             #self._sbnusb = None
             if self._sbnusb is None:
-                logInfo(self, "SboxnetUSB initialising...")
+                #logInfo(self, "SboxnetUSB initialising...")
                 if self._debug: logDebug(self, f"serialNR={self._serialn} dev={self._sbnusb}")
                 try:
                     self._sbnusb = SboxnetUSB(serialn=self._serialn)

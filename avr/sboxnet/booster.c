@@ -806,7 +806,7 @@ void dccgen_init(void) {
 
 #ifdef USE_BOOSTER
 
-#include "dccdec.hh"
+#include "dccdec.c"
 static void booster_sensors_shortcut_on(void) {
     if ((PORTC.INTCTRL & PORT_INT0LVL_gm) == PORT_INT0LVL_OFF_gc) {
         PORTC.INTFLAGS = Bit(PORT_INT0IF_bp);
