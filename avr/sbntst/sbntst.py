@@ -517,7 +517,7 @@ class sbntst(object):
         #else:
         #logInfo(self, outstr, fh)
         #logInfo(self, outstr)
-        print(outstr)
+        logDebug(self, outstr)
         #if self._debug: logDebug(self, outstr)
         return msg    
 
