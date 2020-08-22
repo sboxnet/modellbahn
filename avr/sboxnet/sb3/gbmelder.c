@@ -149,8 +149,8 @@ static void read_sensors(void) {
     
     debounce_16(&g_sensor_bits, &g_sensor_bits_1, sensors);
     
-    uint16_t mask = 0x01;
-    for (uint8_t i = 0; i < NUM_SENSORS; i++, mask <<= 1) {
+    volatile uint16_t mask = 0x01;
+    for (volatile uint8_t i = 0; i < NUM_SENSORS; i++, mask <<= 1) {
         if (sensors & mask) {
             if (!g_sensors[i].flags.on) {
                 g_sensors[i].flags.notack = 1;
@@ -190,7 +190,7 @@ void show_besetzt_leds(void) {
 	// PC6 (Bit 0) und PC7 (Bit 1)
 	// PD0..PD7(Bit 2 .. 9)
 	// zuerst mal alles aus
-	port_clr(PORTC, Bit(0)|Bit(1));
+	port_clr(PORTC, Bit(6)|Bit(7));
 	port_out(PORTD) = 0;
 	uint16_t inp = g_sensor_bits;
 	for (uint8_t i = 0; i < NUM_SENSORS; i++) {
@@ -273,7 +273,7 @@ void do_init_system(void) {
             // Port für LEDs: im Gegensatz zur alten Hardware wird hier nicht multiplexed, sondern direkt LEDs angesteuert
             // PD0..PD7(Bit 2 .. 9)
 			port_out(PORTD) = 0; // PORTD = 0
-			port_dirout(PORTD, 0); // PORTD as output
+			port_dirout(PORTD, 0xff); // PORTD as output
 			PORTCFG_MPCMASK = 0xff; // Alle Pins
 			PORTD.PIN0CTRL = PORT_OPC_TOTEM_gc; // Alle PORTD Pins auf TOTEM Pole
 			// PC6 (Bit 0) und PC7 (Bit 1)
@@ -281,10 +281,16 @@ void do_init_system(void) {
             PORTCFG_MPCMASK = 0xc0;
             PORTC.PIN0CTRL = PORT_OPC_TOTEM_gc;
 
-            // PORTA als Input (PA0..PA7) (Bit 0 .. 7)
+            // PORTA als Eingabe (PA0..PA7) (Bit 0 .. 7) mit Pull Up's
             port_dirin(PORTA, 0xff);
-            // PC0 (Bit 8), PC1 (Bit 9) als Eingabe
+			// pull up on
+			PORTCFG_MPCMASK = 0xff; 
+			port_pullup_on(PORTA, 0xff);
+            // PC0 (Bit 8), PC1 (Bit 9) als Eingabe mit Pull Up's
             port_dirin(PORTC, 0x3);
+			// pull up on
+			PORTCFG_MPCMASK = 0x03;
+			port_pullup_on(PORTC, 0x03);
 
 			break;
 		}
