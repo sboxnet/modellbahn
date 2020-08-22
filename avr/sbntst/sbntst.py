@@ -104,12 +104,8 @@ class SboxnetReceiver(threading.Thread):
         self.addrmap = sboxnet.AddrMap()
         self.term = False
         
-    #def process_msg(self, msg):
-    #    pass #logDebug(self, f"{msg}")
     def process_msg(self, msg):
         logDebug(self, f"{msg}")
-        if (msg.cmd and 0x7f) == sboxnet.SBOXNET_CMD_NET_WATCHDOG:
-            return None
         if msg.cmd == sboxnet.SBOXNET_CMD_DEV_REQ_ADDR:
             self.sbntst.resetdone = True
             logDebug(self, f"process SBOXNET_CMD_DEV_REQ_ADDR")
@@ -482,8 +478,6 @@ class sbntst(object):
         elif msg.cmd == 0x80:
             rcmd = msg.data[0]
             rc = msg.data[1]
-            #if rcmd == sboxnet.SBOXNET_NET_WATCHDOG:
-            #    return None
             outstr = outstr +f": ackrc: {sboxnet.ackrc_to_str(rc)} ({rc})  cmd: {sboxnet.cmd_to_str(rcmd)} (0x{rcmd:x})"
         else:
             i = 0
