@@ -1011,8 +1011,8 @@ def init_dccmap():
 
 if __name__ == "__main__":
 
-    logInfo(None, "Init Signals")
-    init_signals()
+    #logInfo(None, "Init Signals")
+    #init_signals()
     logInfo(None, "Init Readline")
     init_readline()
     logInfo(None, "Init DCC Map")
