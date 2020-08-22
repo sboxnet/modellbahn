@@ -504,6 +504,8 @@ class sbntst(object):
         elif msg.cmd == 0x80:
             rcmd = msg.data[0]
             rc = msg.data[1]
+            if rcmd == sboxnet.SBOXNET_NET_WATCHDOG:
+                return None
             outstr = outstr +f": ackrc: {sboxnet.ackrc_to_str(rc)} ({rc})  cmd: {sboxnet.cmd_to_str(rcmd)} (0x{rcmd:x})"
         else:
             i = 0
@@ -555,33 +557,10 @@ class sbntst(object):
         print("locopom addr locaddr cv data")
         
         """
-        
-        
-        
-        
-        
-        
-        
-        
         print("tobootloader")
-       
-        
-        
-        
-        
-        
-        
-        
-        
         print("devsbndbg addr")
         print("avrgetbootloader")
         print("fwupd addr flag file")
-        
-        
-        
-        
-        
-        
         """
         return 1
     #
