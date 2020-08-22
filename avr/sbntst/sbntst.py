@@ -321,32 +321,8 @@ class sbntst(object):
                     ]
                     
         """
-                    
-                    
-                    
                     self.cmd_devsbndbg,
-                    
-                    
-                    
                     self.cmd_tobootloader,
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
                     self.cmd_fwupd,
                     self.cmd_avrgetbootloader """
         try:
@@ -474,6 +450,8 @@ class sbntst(object):
     def printmsg(self, msg, fh=None):
         if msg is None:
             return None
+        if msg.cmd == 0x80 and msg.data and msg.data[0] == sboxnet.SBOXNET_NET_WATCHDOG:
+            return None
         #logDebug(self, f'~~~~~ PRINT MSG ')
         outstr = f"({'--> (IN)' if (msg.cmd & 0x80==0x80) else '<-- (OUT)'}) srcaddr={msg.srcaddr} "+\
             f"destaddr={msg.dstaddr} seq={msg.seq} len={msg.dlen} "+\
@@ -504,8 +482,8 @@ class sbntst(object):
         elif msg.cmd == 0x80:
             rcmd = msg.data[0]
             rc = msg.data[1]
-            if rcmd == sboxnet.SBOXNET_NET_WATCHDOG:
-                return None
+            #if rcmd == sboxnet.SBOXNET_NET_WATCHDOG:
+            #    return None
             outstr = outstr +f": ackrc: {sboxnet.ackrc_to_str(rc)} ({rc})  cmd: {sboxnet.cmd_to_str(rcmd)} (0x{rcmd:x})"
         else:
             i = 0
