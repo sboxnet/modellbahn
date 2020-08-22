@@ -108,6 +108,8 @@ class SboxnetReceiver(threading.Thread):
     #    pass #logDebug(self, f"{msg}")
     def process_msg(self, msg):
         logDebug(self, f"{msg}")
+        if (msg.cmd and 0x7f) == sboxnet.SBOXNET_CMD_NET_WATCHDOG:
+            return None
         if msg.cmd == sboxnet.SBOXNET_CMD_DEV_REQ_ADDR:
             self.sbntst.resetdone = True
             logDebug(self, f"process SBOXNET_CMD_DEV_REQ_ADDR")
