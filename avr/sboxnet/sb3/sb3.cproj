@@ -159,6 +159,12 @@
     <None Include="dccdec.c">
       <SubType>compile</SubType>
     </None>
+    <None Include="booster-raw.c">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="dccgen.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="defines.h">
       <SubType>compile</SubType>
     </Compile>
@@ -180,9 +186,9 @@
     <Compile Include="common.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="gbmelder.c">
+    <None Include="gbmelder.c">
       <SubType>compile</SubType>
-    </Compile>
+    </None>
     <None Include="mtester.c">
       <SubType>compile</SubType>
     </None>
