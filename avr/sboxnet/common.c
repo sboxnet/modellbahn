@@ -502,7 +502,7 @@ static void com_init_system(void) {
     }
 }
 
-/* Timer D1 CCB Interrupt vector
+/* Timer D0 CCB Interrupt vector
  * every 1ms
  */
 ISR(TCD0_CCB_vect) {

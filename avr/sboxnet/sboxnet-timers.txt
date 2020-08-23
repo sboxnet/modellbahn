@@ -24,10 +24,10 @@ booster:
 	- timer 500 kHz / 2us, FRQ Mode, 8bit
     - DCC generator.
     - CCA: filled by DMA transfer
+    - CCB: booster shortcut detector
 	TCD0
 	- general timer 500 kHz / 2us, normal mode, 16bit
     - CCA: timer
-    - CCB: booster shortcut detector
     - CCC: DCC decoder, cutout timer
 	TCD1
 	 - timer 500 kHz / 2us, normal mode, 8bit

@@ -446,7 +446,7 @@ class sbntst(object):
     def printmsg(self, msg, fh=None):
         if msg is None:
             return None
-        if msg.cmd == 0x80 and msg.data and msg.data[0] == sboxnet.SBOXNET_NET_WATCHDOG:
+        if msg.cmd == 0x80 and msg.data and msg.data[0] == sboxnet.SBOXNET_CMD_NET_WATCHDOG:
             return None
         #logDebug(self, f'~~~~~ PRINT MSG ')
         outstr = f"({'--> (IN)' if (msg.cmd & 0x80==0x80) else '<-- (OUT)'}) srcaddr={msg.srcaddr} "+\
