@@ -159,12 +159,12 @@
     <None Include="dccdec.c">
       <SubType>compile</SubType>
     </None>
-    <None Include="booster-raw.c">
-      <SubType>compile</SubType>
-    </None>
-    <Compile Include="dccgen.c">
+    <Compile Include="booster-raw.c">
       <SubType>compile</SubType>
     </Compile>
+    <None Include="dccgen.c">
+      <SubType>compile</SubType>
+    </None>
     <Compile Include="defines.h">
       <SubType>compile</SubType>
     </Compile>
