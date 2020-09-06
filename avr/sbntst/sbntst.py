@@ -1,7 +1,5 @@
 #!/usr/bin/python3 -tt
 
-# ein test
-
 import sys
 import time
 import re
