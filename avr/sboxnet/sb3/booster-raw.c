@@ -91,9 +91,10 @@ struct Eeprom {
 };
 struct Eeprom g_eeprom EEMEM;
 
-#define LED_BO_NOTAUS_b   0
-#define LED_CUR_OV_b      1
-#define LED_CUR_SHORT_b   2
+#define LED_BO_NOTAUS_b     0
+#define LED_CUR_OV_b        1
+#define LED_CUR_SHORT_b     2
+#define LED_BO_ON_b         3
 
 #define DCCM_PORT  PORTC
 #define DCCM_IN1_b  0
@@ -122,7 +123,7 @@ struct booster {
     uint8_t        flags;
     struct timer   timer_startup;
     struct timer   timer_dcc_watchdog;
-    uint16_t       advals[2];
+    uint16_t       advals[4];
     uint16_t       shortcut_cnt;
     uint16_t       shortcut_limit;
     uint16_t       shortcut_interval;
@@ -139,6 +140,7 @@ struct booster g_booster = { 0, };
 
 
 #include "dccdec.c"
+static void led_set(uint8_t bit, uint8_t on);
 static void booster_sensors_shortcut_on(void) {
     if ((PORTC.INTCTRL & PORT_INT0LVL_gm) == PORT_INT0LVL_OFF_gc) {
         PORTC.INTFLAGS = Bit(PORT_INT0IF_bp);
@@ -215,6 +217,7 @@ static void booster_sensors_off(void) {
 }
 
 void booster_sensors_init(void) {
+	// LED aus Notaus und Kurzschluss
     port_set(LED_PORT, Bit(LED_BO_NOTAUS_b)|Bit(LED_CUR_SHORT_b));
 
     clrbit(g_booster.flags, BOOSTER_FLAG_CUR_OV_b);
@@ -236,6 +239,9 @@ void booster_sensors_init(void) {
 void booster_power_off_all(void) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         booster_sensors_off();
+
+        // "on" LED Aus
+        led_set(LED_BO_ON_b, 0);
 
         port_clr(DCCM_PORT, Bit(DCCM_EN1_b)|Bit(DCCM_EN2_b)|Bit(DCCM_IN1_b)|Bit(DCCM_IN2_b));
         AWEXC.OUTOVEN = 0;
@@ -335,22 +341,27 @@ ISR(PORTC_INT1_vect) { // DCC Input Signal
 #define USE_BOOSTER 1
 
 static void measure_task(void) {
-    if (ADCA.INTFLAGS == 0x03) {
+    if (ADCA.INTFLAGS == 0x07) {
         int16_t ch0;
         int16_t ch1;
-        // channel 0 and 1 conversion finished
+        int16_t ch2;
+        // channel 0,1,2 conversion finished
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
             ch0 = (int16_t)ADCA.CH0.RES;
             ch1 = (int16_t)ADCA.CH1.RES;
+            ch2 = (int16_t)ADCA.CH2.RES;
         }
         if (ch0 < 0)
             ch0 = 0;
         if (ch1 < 0)
             ch1 = 0;
+        if (ch2 < 0)
+            ch2 = 0;
         g_booster.advals[0] = ch0;
         g_booster.advals[1] = ch1;
-        ADCA.INTFLAGS = 0x03; // clear intflags
-        ADCA.CTRLA |= Bit(3)|Bit(2); // start conversions
+        g_booster.advals[2] = ch2;
+        ADCA.INTFLAGS = 0x07; // clear intflags
+        ADCA.CTRLA |= Bit(4)|Bit(3)|Bit(2); // start conversions
     }
 }
 
@@ -363,38 +374,46 @@ static uint8_t read_production_signature_row(uint8_t offset) {
 }
 
 void do_init_system(void) {
-    uint8_t portd_bits = 0
-                        |7
-                        ;
-    port_out(PORTD) = portd_bits;
+    // bit 0,1,2,3
+    uint8_t portd_bits = 0x0f;
+    // LED_PORT leds off (Bit == High = off
+    port_out(LED_PORT) = portd_bits;
+    // LED Ports to Totem Pole
     PORTCFG_MPCMASK = portd_bits;
     PORTD.PIN0CTRL = PORT_OPC_TOTEM_gc;
-    port_dirout(PORTD, portd_bits);
+    // als Ausgang
+    port_dirout(LED_PORT, portd_bits);
 
- 
-    port_out(PORTC) = 0;
-    PORTCFG_MPCMASK = 0x0c;
+    // Treiber off; PC0 (O IN1), PC1 (O IN2), PC2 (O EN), PC3(I RC), PC4 (I DCCIN), PC5 (I NOTAUS)
+    port_out(PORTC) = 0; // PC0(IN1),PC1(IN2),PC2(EN) auf Low
+    // EN + RC WiredOr Pullup
+    PORTCFG_MPCMASK = 0x0c; // 00001100
     PORTC.PIN2CTRL = PORT_OPC_WIREDORPULL_gc;
-    PORTCFG_MPCMASK = 0x43;
-    PORTC.PIN0CTRL = PORT_OPC_TOTEM_gc;
-    port_dirout(PORTC, 0x4f);
-    PORTCFG_MPCMASK = Bit(7);
-    PORTC.PIN7CTRL = PORT_OPC_PULLUP_gc;
-    
+    // PC0(IN1),PC1(IN2) als Totem Pole
     PORTCFG_MPCMASK = 0x03;
-    PORTA.PIN0CTRL = PORT_OPC_TOTEM_gc;
+    PORTC.PIN0CTRL = PORT_OPC_TOTEM_gc;
+    // PC0, PC1, PC2 als Ausgabe
+    port_dirout(PORTC, 0b00000111);
+	
+    //PORTCFG_MPCMASK = Bit(7);
+    //PORTC.PIN7CTRL = PORT_OPC_PULLUP_gc;
+    
+    // PA0,PA1,PA2 als Eingang
+    //PORTCFG_MPCMASK = 0x03;
+    //PORTA.PIN0CTRL = PORT_OPC_TOTEM_gc;
+    port_dirin(PORTA, Bit(2)|Bit(1)|Bit(0));
 
     // configure sleep mode: idle sleep mode, sleep mode allowed
     SLEEP.CTRL = SLEEP_SMODE_IDLE_gc|Bit(SLEEP_SEN_bp);
     // power reduction
-    PR.PRPA = Bit(PR_DAC_bp)
-                |Bit(PR_ADC_bp)
-                |Bit(PR_AC_bp);
-    PR.PRPB = Bit(PR_DAC_bp)
-                |Bit(PR_ADC_bp)
-                |Bit(PR_AC_bp);
-    PR.PRPC = Bit(PR_TWI_bp)|Bit(PR_USART1_bp)|Bit(PR_USART0_bp)|Bit(PR_SPI_bp)|Bit(PR_HIRES_bp); // PR_TC1_bp PR_TC0_bp;
-    PR.PRPD = Bit(PR_TWI_bp)|Bit(PR_USART1_bp)|Bit(PR_USART0_bp)|Bit(PR_SPI_bp)|Bit(PR_HIRES_bp); // PR_TC1_bp PR_TC0_bp;
+    //PR.PRPA = Bit(PR_DAC_bp)
+    //            |Bit(PR_ADC_bp)
+    //            |Bit(PR_AC_bp);
+    //PR.PRPB = Bit(PR_DAC_bp)
+    //            |Bit(PR_ADC_bp)
+    //            |Bit(PR_AC_bp);
+    //PR.PRPC = Bit(PR_TWI_bp)|Bit(PR_USART1_bp)|Bit(PR_USART0_bp)|Bit(PR_SPI_bp)|Bit(PR_HIRES_bp); // PR_TC1_bp PR_TC0_bp;
+    //PR.PRPD = Bit(PR_TWI_bp)|Bit(PR_USART1_bp)|Bit(PR_USART0_bp)|Bit(PR_SPI_bp)|Bit(PR_HIRES_bp); // PR_TC1_bp PR_TC0_bp;
 
     // ADC: use signed mode (unsigned mode may be broken) and Vcc/1.6 reference (1V internal reference may be broken)
     //      see Atmel Xmega Errata
@@ -415,11 +434,16 @@ void do_init_system(void) {
     ADCA.CH1.CTRL = ADC_CH_GAIN_1X_gc|ADC_CH_INPUTMODE_SINGLEENDED_gc;
     ADCA.CH1.MUXCTRL = ADC_CH_MUXPOS_PIN1_gc;
     ADCA.CH1.INTCTRL = ADC_CH_INTMODE_COMPLETE_gc|ADC_CH_INTLVL_OFF_gc;
+	// ADC Channel 2: current
+	ADCA.CH0.CTRL = ADC_CH_GAIN_1X_gc|ADC_CH_INPUTMODE_SINGLEENDED_gc;
+	ADCA.CH0.MUXCTRL = ADC_CH_MUXPOS_PIN2_gc;
+	ADCA.CH0.INTCTRL = ADC_CH_INTMODE_COMPLETE_gc|ADC_CH_INTLVL_OFF_gc;
+	
     // start conversions
-    ADCA.CTRLA |= Bit(3)|Bit(2);
+    ADCA.CTRLA |= Bit(4)|Bit(3)|Bit(2);
     
     // --- AWE ---
-    // AWE nable B and A Channel
+    // AWE enable B and A Channel
     AWEXC.CTRL = Bit(AWEX_DTICCBEN_bp)|Bit(AWEX_DTICCAEN_bp);
     AWEXC.DTBOTH = F_CPU_MHZ * 3; // 3us
     AWEXC.OUTOVEN = 0; // Bit(3)|Bit(2)|Bit(1)|Bit(0);
@@ -432,9 +456,7 @@ void do_init_system(void) {
     g_com.productid = PRODUCT_ID;
     g_com.vendorid = VENDOR_ID;
     g_com.firmware_version = FIRMWARE_VERSION;
-    g_com.capabilities = 0
-        |CAP_DCC_BOOSTER
-        ;
+    g_com.capabilities = CAP_DCC_BOOSTER;
     g_com.cap_class = 0;
     g_com.dev_desc_P = PSTR(DEVICE_DESC);
 
@@ -465,6 +487,8 @@ uint8_t do_msg(struct sboxnet_msg_header *pmsg) {
                     booster_power_on_track();
                 }
                 setbit(g_booster.flags, BOOSTER_FLAG_ON_b);
+				// power on LED ON
+				led_set(LED_BO_ON_b, 1);
             } else { // off
                 booster_power_off_all();
                 clrbit(g_booster.flags, BOOSTER_FLAG_ON_b);
@@ -484,6 +508,7 @@ uint8_t do_reg_read(uint16_t reg, uint16_t* pdata) {
         case R_ADCVAL_NUM: *pdata = 2; return 0;
         case R_ADCVAL_0: *pdata = g_booster.advals[0]; return 0;
         case R_ADCVAL_1: *pdata = g_booster.advals[1]; return 0;
+		case R_ADCVAL_2: *pdata = g_booster.advals[2]; return 0;
         
         case R_BOOSTER_SHORTCUT_LIMIT:  *pdata = g_booster.shortcut_limit; return 0;
         case R_BOOSTER_SHORTCUT_CNT:    *pdata = g_booster.shortcut_nummax; g_booster.shortcut_nummax = 0; return 0;
@@ -514,9 +539,9 @@ void do_setup(void) {
 
 static void led_set(uint8_t bit, uint8_t on) {
     if (on) {
-        port_clrbit(LED_PORT, bit);
+        port_clrbit(LED_PORT, Bit(bit));
     } else {
-        port_setbit(LED_PORT, bit);
+        port_setbit(LED_PORT, Bit(bit));
     }
 }
     
