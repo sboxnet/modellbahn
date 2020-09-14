@@ -1218,7 +1218,7 @@ static uint8_t _bldr_task(struct sboxnet_msg_max* pmsg) {
     if (bit_is_set(g_dev_state, DEV_STATE_FLG_REQ_ADDR_b)) {
         // Logon
         bldr_sboxnet_logon(pmsg);
-        // 1 zuückgeben
+        // 1 zurückgeben
         return 1;
     }
     return 0;
@@ -1300,7 +1300,9 @@ void bldr_start(void) {
     g_v.timer_watchdog = 0;
 
     // Test ob Firmware  Update Flag 0 ist
-    if (e2prom_get_byte(&bldr_eeprom.firmware_update) == 0) { // check Firmware Update flag in EEPROM address 0x300
+    // Wenn 0x300 (EEPROM) 0 ist dann zur Applikation springen
+    volatile uint8_t rc = e2prom_get_byte(&bldr_eeprom.firmware_update);
+    if (rc == 0) { // check Firmware Update flag in EEPROM address 0x300
         // Applikation Sektion Vector Tabelle aktivieren und HI,MED,LO Interrupts
         ioreg_ccp(&PMIC.CTRL, Bit(PMIC_HILVLEN_bp)|Bit(PMIC_MEDLVLEN_bp)|Bit(PMIC_LOLVLEN_bp));
         // springe zum Applikations Code bei Adresse 0

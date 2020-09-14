@@ -17,6 +17,18 @@ TCE0_OVF_vect    _VECTOR(47)
 32.2 Alternate Pin Functions
 - Datasheet Page 58ff
 
+Table 32-3. Port C - alternate functions.
+- Datasheet Page 59
+       AWEXC
+PC0 10 _OC0ALS
+PC1 11 OC0AHS
+PC2 12 _OC0BLS
+PC3 13 OC0BHS
+PC4 14 _OC0CLS
+PC5 15 OC0CHS
+PC6 16 _OC0DLS
+PC7 17 OC0DHS
+
 
 XMEGA AU MANUAL
 ---------------

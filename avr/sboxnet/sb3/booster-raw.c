@@ -174,6 +174,8 @@ ISR(TCD0_CCC_vect) {
         case 1: { // cutout enable
             port_set(DCCM_PORT, Bit(DCCM_EN1_b)|Bit(DCCM_EN2_b)); // EN* on
             port_clr(DCCM_PORT, Bit(DCCM_IN1_b)|Bit(DCCM_IN2_b)); // 2 lower MOSFETs on, connect to 0V
+            
+            // disable AWEXC ports
             AWEXC.OUTOVEN = 0;                                    // output override enable off
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
                 TCD0.CCC = TCD0.CNT + (432/2);
@@ -183,6 +185,7 @@ ISR(TCD0_CCC_vect) {
             break;
         }
         case 2: { //cutout disable
+            // Enable AWEXC ports
             AWEXC.OUTOVEN = Bit(3)|Bit(2)|Bit(1)|Bit(0);
             port_clr(DCCM_PORT, Bit(DCCM_EN1_b)|Bit(DCCM_EN2_b)|Bit(DCCM_IN1_b)|Bit(DCCM_IN2_b));
             port_clrbit(DCC_CUTOUT_TEST_PORT, DCC_CUTOUT_TEST_b); // cutout test point
@@ -244,6 +247,7 @@ void booster_power_off_all(void) {
         led_set(LED_BO_ON_b, 0);
 
         port_clr(DCCM_PORT, Bit(DCCM_EN1_b)|Bit(DCCM_EN2_b)|Bit(DCCM_IN1_b)|Bit(DCCM_IN2_b));
+        // Disable AWEXC ports
         AWEXC.OUTOVEN = 0;
 
         booster_sensors_shortcut_off();
@@ -259,24 +263,43 @@ void booster_power_off_all(void) {
 }
 
 void booster_power_on_track(void) {
+    // DCC In
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        // DCC In Interrupt:
+        // PORT DCC_IN_b: PC4, Port Interrupt 1
         PORTC.INT1MASK = Bit(DCC_IN_b);
+        // beidseitige Flanken
         PORTC.PIN4CTRL = PORT_ISC_BOTHEDGES_gc;
+        // PORTC INT 1 Flag zurücksetzen
         PORTC.INTFLAGS = Bit(PORT_INT1IF_bp);
+        // PORTC Interrupt LEVEL: HIGH
         PORTC.INTCTRL = (PORTC.INTCTRL & ~PORT_INT1LVL_gm) | PORT_INT1LVL_HI_gc;
-                
+        
+        // Booster Sensoren Init
         booster_sensors_init();
         
+        // Timer Init
+        // - Shortcut detection is disabled in the TIMER_STARTUP time after DCC startup
         timer_set(&g_booster.timer_startup, TIMER_STARTUP);
+        // - Notaus erst ab  4*16ms = 64ms nach Timerstart
         timer_set(&g_booster.timer_dcc_watchdog, DCC_WATCHDOG_VAL);
 
+        // DCC Decoder starten
         dec_start();
         
+        // ist DCC High?
         uint8_t v = 0;
         if (bit_is_set(port_in(DCC_IN_PORT), DCC_IN_b)) {
+            // dann auf CCA (OC0ALS,PC0) und CCB (OC0AHS,PC1) von TC0 auf High setzten
             v = Bit(TC0_CMPA_bp)|Bit(TC0_CMPB_bp);
         }
         TCC0.CTRLC = v;
+        
+        // Enable AWEXC Ports: 
+        // PC0 10 OC0ALS Bit PC0
+        // PC1 11 OC0AHS Bit PC1
+        // PC2 12 OC0BLS Bit PC2
+        // PC3 13 OC0BHS Bit PC3
         AWEXC.OUTOVEN = Bit(3)|Bit(2)|Bit(1)|Bit(0);
     }
 }
@@ -375,14 +398,23 @@ static uint8_t read_production_signature_row(uint8_t offset) {
 
 void do_init_system(void) {
     // bit 0,1,2,3
-    uint8_t portd_bits = 0x0f;
-    // LED_PORT leds off (Bit == High = off
-    port_out(LED_PORT) = portd_bits;
-    // LED Ports to Totem Pole
-    PORTCFG_MPCMASK = portd_bits;
+    //uint8_t portd_bits = 0x0f;
+    PORTD.DIRSET = 0xff;
+    PORTCFG.MPCMASK = 0xff;
     PORTD.PIN0CTRL = PORT_OPC_TOTEM_gc;
+    //PORTD.OUTCLR = 0x80;
+    // LED_PORT leds off (Bit == High = off
+    port_out(LED_PORT) = 0xff;
+    // LED Ports to Totem Pole
+    //PORTCFG_MPCMASK = portd_bits;
+    //PORTD.PIN0CTRL = PORT_OPC_TOTEM_gc;
+    //PORTD.PIN0CTRL = PORT_OPC_TOTEM_gc;
+    //PORTD.PIN1CTRL = PORT_OPC_TOTEM_gc;
+    //PORTD.PIN2CTRL = PORT_OPC_TOTEM_gc;
+    //PORTD.PIN3CTRL = PORT_OPC_TOTEM_gc;
     // als Ausgang
-    port_dirout(LED_PORT, portd_bits);
+    //PORTD.DIRSET = 0x0f; 
+    //port_dirout(LED_PORT, 0x0f);
 
     // Treiber off; PC0 (O IN1), PC1 (O IN2), PC2 (O EN), PC3(I RC), PC4 (I DCCIN), PC5 (I NOTAUS)
     port_out(PORTC) = 0; // PC0(IN1),PC1(IN2),PC2(EN) auf Low
@@ -443,15 +475,19 @@ void do_init_system(void) {
     ADCA.CTRLA |= Bit(4)|Bit(3)|Bit(2);
     
     // --- AWE ---
-    // AWE enable B and A Channel
+    // AWE enable DTI B and DTI A Channel
     AWEXC.CTRL = Bit(AWEX_DTICCBEN_bp)|Bit(AWEX_DTICCAEN_bp);
+    // Dead Time Zeit gleichzeitig auf beiden Seiten (High/Low Seite) setzen
     AWEXC.DTBOTH = F_CPU_MHZ * 3; // 3us
+    // disable AWEXC Ports
     AWEXC.OUTOVEN = 0; // Bit(3)|Bit(2)|Bit(1)|Bit(0);
+    
     // TC C0 Off
-    TCC0.CTRLA = TC_CLKSEL_OFF_gc;
-    TCC0.CTRLB = /*Bit(TC0_CCAEN_bp)|Bit(TC0_CCBEN_bp)|*/ TC_WGMODE_FRQ_gc;
-    TCC0.INTCTRLA = 0;
-    TCC0.INTCTRLB = 0;
+    // TCC0 Off, TCC0 wird als AWEX genutzt
+    TCC0.CTRLA = TC_CLKSEL_OFF_gc; // off
+    TCC0.CTRLB = TC_WGMODE_FRQ_gc;
+    TCC0.INTCTRLA = 0; // Keine Interrupts: OVF oder ERR
+    TCC0.INTCTRLB = 0; // Keine Interrupts: CCx Interrupts
     
     g_com.productid = PRODUCT_ID;
     g_com.vendorid = VENDOR_ID;
@@ -476,7 +512,7 @@ uint8_t do_msg(struct sboxnet_msg_header *pmsg) {
             if (pmsg->opt.len != 1) {
                 return SBOXNET_ACKRC_INVALID_ARG;
             }
-            uint8_t flags = pmsg->data[0];
+            volatile uint8_t flags = pmsg->data[0];
             if (flags & 0x01) { // on
                 if (bit_is_set(g_booster.flags, BOOSTER_FLAG_NOTAUS_b) /*||
                         bit_is_set(g_dev_state, DEV_STATE_FLG_WATCHDOG_b)*/) {
@@ -488,7 +524,7 @@ uint8_t do_msg(struct sboxnet_msg_header *pmsg) {
                 }
                 setbit(g_booster.flags, BOOSTER_FLAG_ON_b);
 				// power on LED ON
-				led_set(LED_BO_ON_b, 1);
+                PORTD.OUTCLR = Bit(LED_BO_ON_b); // led_set(LED_BO_ON_b, 1);
             } else { // off
                 booster_power_off_all();
                 clrbit(g_booster.flags, BOOSTER_FLAG_ON_b);
