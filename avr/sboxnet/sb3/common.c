@@ -564,7 +564,7 @@ __ATTR_OS_MAIN int main(void) {
         // Buffer für Nachrichten
         struct sboxnet_msg_max msg;
         
-        // wird keine Adresse angefordert? 0==keine Addresse angefordert
+        // wird keine Adresse angefordert? 0==keine Addresse angefordert: !=0 Adresse angefordert
         if (bldr_task(&msg) == 0) {
             // dann verarbeiten
             com_receive_and_process_msg(&msg);
@@ -606,7 +606,8 @@ __ATTR_OS_MAIN int main(void) {
                 do_main();
             }
         } else {
-            // ansonsten schlafen legen
+            // keine Adresse angefordert
+            // schlafen legen
             sleep_mode();
         }
     }
