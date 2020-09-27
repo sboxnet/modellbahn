@@ -185,7 +185,7 @@ F 3 "~" H 1890 1420 50  0001 C CNN
 	1    1890 1420
 	0    -1   -1   0   
 $EndComp
-Text Notes 2265 1270 2    50   ~ 0
+Text Notes 1920 830  3    50   ~ 0
 NOTAUS
 Text Notes 2225 1470 2    50   ~ 0
 rt
@@ -213,8 +213,8 @@ F 3 "~" H 1345 1420 50  0001 C CNN
 	1    1345 1420
 	0    -1   -1   0   
 $EndComp
-Text Notes 1755 1210 3    50   ~ 0
-OVERCURRENT
+Text Notes 1430 780  3    50   ~ 0
+OV
 Text Notes 1680 1470 2    50   ~ 0
 ge
 $Comp
@@ -241,7 +241,7 @@ F 3 "~" H 800 1400 50  0001 C CNN
 	1    800  1400
 	0    -1   -1   0   
 $EndComp
-Text Notes 1200 1350 3    50   ~ 0
+Text Notes 840  720  3    50   ~ 0
 Abschaltung
 Text Notes 1135 1450 2    50   ~ 0
 bl
@@ -1660,4 +1660,6 @@ $EndComp
 Connection ~ 1050 4940
 Wire Wire Line
 	1050 4940 1069 4940
+Text Notes 2410 840  3    50   ~ 0
+ON
 $EndSCHEMATC

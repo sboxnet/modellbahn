@@ -161,15 +161,21 @@
     <None Include="dccgen.c">
       <SubType>compile</SubType>
     </None>
+    <None Include="booster-raw.c">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="booster-602.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="defines.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="iox32a4u.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="booster.c">
+    <None Include="booster.c">
       <SubType>compile</SubType>
-    </Compile>
+    </None>
     <Compile Include="bootloader-crt0.c">
       <SubType>compile</SubType>
     </Compile>

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2014-2020
+ *   Copyright (C) 2014-2015
  *   by Thomas Maier <balagi@justmail.de>
  *
  *   Copyright: See COPYING file that comes with this distribution         *
@@ -16,6 +16,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#define USE_BOOSTER 1
+#if !defined(USE_BOOSTER)
+# error "define as least one of USE_BOOSTER"
+#endif
 
 #include "common.h"
 
@@ -27,15 +31,6 @@
  * - Shortcut detection is disabled in the first half of the first DCC bit after a cutout
  */
 
-/*
- * Port Mapping
- * AWEXC:
- * ------ (ATXMEGA32A4U Datasheet P 59)
- * PC0 10 OC0ALS
- * PC1 11 OC0AHS
- * PC2 12 OC0BLS
- * PC3 13 OC0BHS
- */
 
 /*
  * TCC0
@@ -47,11 +42,11 @@
  * - timer 500 kHz / 2us, FRQ Mode, 8bit
  * - DCC generator.
  * - CCA: filled by DMA transfer
- * - CCB: booster shortcut detector
  * 
  * TCD0
  * - general timer 500 kHz / 2us, normal mode, 16bit
  * - CCA: timer
+ * - CCB: booster shortcut detector
  * - CCC: DCC decoder, cutout timer
  * 
  * TCD1
@@ -59,10 +54,18 @@
  * - CCA: DCC decoder. input capture, event 0, PC4
  */
 
-#define VENDOR_ID    0x9999
-#define FIRMWARE_VERSION 0x0200
-#define PRODUCT_ID   0x0003
-#define DEVICE_DESC  "Booster:2"
+#define VENDOR_ID    0x0001
+#define FIRMWARE_VERSION 0x0102
+#if defined(USE_BOOSTER) && defined(USE_DCCGEN)
+# define PRODUCT_ID   0x0005
+# define DEVICE_DESC  "DCCgen+Booster:1"
+#elif defined(USE_DCCGEN)
+# define PRODUCT_ID   0x0004
+# define DEVICE_DESC  "DCCgen:1"
+#else
+# define PRODUCT_ID   0x0003
+# define DEVICE_DESC  "Booster:1"
+#endif
 
 APP_FIRMWARE_HEADER(PRODUCT_ID, VENDOR_ID, FIRMWARE_VERSION)
 
@@ -71,29 +74,41 @@ APP_FIRMWARE_HEADER(PRODUCT_ID, VENDOR_ID, FIRMWARE_VERSION)
 #define NOTAUS_PORT PORTC
 #define NOTAUS_b    5
 
-// timer 10ms
 static struct timer g_timer_10ms;
 
-// Booster Werte im EEPROM
-// Shortcut Limit
-// Shortcut Interval
 struct booster_eeprom {
     uint16_t   shortcut_limit;
     uint16_t   shortcut_interval;
 };
 
-
+struct dccgen_eeprom {
+    uint16_t   locoaddr_scan_max;
+};
 
 struct Eeprom {
     struct booster_eeprom booster;
     uint8_t reserved[128-sizeof(struct booster_eeprom)];
-    //struct dccgen_eeprom  dccgen;
+    struct dccgen_eeprom  dccgen;
 };
 struct Eeprom g_eeprom EEMEM;
 
-#define LED_BO_NOTAUS_b   0
-#define LED_CUR_OV_b      1
-#define LED_CUR_SHORT_b   2
+// LED Port
+#define LED_PORT  PORTD
+// Bits für LEDs
+#define LED_CUR_OV_b      0 // Strom zu hoch
+#define LED_CUR_SHORT_b   1 // Kurzschluss
+#define LED_NOTAUS_b      2 // Notaus
+#define LED_BO_ON_b       3 // Booster EIN
+
+// Port für Strombrücke
+#define DCCM_PORT  PORTC
+// Bits für Strombrücke
+#define DCCM_IN1_b  0 // IN1
+#define DCCM_IN2_b  1 // IN2
+#define DCCM_EN_b   2 // Enable
+#define DCCM_OV_b   3 // OV
+#define DCCM_DCCIN_b  4
+#define DCCM_NOTAUS_b 5 // NOTAUS
 
 #define DCCM_PORT  PORTC
 #define DCCM_IN1_b  0
@@ -121,7 +136,7 @@ struct Eeprom g_eeprom EEMEM;
 struct booster {
     uint8_t        flags;
     struct timer   timer_startup;
-    struct timer   timer_dcc_watchdog;
+    //struct timer   timer_dcc_watchdog;
     uint16_t       advals[2];
     uint16_t       shortcut_cnt;
     uint16_t       shortcut_limit;
@@ -138,6 +153,22 @@ struct booster g_booster = { 0, };
 #define DCC_IN_b   4
 
 
+#define LED_DCC_ON_b      6
+#define LED_DCC_NOTAUS_b  7
+
+#define DCCGEN_FLAG_ON_b      0
+#define DCCGEN_FLAG_NOTAUS_b  1
+
+#define SWITCH_NOTAUS_b  0
+
+#define DCC_PORT        PORTC
+#define DCC_PORT_BIT    4
+
+
+#define DCC_1  ((58/2)-1)
+#define DCC_0  ((116/2)-1)
+
+
 #include "dccdec.c"
 static void booster_sensors_shortcut_on(void) {
     if ((PORTC.INTCTRL & PORT_INT0LVL_gm) == PORT_INT0LVL_OFF_gc) {
@@ -151,7 +182,7 @@ static void booster_sensors_shortcut_off(void) {
 }
 
 static void do_dec_parse_packet(void) {
-    timer_set(&g_booster.timer_dcc_watchdog, DCC_WATCHDOG_VAL);
+    //timer_set(&g_booster.timer_dcc_watchdog, DCC_WATCHDOG_VAL);
     
     if (g_dccdec.buf[0] != 0 // broadcast or reset
            && g_dccdec.buf[0] != 0xff) { // idle
@@ -233,21 +264,31 @@ void booster_sensors_init(void) {
     }
 }
 
+/* void booster_power_off_all(void)
+ *
+ * Booster AUS.
+ */
 void booster_power_off_all(void) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        // Sensoren AUS
         booster_sensors_off();
 
-        port_clr(DCCM_PORT, Bit(DCCM_EN1_b)|Bit(DCCM_EN2_b)|Bit(DCCM_IN1_b)|Bit(DCCM_IN2_b));
-        AWEXC.OUTOVEN = 0;
+        // Strombrücke AUS
+        //port_clr(DCCM_PORT, Bit(DCCM_EN1_b)|Bit(DCCM_EN2_b)|Bit(DCCM_IN1_b)|Bit(DCCM_IN2_b));
+        port_clr(DCCM_PORT, Bit(DCCM_EN_b)|Bit(DCCM_IN1_b)|Bit(DCCM_IN2_b));
+        //AWEXC.OUTOVEN = 0;
 
+        // Kurzschluss Sensor AUS
         booster_sensors_shortcut_off();
+        // PC LEVEL 1 Interrupt AUS == DCC_IN
         PORTC.INTCTRL = (PORTC.INTCTRL & ~PORT_INT1LVL_gm) | PORT_INT1LVL_OFF_gc;
         PORTC.INTFLAGS = Bit(PORT_INT1IF_bp)|Bit(PORT_INT0IF_bp);
 
+        // TCD0 CCB Interrupt level AUS
         TCD0.INTCTRLB &= ~TC0_CCBINTLVL_gm;
-
+        // Startup Timer Init
         timer_set(&g_booster.timer_startup, 0xff);
-        
+        // Decoder Stop
         dec_stop();
     }
 }
@@ -262,7 +303,7 @@ void booster_power_on_track(void) {
         booster_sensors_init();
         
         timer_set(&g_booster.timer_startup, TIMER_STARTUP);
-        timer_set(&g_booster.timer_dcc_watchdog, DCC_WATCHDOG_VAL);
+        //timer_set(&g_booster.timer_dcc_watchdog, DCC_WATCHDOG_VAL);
 
         dec_start();
         
@@ -291,9 +332,9 @@ ISR(PORTC_INT0_vect) { // L6206 current
     }
 }
 
-ISR(TCC1_CCB_vect) { // shortcut detector
+ISR(TCD0_CCB_vect) { // shortcut detector
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-        TCC1.CCB = TCC1.CNT + g_booster.shortcut_interval;
+        TCD0.CCB = TCD0.CNT + g_booster.shortcut_interval;
     }
     if (g_booster.shortcut_cnt >= g_booster.shortcut_limit) {
         booster_power_off_all();
@@ -306,21 +347,35 @@ ISR(TCC1_CCB_vect) { // shortcut detector
 }
 
 static void booster_init(void) {
+    // Startup Timer mit 16ms Auslösung
     timer_register(&g_booster.timer_startup, TIMER_RESOLUTION_16MS);
-    timer_register(&g_booster.timer_dcc_watchdog, TIMER_RESOLUTION_16MS);
+    
+    //timer_register(&g_booster.timer_dcc_watchdog, TIMER_RESOLUTION_16MS);
+    
+    // DCC Decoder Init: portc pin 4 = DCC_IN
     dec_init(EVSYS_CHMUX_PORTC_PIN4_gc);
+    
+    // Booster Flags löschen
     g_booster.flags = 0;
+    // Init Kurzschluss Grenze aus dem EEPROM
     g_booster.shortcut_limit = e2prom_get_word(&g_eeprom.booster.shortcut_limit);
+    // Falls noch nicht gesetzt nehme BOOSTER_DEFAULT_SHORTCUT_LIMIT=4300
     if (g_booster.shortcut_limit == 0xffff) {
         g_booster.shortcut_limit = BOOSTER_DEFAULT_SHORTCUT_LIMIT;
     }
+    // Init Kurzschluss Intervall aus dem EEPROM
     g_booster.shortcut_interval = e2prom_get_word(&g_eeprom.booster.shortcut_interval);
+    // falls noch nicht gesetzt nehme BOOSTER_DEFAULT_SHORTCUT_INTERVAL=35000 ~70ms
     if (g_booster.shortcut_interval == 0xffff) {
         g_booster.shortcut_interval = BOOSTER_DEFAULT_SHORTCUT_INTERVAL;
     }
+    // Maximale bisherige Anzahl der Kurzschlüsse
     g_booster.shortcut_nummax = 0;
+    // soll Kurzschluss Grenze in das EEPROM geschrieben werden in do_main()
     g_booster.eeprom_flags.write_shortcut_limit = 0;
+    // soll Kurzschluss Intervall in das EEPROM geschrieben werden in do_main()
     g_booster.eeprom_flags.write_shortcut_interval = 0;
+    // Booster AUS
     booster_power_off_all();
 }
 
@@ -332,7 +387,6 @@ ISR(PORTC_INT1_vect) { // DCC Input Signal
     TCC0.CTRLC = v;
 }
 
-#define USE_BOOSTER 1
 
 static void measure_task(void) {
     if (ADCA.INTFLAGS == 0x03) {
@@ -363,49 +417,69 @@ static uint8_t read_production_signature_row(uint8_t offset) {
 }
 
 void do_init_system(void) {
-    uint8_t portd_bits = 0
-                        |7
-                        ;
-    port_out(PORTD) = portd_bits;
-    PORTCFG_MPCMASK = portd_bits;
+    // LED_PORT auf LEDs off
+    port_out(LED_PORT) = 0x0f;
+    // LED_PORT auf Ausgabe
+    port_dirout(PORTD, 0x0f);
+    // LED_PORTs auf totem pole
+    PORTCFG_MPCMASK = 0x0f; // PD2..0
     PORTD.PIN0CTRL = PORT_OPC_TOTEM_gc;
-    port_dirout(PORTD, portd_bits);
+        
+    // DCCM_PORT
+    // alles OFF vorbereiten
+    port_out(DCCM_PORT) = 0;
+    // PC0 (IN1), PC1(IN2), PC2 (EN) als Ausgabe
+    port_dirout(DCCM_PORT, Bit(DCCM_DCCOUT_b)|(DCCM_EN_b)|Bit(DCCM_IN2_b)|Bit(DCCM_IN1_b));
+    // PC3(OV), PC4 (DCCIN), PC5(NOTAUS) als Eingabe
+    port_dirin(DCCM_PORT, Bit(DCCM_OV_b)|Bit(DCCM_DCCIN_b)|Bit(DCCM_NOTAUS_b));
+    // Ausgabe ports als totem pole
+    PORTCFG_MPCMASK = Bit(DCCM_DCCOUT_b)|Bit(DCCM_EN_b)|Bit(DCCM_IN2_b)|Bit(DCCM_IN1_b);
+    DCCM_PORT.PIN0CTRL = PORT_OPC_TOTEM_gc;
+    // Eingabeports mit Pullups;
+    PORTCFG_MPCMASK = Bit(DCCM_OV_b)|Bit(DCCM_DCCIN_b)|Bit(DCCM_NOTAUS_b);
+    DCCM_PORT.PIN3CTRL = PORT_OPC_PULLUP_gc;
 
- 
-    port_out(PORTC) = 0;
-    PORTCFG_MPCMASK = 0x0c;
-    PORTC.PIN2CTRL = PORT_OPC_WIREDORPULL_gc;
-    PORTCFG_MPCMASK = 0x43;
-    PORTC.PIN0CTRL = PORT_OPC_TOTEM_gc;
-    port_dirout(PORTC, 0x4f);
-    PORTCFG_MPCMASK = Bit(7);
-    PORTC.PIN7CTRL = PORT_OPC_PULLUP_gc;
-    
-    PORTCFG_MPCMASK = 0x03;
-    PORTA.PIN0CTRL = PORT_OPC_TOTEM_gc;
+    // ADCA Kanäle als Eingabe
+    port_dirin(PORTA, 0xff);
+    PORTCFG_MPCMASK = 0xff; // all pins
+    // mit Pulldown
+    PORTA.PIN0CTRL = PORT_OPC_PULLDOWN_gc;
 
     // configure sleep mode: idle sleep mode, sleep mode allowed
     SLEEP.CTRL = SLEEP_SMODE_IDLE_gc|Bit(SLEEP_SEN_bp);
-    // power reduction
-    PR.PRPA = Bit(PR_DAC_bp)
-                |Bit(PR_ADC_bp)
-                |Bit(PR_AC_bp);
-    PR.PRPB = Bit(PR_DAC_bp)
-                |Bit(PR_ADC_bp)
-                |Bit(PR_AC_bp);
-    PR.PRPC = Bit(PR_TWI_bp)|Bit(PR_USART1_bp)|Bit(PR_USART0_bp)|Bit(PR_SPI_bp)|Bit(PR_HIRES_bp); // PR_TC1_bp PR_TC0_bp;
-    PR.PRPD = Bit(PR_TWI_bp)|Bit(PR_USART1_bp)|Bit(PR_USART0_bp)|Bit(PR_SPI_bp)|Bit(PR_HIRES_bp); // PR_TC1_bp PR_TC0_bp;
+    // timer C0 als Normal Timer für 100Hz, und Kurzschluss Timer + Shortcut Timer
+    //  CCA für 100Hz
+    //  CCB Kurzschlusstimer
+    TCC0.CTRLB = TC_WGMODE_NORMAL_gc; // Normal Modus
+    TCC0.CTRLC = 0; // kein CMPx
+    TCC0.CTRLD = 0; // keine Events
+    TCC0.CTRLE = 0; // kein Bytemode
+    TCC0.INTCTRLA = 0; // kein ERR oder OVF Interrupt
+    TCC0.INTCTRLB = TC_CCAINTLVL_LO_gc; // aber CCA Low Interrupt Level für 100Hz
+    TCC0.INTFLAGS = 0xff; // Lösche Interrupt Flags
+    TCC0.PER = 0xffff; // Timer auf endlos
+    TCC0.CCA = TCC0.CNT + TIMER_PERIOD; // CCA Periode für 100Hz einstellen
+    TCC0.CTRLA = TC_CLKSEL_DIV64_gc; // Timer starten mit 1:64
 
+    // ADC: benutze mit Vorzeichen (unsigned mode may be broken) and 1V Interne Referenz
+    // - ADC_CONMODE_bp mit Vorzeichen
+    // - ADC_FREERUN_bp nein muss angestossen werden
+    // - ADC_RESOLUTION_12BIT_gc 12-bit result, right adjusted
     // ADC: use signed mode (unsigned mode may be broken) and Vcc/1.6 reference (1V internal reference may be broken)
     //      see Atmel Xmega Errata
     ADCA.CTRLB = Bsv(ADC_CONMODE_bp,1)|Bsv(ADC_FREERUN_bp,0)|ADC_RESOLUTION_12BIT_gc;
-    // !__AVR_ATxmega32A4U__
-    ADCA.REFCTRL = ADC_REFSEL_INTVCC_gc/* ADC_REFSEL_VCC_gc*/; //|Bit(ADC_BANDGAP_bp);
+    // Referenz Interne 1V
+    ADCA.REFCTRL = ADC_REFSEL_INT1V_gc;
+    // Keine Events
     ADCA.EVCTRL = 0;
+    // ADC Prescaler auf 1:128
     ADCA.PRESCALER = ADC_PRESCALER_DIV128_gc;
+    // Lösche ggf. Int Flags
     ADCA.INTFLAGS = 0x0f;
+    // ADCA Kalibrieren
     ADCA.CALL = read_production_signature_row(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL0));
     ADCA.CALH = read_production_signature_row(offsetof(NVM_PROD_SIGNATURES_t, ADCACAL1));
+    // ADCA einschschalten
     ADCA.CTRLA = Bit(ADC_ENABLE_bp);
     // ADC Channel 0: current
     ADCA.CH0.CTRL = ADC_CH_GAIN_1X_gc|ADC_CH_INPUTMODE_SINGLEENDED_gc;
@@ -415,26 +489,21 @@ void do_init_system(void) {
     ADCA.CH1.CTRL = ADC_CH_GAIN_1X_gc|ADC_CH_INPUTMODE_SINGLEENDED_gc;
     ADCA.CH1.MUXCTRL = ADC_CH_MUXPOS_PIN1_gc;
     ADCA.CH1.INTCTRL = ADC_CH_INTMODE_COMPLETE_gc|ADC_CH_INTLVL_OFF_gc;
-    // start conversions
-    ADCA.CTRLA |= Bit(3)|Bit(2);
+    // ADC Channel 2: current
+    ADCA.CH0.CTRL = ADC_CH_GAIN_1X_gc|ADC_CH_INPUTMODE_SINGLEENDED_gc;
+    ADCA.CH0.MUXCTRL = ADC_CH_MUXPOS_PIN2_gc;
+    ADCA.CH0.INTCTRL = ADC_CH_INTMODE_COMPLETE_gc|ADC_CH_INTLVL_OFF_gc;
+    // start ADCA conversions
+    ADCA.CTRLA |= Bit(4)|Bit(3)|Bit(2);
     
-    // --- AWE ---
-    // AWE nable B and A Channel
-    AWEXC.CTRL = Bit(AWEX_DTICCBEN_bp)|Bit(AWEX_DTICCAEN_bp);
-    AWEXC.DTBOTH = F_CPU_MHZ * 3; // 3us
-    AWEXC.OUTOVEN = 0; // Bit(3)|Bit(2)|Bit(1)|Bit(0);
-    // TC C0 Off
-    TCC0.CTRLA = TC_CLKSEL_OFF_gc;
-    TCC0.CTRLB = /*Bit(TC0_CCAEN_bp)|Bit(TC0_CCBEN_bp)|*/ TC_WGMODE_FRQ_gc;
-    TCC0.INTCTRLA = 0;
-    TCC0.INTCTRLB = 0;
-    
+    //AWEXC.CTRL = Bit(AWEX_DTICCBEN_bp)|Bit(AWEX_DTICCAEN_bp);
+    //AWEXC.DTBOTH = F_CPU_MHZ * 3; // 3us
+    //AWEXC.OUTOVEN = 0; // Bit(3)|Bit(2)|Bit(1)|Bit(0);
+    // Setze ProductID, VendorID, ... im Common Bereich
     g_com.productid = PRODUCT_ID;
     g_com.vendorid = VENDOR_ID;
     g_com.firmware_version = FIRMWARE_VERSION;
-    g_com.capabilities = 0
-        |CAP_DCC_BOOSTER
-        ;
+    g_com.capabilities = CAP_DCC_BOOSTER;
     g_com.cap_class = 0;
     g_com.dev_desc_P = PSTR(DEVICE_DESC);
 
@@ -456,8 +525,9 @@ uint8_t do_msg(struct sboxnet_msg_header *pmsg) {
             }
             uint8_t flags = pmsg->data[0];
             if (flags & 0x01) { // on
-                if (bit_is_set(g_booster.flags, BOOSTER_FLAG_NOTAUS_b) /*||
-                        bit_is_set(g_dev_state, DEV_STATE_FLG_WATCHDOG_b)*/) {
+                if (
+
+                        bit_is_set(g_booster.flags, BOOSTER_FLAG_NOTAUS_b) ) {
                     return SBOXNET_ACKRC_LOCO_NOTAUS;
                 }
 
@@ -465,7 +535,9 @@ uint8_t do_msg(struct sboxnet_msg_header *pmsg) {
                     booster_power_on_track();
                 }
                 setbit(g_booster.flags, BOOSTER_FLAG_ON_b);
+
             } else { // off
+
                 booster_power_off_all();
                 clrbit(g_booster.flags, BOOSTER_FLAG_ON_b);
                 clrbit(g_booster.flags, BOOSTER_FLAG_NOTAUS_b);
@@ -473,13 +545,13 @@ uint8_t do_msg(struct sboxnet_msg_header *pmsg) {
             pmsg->opt.len = 0;
             return SBOXNET_ACKRC_OK;
         }
-
     }
     return SBOXNET_ACKRC_CMD_UNKNOWN;
 }
 
 uint8_t do_reg_read(uint16_t reg, uint16_t* pdata) {
     switch(reg) {
+
         case R_BOOSTER_FLAGS: *pdata = g_booster.flags; return 0;
         case R_ADCVAL_NUM: *pdata = 2; return 0;
         case R_ADCVAL_0: *pdata = g_booster.advals[0]; return 0;
@@ -531,7 +603,7 @@ void do_main(void) {
         }
     }
 
-    if (/*bit_is_set(g_dev_state, DEV_STATE_FLG_WATCHDOG_b) ||*/ (bit_is_set(g_booster.flags, BOOSTER_FLAG_ON_b) && timer_timedout(&g_booster.timer_dcc_watchdog))) {
+    if (bit_is_set(g_dev_state, DEV_STATE_FLG_WATCHDOG_b) || (bit_is_set(g_booster.flags, BOOSTER_FLAG_ON_b) && timer_timedout(&g_booster.timer_dcc_watchdog))) {
         booster_notaus();
         clrbit(g_booster.flags, BOOSTER_FLAG_ON_b);
     }
@@ -552,7 +624,6 @@ void do_main(void) {
 }
 
 void do_before_bldr_activate(void) {
-
     booster_power_off_all();
     
     PORTC.INT0MASK = 0;
