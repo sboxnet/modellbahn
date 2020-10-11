@@ -18,5 +18,6 @@ weichenserver:
 booster:
    TCC0.CCA 100Hz Timer
    TCC0.CCB Kurzschluss Timer und Shortcut Timer
+   TCC0.CCC als Cutout Timer
    PORTC.INT0 Stromabschaltung
    PORTC.INT1 DCC Input Signal

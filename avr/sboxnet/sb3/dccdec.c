@@ -51,6 +51,7 @@ static void do_dec_parse_packet(void);
 /* void dec_init(uint8_t evmux)
  *   evmux  Wert für Kanal 0 Multiplexer C0MUX z.b. EVSYS_CHMUX_PORTC_PIN4_g
  * DCC Decoder Init. evmux Wert für Kanal 0 Multiplexer C0MUX z.b. EVSYS_CHMUX_PORTC_PIN4_gc
+ * Event Channel wird benutzt im DCC Generator um die DMA Kanäle zu wechseln
  */
 static void dec_init(uint8_t evmux) { // e.g.: EVSYS_CHMUX_PORTC_PIN4_gc
 	// DCC Decoder Init

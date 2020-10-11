@@ -479,10 +479,10 @@ static void com_init_system(void) {
     TCD1.CTRLD = 0; // Event Action off
     TCD1.CTRLE = 0; // normal mode
     TCD1.INTCTRLA = 0;  // err and ov disabled
-    TCD1.INTCTRLB = TC_CCBINTLVL_LO_gc; // CCD interupt level auf LOW
+    TCD1.INTCTRLB = TC_CCBINTLVL_LO_gc; // CCB interupt level auf LOW
     TCD1.INTFLAGS = 0xff; // clear interupt TCD0 flags
-    TCD1.PER = 0xffff; // D1 periode
-    //TCD1.CCB = TCD1.CNT + TIMER_PERIOD;
+    TCD1.PER = 0xffff; // D1 Periode
+    TCD1.CCB = TCD1.CNT + TIMER_PERIOD; // 1000 Hz
     TCD1.CTRLA = TC_CLKSEL_DIV64_gc; // TCD0 clock divider /64
 
     // schreibe Product und Vendor ID in das EEPROM
@@ -500,6 +500,7 @@ static void com_init_system(void) {
             }
         }
     }
+    uint8_t x = 0;
 }
 
 /* Timer D1 CCB Interrupt vector

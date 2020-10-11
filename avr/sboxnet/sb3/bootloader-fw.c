@@ -402,7 +402,7 @@ static void bldr_leds_task(void) {
         // Direction von PORTE Bit 1 == LED_RED_b
         
         // Direction von PORTE Bit 1?
-        if (bit_is_clear(port_dir(LED_PORT), LED_RED_b)) {
+         if (bit_is_clear(port_dir(LED_PORT), LED_RED_b)) {
             // ist Eingabe, setzte timer_keys auf 10
             g_v.timer_keys = 10;
             // lese PE1, wenn gesetzt Bit KEY_ID_b
@@ -1215,7 +1215,9 @@ static uint8_t _bldr_task(struct sboxnet_msg_max* pmsg) {
     }
     
     // soll Adresse angefordert werden?
-    if (bit_is_set(g_dev_state, DEV_STATE_FLG_REQ_ADDR_b)) {
+    uint8_t t = g_dev_state;
+    uint8_t r = DEV_STATE_FLG_REQ_ADDR_b;
+    if (bit_is_set(t, r)) {
         // Logon
         bldr_sboxnet_logon(pmsg);
         // 1 zurückgeben

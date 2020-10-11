@@ -55,9 +55,10 @@ APP_FIRMWARE_HEADER(PRODUCT_ID, VENDOR_ID, FIRMWARE_VERSION)
 // LED Port
 #define LED_PORT  PORTD
 // Bits für LEDs
-#define LED_NOTAUS_b      0 // Notaus
-#define LED_CUR_OV_b      1 // Strom zu hoch
-#define LED_CUR_SHORT_b   2 // Kurzschluss
+#define LED_NOTAUS_b      2 // Notaus
+#define LED_CUR_OV_b      0 // Strom zu hoch
+#define LED_CUR_SHORT_b   1 // Kurzschluss
+
 #define LED_BO_ON_b       3 // Booster EIN
 
 // Port für Strombrücke
@@ -69,6 +70,7 @@ APP_FIRMWARE_HEADER(PRODUCT_ID, VENDOR_ID, FIRMWARE_VERSION)
 #define DCCM_OV_b   3 // OV
 #define DCCM_DCCIN_b  4
 #define DCCM_NOTAUS_b 5 // NOTAUS
+#define DCCM_DCCOUT_b 7
 //#define DCCM_CUTOUT_b 7
 
 // Strom zu hoch detektor: PORT
@@ -349,16 +351,28 @@ ISR(PORTC_INT1_vect) { // DCC Input Signal
     if (bit_is_set(port_in(DCC_IN_PORT), DCC_IN_b)) {
         // webb H, dann erst disable
         dcc_signal_disable();
-        // dann Flanke wechseln
-        port_setbit(DCCM_PORT, DCCM_IN1_b); // IN1 H
+        port_clrbit(DCCM_PORT, DCCM_IN1_b); // IN1 L
         port_clrbit(DCCM_PORT, DCCM_IN2_b); // IN2 L
+        // dann Flanke wechseln
+        _delay_us(0.5);
+        port_setbit(DCCM_PORT, DCCM_IN1_b); // IN1 H
+        _delay_us(0.5);
+        //port_clrbit(DCCM_PORT, DCCM_IN2_b); // IN2 L
+        
     } else {
         // wenn L,
         // erst disable
         dcc_signal_disable();
-        // dann Flanke wechseln
         port_clrbit(DCCM_PORT, DCCM_IN1_b); // IN1 L
+        port_clrbit(DCCM_PORT, DCCM_IN2_b); // IN2 L
+        
+        // dann Flanke wechseln
+        _delay_us(0.5);
+        //port_clrbit(DCCM_PORT, DCCM_IN1_b); // IN1 L
         port_setbit(DCCM_PORT, DCCM_IN2_b); // IN2 H
+        _delay_us(0.5);
+        
+        //port_clrbit(DCCM_PORT, DCCM_DCCOUT_b);
     }
     // nach dem Flankenwechsel Booster wieder ein
     dcc_signal_enable();
@@ -378,10 +392,10 @@ static void read_switches(void) {
     uint8_t sw;
 
     sw = 0;
-    // ist NOTAUS gedrückt (-> Schalter geschlossen  -> H wg. Pullup)
-    volatile uint8_t v = port_in(DCCM_PORT);
-    if (v & Bit(DCCM_NOTAUS_b)) {
-    //if (bit_is_set(port_in(DCCM_PORT), DCCM_NOTAUS_b)) {
+    // ist NOTAUS gedrückt (-> Schalter geschlossen  -> L)
+    //volatile uint8_t v = port_in(DCCM_PORT);
+    //if (!(v & Bit(DCCM_NOTAUS_b))) {
+    if (bit_is_clear(port_in(DCCM_PORT), DCCM_NOTAUS_b)) {
        // dann Flag SWITCH_NOTAUS_b setzen
        setbit(sw, SWITCH_NOTAUS_b);
     }
@@ -486,11 +500,11 @@ void do_init_system(void) {
     // alles OFF vorbereiten
     port_out(DCCM_PORT) = 0;
     // PC0 (IN1), PC1(IN2), PC2 (EN) als Ausgabe
-    port_dirout(DCCM_PORT, Bit(DCCM_EN_b)|Bit(DCCM_IN2_b)|Bit(DCCM_IN1_b));
+    port_dirout(DCCM_PORT, Bit(DCCM_DCCOUT_b)|(DCCM_EN_b)|Bit(DCCM_IN2_b)|Bit(DCCM_IN1_b));
     // PC3(OV), PC4 (DCCIN), PC5(NOTAUS) als Eingabe
     port_dirin(DCCM_PORT, Bit(DCCM_OV_b)|Bit(DCCM_DCCIN_b)|Bit(DCCM_NOTAUS_b));
     // Ausgabe ports als totem pole
-    PORTCFG_MPCMASK = Bit(DCCM_EN_b)|Bit(DCCM_IN2_b)|Bit(DCCM_IN1_b);
+    PORTCFG_MPCMASK = Bit(DCCM_DCCOUT_b)|Bit(DCCM_EN_b)|Bit(DCCM_IN2_b)|Bit(DCCM_IN1_b);
     DCCM_PORT.PIN0CTRL = PORT_OPC_TOTEM_gc;
     // Eingabeports mit Pullups;
     PORTCFG_MPCMASK = Bit(DCCM_OV_b)|Bit(DCCM_DCCIN_b)|Bit(DCCM_NOTAUS_b);
@@ -549,7 +563,6 @@ void do_init_system(void) {
     ADCA.CH0.CTRL = ADC_CH_GAIN_1X_gc|ADC_CH_INPUTMODE_SINGLEENDED_gc;
     ADCA.CH0.MUXCTRL = ADC_CH_MUXPOS_PIN2_gc;
     ADCA.CH0.INTCTRL = ADC_CH_INTMODE_COMPLETE_gc|ADC_CH_INTLVL_OFF_gc;
-    
     // start ADCA conversions
     ADCA.CTRLA |= Bit(4)|Bit(3)|Bit(2);
     
@@ -645,6 +658,11 @@ void do_setup(void) {
  * - notaus_task()
  */
 void do_main(void) {
+    //port_clrbit(LED_PORT, LED_BO_ON_b);
+    //port_clrbit(LED_PORT, LED_CUR_OV_b);
+    //port_clrbit(LED_PORT, LED_CUR_SHORT_b);
+    //port_clrbit(LED_PORT, LED_NOTAUS_b);
+    port_setbit(DCCM_PORT, DCCM_DCCOUT_b);
     measure_task();
     notaus_task();
 }
