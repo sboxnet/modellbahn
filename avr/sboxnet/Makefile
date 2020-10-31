@@ -2,7 +2,7 @@
 # AVR Includes: /usr/lib/avr/include/
 # AVR Libs: /usr/lib/gcc/avr/5.4.0
 
-DEVICENAMES=booster-raw gbmelder weichen-servo dccgen mtester sboxnet-lcd
+DEVICENAMES=booster gbmelder weichen-servo dccgen mtester sboxnet-lcd
 
 .PHONY: $(DEVICENAMES)
 
@@ -57,7 +57,7 @@ $(DEVICENAMES): %: build/%-$(FLASH).avr
 build/%.o: %.c
 	mkdir -p build
 	avr-gcc $(COPTS) -o $@ -c $<
-build/booster-raw.o: booster-raw.c
+build/booster.o: booster-raw.c
 	mkdir -p build
 	avr-gcc $(COPTS) -DUSE_BOOSTER -o $@ -c $<
 build/dccgen.o: dccgen.c
@@ -123,7 +123,7 @@ proggbm: build/gbmelder-$(FLASH).avr
 	mcp avr --chipprops=/home/balagi/bin/avrchips.properties --prgdev=gpio-usb-xmega --chip=$(MCU) \
 	     --cmd="erase flash ; progflash bin:bootloader-$(FLASH).bin $(FLASHADDR) ; progflash bin:$(<:.avr=.bin) ; puteeprom 0x300 0"
 
-progbo: build/booster-raw-$(FLASH).avr
+progbo: build/booster-$(FLASH).avr
 	mcp avr --chipprops=/home/balagi/bin/avrchips.properties --prgdev=gpio-usb-xmega --chip=$(MCU) \
 	     --cmd="erase chip ; progflash bin:bootloader-$(FLASH).bin $(FLASHADDR) ; progflash bin:$(<:.avr=.bin) ; puteeprom 0x300 0"
 #	     --cmd="erase flash ; progflash bin:bootloader-$(FLASH).bin $(FLASHADDR) ; progflash bin:$(<:.avr=.bin) ; puteeprom 0x300 0"

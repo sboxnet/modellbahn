@@ -48,18 +48,25 @@ struct dccdec g_dccdec;
 // declaration
 static void do_dec_parse_packet(void);
 
+/* void dec_init(uint8_t evmux)
+ *   evmux  Wert für Kanal 0 Multiplexer C0MUX z.b. EVSYS_CHMUX_PORTC_PIN4_g
+ * DCC Decoder Init. evmux Wert für Kanal 0 Multiplexer C0MUX z.b. EVSYS_CHMUX_PORTC_PIN4_gc
+ * Event Channel wird benutzt im DCC Generator um die DMA Kanäle zu wechseln
+ */
 static void dec_init(uint8_t evmux) { // e.g.: EVSYS_CHMUX_PORTC_PIN4_gc
-    g_dccdec.state = DEC_STATE_OFF;
-    g_dccdec.preamble = 0;
-    g_dccdec.bufsize = 0;
-    g_dccdec.bits = 0;
-    g_dccdec.lasthbit = 0;
-    g_dccdec.xor = 0;
-    g_dccdec.cutout = 0;
+	// DCC Decoder Init
+	
+    g_dccdec.state = DEC_STATE_OFF; // Status OFF
+    g_dccdec.preamble = 0;  // keine Preamble 
+    g_dccdec.bufsize = 0;   // aktuelle Buffergröße
+    g_dccdec.bits = 0;      // wieviele Bits sind im Buffer
+    g_dccdec.lasthbit = 0;  // letzte Halfbit
+    g_dccdec.xor = 0;       // XOR Wert für die CRC
+    g_dccdec.cutout = 0;    // Sind wir ein Cutout?
     
 	// setze Event System Multiplexer EVSYS_CHMUX_PORTC_PIN4_gc
     EVSYS.CH0MUX = evmux;
-	
+	// Event Kanal 0: Quadratur ausgeschaltet
     EVSYS.CH0CTRL = 0;
     
 	// Timer D1 off
@@ -80,48 +87,82 @@ static void dec_init(uint8_t evmux) { // e.g.: EVSYS_CHMUX_PORTC_PIN4_gc
     TCD1.PER = 0xffff;
 }
 
+/* void dec_start(void)
+ * Start den DCC Decoder.
+ */
 static void dec_start(void) {
+	// Erstes Bit
     g_dccdec.state = DEC_STATE_FIRST;
+	// noch keine Preamble
     g_dccdec.preamble = 0;
+	// der Buffer ist noch leer
     g_dccdec.bufsize = 0;
+	// kein Cutout
     g_dccdec.cutout = 0;
     
+	// TCD1 Restart
     TCD1.CTRLFSET = TC_CMD_RESTART_gc;
+	// alle Interrupt Flags clearen
     TCD1.INTFLAGS = 0xff;
+	// TCD2.CCA auf LO Interrupt
     TCD1.INTCTRLB = TC_CCAINTLVL_LO_gc;
+	// TCD1 Timer starten mit /64
     TCD1.CTRLA = TC_CLKSEL_DIV64_gc;
 }
 
+/* void dec_stop(void)
+ * DCC Decoder stoppen.
+ */
 static void dec_stop(void) {
+	// Status auf OFF
     g_dccdec.state = DEC_STATE_OFF;
+	// keine Interrupts
     TCD1.INTCTRLB = 0;
+	// Interrupt Flags clearen
     TCD1.INTFLAGS = 0xff;
+	// und Timer TCD1 aus
     TCD1.CTRLA = TC_CLKSEL_OFF_gc;
 }
 
+/* void dec_parse_packet(void)
+ * Ein DCC Packet parsen im User Code.
+ */ 
 static void dec_parse_packet(void) {
+	// wenn mehr als 3 Bits im Buffer sind und der XOR Wert 0 ist
     if (g_dccdec.bufsize >= 3 && g_dccdec.xor == 0) {
-//port_tglbit(PORTC, 6);
+		// dann parsen
         do_dec_parse_packet();
     }
 }
 
+/*  void dec_halfbit(uint8_t hb)
+ *   hb Wert des Half bits (0|1)
+ * Ein halbes Bit dem Decoder zuführen.
+ */
 static void dec_halfbit(uint8_t hb) {
     switch(g_dccdec.state) {
+		// sind wir in der preamble?
         case DEC_STATE_PREAMBLE: {
+			// Halfbit 1?
             if (hb) {
+				// ist Preamble < 100 halfbits
                 if (g_dccdec.preamble < 100) {
+					// dann Zähler erhöhen
                     g_dccdec.preamble++;
                 }
             } else {
+				// mind 10 Bits volle Bits für die Preamble
                 if (g_dccdec.preamble >= 20) {
+					// dann ist es ein Start Bit
                     g_dccdec.state = DEC_STATE_STARTBIT;
                 } else {
+					// ansonsten zurücksetzen
                     g_dccdec.preamble = 0;
                 }
             }
             break;
         }
+		// sind wir im Start Bit?
         case DEC_STATE_STARTBIT: {
             if (hb) {
                 goto dec_reset;

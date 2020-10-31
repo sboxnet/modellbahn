@@ -354,10 +354,20 @@ class SboxnetMsg(object):
     
     def print(self, o):
         s = cmd_to_str(self.cmd&0x7f) + " ("+ cmd_to_str(self.cmd&0x7f)+ f"  is_answer {self.cmd&0x80 == 0x80}) {('--> SEND' if (self.cmd&0x80== 0) else '<-- RECEIVE ')}| dstaddr={self.dstaddr} srcaddr={self.srcaddr} seq={self.seq} dlen={self.dlen} cmd={self.cmd} cmd_hex={self.cmd:x} data={self.data} crc={self.crc}"
-        if o._debug: logDebug(self, s)
+        if o._debug:
+            if self.cmd==SBOXNET_CMD_DEV_REQ_ADDR:
+                pass
+            if self.cmd==SBOXNET_CMD_DEV_REQ_ADDR|0x80:
+                s = s + f" ----- REQ DEVICE ADDR {self.data[8]}"
+            logDebug(self, s)
     
     def __str__(self):
-        return cmd_to_str(self.cmd&0x7f) + " ("+ cmd_to_str(self.cmd&0x7f) + f"  is_answer {self.cmd&0x80 == 0x80}) {('--> SEND' if (self.cmd&0x80== 0) else '<-- RECEIVE ')}| dstaddr={self.dstaddr} srcaddr={self.srcaddr} seq={self.seq} dlen={self.dlen} cmd={self.cmd} cmd_hex={self.cmd:x} data={self.data} crc={self.crc}"
+        s = cmd_to_str(self.cmd&0x7f) + " ("+ cmd_to_str(self.cmd&0x7f) + f"  is_answer {self.cmd&0x80 == 0x80}) {('--> SEND' if (self.cmd&0x80== 0) else '<-- RECEIVE ')}| dstaddr={self.dstaddr} srcaddr={self.srcaddr} seq={self.seq} dlen={self.dlen} cmd={self.cmd}"
+        if self.cmd==SBOXNET_CMD_DEV_REQ_ADDR:
+            pass
+        if self.cmd==SBOXNET_CMD_DEV_REQ_ADDR|0x80:
+            s = s + f" ----- REQ DEVICE ADDR {self.data[8]}"
+        return s
 
 class SboxnetError(Exception):
     pass

@@ -96,10 +96,14 @@ struct Eeprom {
 };
 struct Eeprom g_eeprom EEMEM;
 
+// LED Ein
 #define LED_DCC_ON_b      6
+// LED Notaus
 #define LED_DCC_NOTAUS_b  7
 
+// Flag Ein
 #define DCCGEN_FLAG_ON_b      0
+// Flag NOTAUS
 #define DCCGEN_FLAG_NOTAUS_b  1
 
 #define SWITCH_NOTAUS_b  0
@@ -176,7 +180,9 @@ void dcc_init_dma(void) {
     for (uint8_t i = 0; i < NUM_DCC_SLOTS; i++, slot++, ch++) {
         ch->CTRLA = 0;
         ch->CTRLA = DMA_CH_RESET_bm;
+        
         while (ch->CTRLA & DMA_CH_RESET_bm);
+        
         ch->REPCNT = 0; // endless
         ch->CTRLA = Bsv(DMA_CH_ENABLE_bp, 0)|Bsv(DMA_CH_REPEAT_bp, 1)|Bsv(DMA_CH_SINGLE_bp, 1)|DMA_CH_BURSTLEN_1BYTE_gc; // single shot: transfer only 1 byte at transfer trigger
         ch->CTRLB = DMA_CH_ERRIF_bm|DMA_CH_TRNIF_bm|DMA_CH_ERRINTLVL_OFF_gc|DMA_CH_TRNINTLVL_LO_gc;

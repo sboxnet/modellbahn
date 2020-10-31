@@ -327,7 +327,7 @@ class sbntst(object):
             devices = []
             # find devices...
             for d in  sboxnet.SboxnetUSB.find_devices():
-                sn = sboxnet.SboxnetUSB(dev=d).getserialnumber()
+                sn = sboxnet.SboxnetUSB(dev=d, sniffer=self.sniffer).getserialnumber()
                 logDebug(self, f"device {l} -> {sn}")
                 devices.append(d)
                 l = l + 1
