@@ -1145,11 +1145,11 @@ static void bldr_sboxnet_logon(struct sboxnet_msg_max* pmsg) {
     uint16_t *pvendid = (uint16_t*)(pmsg->data + 6);
     
     // Product ID und Vendor ID des Gerätes ermitteln aus dem EEPROM
-    uint16_t productid = e2prom_get_word(&bldr_eeprom.productid);
-    uint16_t vendorid = e2prom_get_word(&bldr_eeprom.vendorid);
+    volatile uint16_t productid = e2prom_get_word(&bldr_eeprom.productid);
+    volatile uint16_t vendorid = e2prom_get_word(&bldr_eeprom.vendorid);
     
     // Nachricht empfangen
-    int8_t rc = sboxnet_receive_msg(&pmsg->msgh, sizeof(*pmsg));
+    volatile int8_t rc = sboxnet_receive_msg(&pmsg->msgh, sizeof(*pmsg));
     if (rc > 0) {
         // empfangen
         // Quelle 0
@@ -1163,7 +1163,9 @@ static void bldr_sboxnet_logon(struct sboxnet_msg_max* pmsg) {
         // nach dem SBOXNET_CMD_DEV_REQ_ADDR wird mit einem SBOXNET_CMD_DEV_SET_ADDR an die Broadcast Adresse geantwortet
         // stimmen PUID, Product ID und Vendor ID überein mit der Nachricht? dann ist das ein SBOXNET_CMD_DEV_SET_ADDR für dieses Gerät.
         if (pmsg->msgh.srcaddr == 0 && pmsg->msgh.dstaddr == SBOXNET_ADDR_BROADCAST && pmsg->msgh.cmd == SBOXNET_CMD_DEV_SET_ADDR) {
+           uint8_t x = 0;
            if (pmsg->msgh.opt.len == 9 && *ppuid == g_v.dev_puid && *pprodid == productid && *pvendid == vendorid) {
+            uint8_t y = 0;
                 g_v.dev_addr = pmsg->msgh.data[8];
                 
                 pmsg->msgh.dstaddr = 0;
@@ -1255,8 +1257,9 @@ static void bldr_main(uint8_t boot) {
     sei();
         
     while(1) {
-        // führe bldr_task() aus: - LEDs je nach Status, Geräte Reset, und anfordern einer Adresse
-        if (!bldr_task(&msg)) {
+        // führe bldr_task() aus: - LEDs je nach Status, Geräte Reset, und anfordern einer Adresse; != 0 Address angefordert; == 0 keine Addresse angefordert
+        volatile uint8_t r1 = bldr_task(&msg);
+        if (!r1 /*!bldr_task(&msg)*/) {
             // ist was empfangen worden?
             if (sboxnet_receive_msg(&msg.msgh, sizeof(msg)) > 0) {
                 // Nachricht verarbeiteiten

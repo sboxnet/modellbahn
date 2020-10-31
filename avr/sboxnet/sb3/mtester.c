@@ -131,17 +131,15 @@ void exec_step2();
 void do_main(void) {
     sei();
     
+    //port_out(PORTA) = 0xff;
+    
     //PORTA = 
 
-    //exec_step2();
+    //exec_step0();
     //exec_step1();
     //exec_step2();
     //step=3;
     
-    //exec_step2();
-    //step = 0;
-    //port_out(PORTA) = 0;
-    //Sport_out(PORTC) = 0x10;
     
     switch(step)
     {
@@ -166,7 +164,6 @@ void do_main(void) {
         default:
             break;
     }
-    //for(;;) ;
     
     return;
 }
