@@ -156,7 +156,8 @@ static uint8_t com_process_cmd_reset(void) {
         // Geräteadresse ist die Broadcast Adresse
         g_v.dev_addr = SBOXNET_ADDR_BROADCAST;
         // eine neue Adresse soll angefordert werden
-        setbit(g_dev_state, DEV_STATE_FLG_REQ_ADDR_b);
+        g_dev_state |= Bit(DEV_STATE_FLG_REQ_ADDR_b);
+		//setbit(g_dev_state, DEV_STATE_FLG_REQ_ADDR_b);
     }
     // keine Antwort senden
     return SBOXNET_ACKRC_SEND_NO_ANSWER;
@@ -571,7 +572,7 @@ __ATTR_OS_MAIN int main(void) {
             // dann verarbeiten
             com_receive_and_process_msg(&msg);
             // ist das Gerät im FW Update Modus?
-            if (g_dev_state & DEV_STATE_FLG_FWUP_MASK) {
+            /*if (g_dev_state & DEV_STATE_FLG_FWUP_MASK) {
                 
                 while (!sboxnet_all_sent()); // wait until sboxnet transmitter is empty
                 
@@ -603,7 +604,7 @@ __ATTR_OS_MAIN int main(void) {
                 // start firmware update
                 bldr_activate();
                 // never reached
-            } else {
+            } else */ {
                 // ansonsten User Main ausführen
                 do_main();
             }

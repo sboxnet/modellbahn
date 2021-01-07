@@ -200,7 +200,8 @@ extern uint8_t _end;
 // BLDR_STACK_TOP = ((INTERNAL_SRAM_END - sizeof(struct bldr_ram) - 1) - 1)
 #define STACK_MAGIC   0
 // stack wird mit 0 gefüllt
-BOOTLOADER_SECTION
+//BOOTLOADER_SECTION
+//BLDR_APP_SECTION
 static uint16_t bldr_stack_free(void) {
     uint8_t* p = &_end;
     // prüfe abwärts ob was anderes als eine 0 auf dem Stack liegt
@@ -213,7 +214,8 @@ static uint16_t bldr_stack_free(void) {
     return (uint16_t)(p - &_end);
 }
 // Stack Grösse
-BOOTLOADER_SECTION
+//BOOTLOADER_SECTION
+//BLDR_APP_SECTION
 static uint16_t bldr_stack_size(void) {
     return (uint8_t*)BLDR_STACK_TOP - &_end;
 }
@@ -295,9 +297,9 @@ void write_errinfo(uint8_t code, uint8_t *errstr) {
 // der sboxnet_device Bereich für sboxnet im Bootloader RAM
 #define SBOXNET_VAR                   (&g_v.sboxnet)
 // die Sektion für Sboxnet Standardsektion für Sboxnet
-#define SBOXNET_SECTION               BOOTLOADER_SECTION
+#define SBOXNET_SECTION               //BLDR_APP_SECTION
 // 2.te Sektion für Sboxnet
-#define SBOXNET_SECTION2              BLDR_APP_SECTION
+#define SBOXNET_SECTION2              //BLDR_APP_SECTION
 // Port für Receiver Bit (RxD)
 #define SBOXNET_RxD_PORT              PORTE
 // RxD Bitnummer im Port
@@ -349,16 +351,30 @@ void write_errinfo(uint8_t code, uint8_t *errstr) {
 // den Code für Sboxnet einbinden
 #include "sboxnet/sboxnet.c"
 
+//BOOTLOADER_SECTION
+uint8_t g_dev_state = 0;
+
+//BOOTLOADER_SECTION
+uint8_t g_dev_errflags = 0;
+
+//BOOTLOADER_SECTION
+uint8_t g_dev_errflags2 = 0;
 
 // TCE0 CCA Interrupt
 //SBOXNET_SECTION ISR(TCC0_CCA_vect) {
-BLDR_APP_SECTION ISR(TCE0_CCA_vect) {
+#ifdef WITH_SECS
+BLDR_APP_SECTION
+#endif
+ISR(TCE0_CCA_vect) {
     sboxnet_timer_bit(); // Sboxnet Timer pro Bit
 }
 
 // TCE0 OVF Interrupt, Timer verwalten
 //BOOTLOADER_SECTION ISR(TCC0_OVF_vect) { // every 4ms
-BLDR_APP_SECTION ISR(TCE0_OVF_vect) { // every 4ms
+#ifdef WITH_SECS
+BLDR_APP_SECTION
+#endif
+ISR(TCE0_OVF_vect) { // every 4ms
     // Timer im bldr_ram erhöhen
     ++g_v.timer;
     // wenn Logon timer gesetzt ist -> dec
@@ -393,7 +409,9 @@ BLDR_APP_SECTION ISR(TCE0_OVF_vect) { // every 4ms
 /* void bldr_leds_task(void)
  * Status LEDs ansteuern.
  */
+#ifdef WITH_SECS
 BLDR_APP_SECTION
+#endif
 static void bldr_leds_task(void) {
     
     // Zuerst Identify Key lesen.
@@ -440,8 +458,9 @@ static void bldr_leds_task(void) {
         }
         
         // Status überprüfen
-        uint8_t st = g_dev_state; // aktueller Status
-        if (st != g_v.dev_old_state) { // ist aktueller STatus != alter Status
+        volatile uint8_t st = g_dev_state; // aktueller Status
+		volatile uint8_t st_old = g_v.dev_old_state;
+        if (1||st != st_old) { // ist aktueller STatus != alter Status
             g_v.dev_old_state = st; // dann alter Status gleich aktueller Status
            
             // Ist Identify Flag gesetzt?
@@ -455,10 +474,10 @@ static void bldr_leds_task(void) {
                 g_v.led_gn = 0;
                 g_v.led_rt = 0x1; //0x55;
             // sind wir im Firmware Update Modus?
-            } else if (bit_is_set(st, DEV_STATE_FLG_FWUP_MASK)) {
+            /*} else if (bit_is_set(st, DEV_STATE_FLG_FWUP_MASK)) {
                 // grüne LED schnell blinken
                 g_v.led_gn = 0xaa;
-                g_v.led_rt = 0;
+                g_v.led_rt = 0;*/
             // ist der bootloader aktiv?
             } else if (bit_is_set(st, DEV_STATE_FLG_BOOTLOADER_b)) {
                 // grüne LED langsam Blinken
@@ -471,10 +490,10 @@ static void bldr_leds_task(void) {
             }
 
             // war eine Watchdog Nachricht und keine Adressanforderung
-			if (bit_is_set(st, DEV_STATE_FLG_WATCHDOG_b) && !bit_is_set(st, DEV_STATE_FLG_REQ_ADDR_b)) {
+			/*if (bit_is_set(st, DEV_STATE_FLG_WATCHDOG_b) && !bit_is_set(st, DEV_STATE_FLG_REQ_ADDR_b)) {
                 // rote LED Blinken
-				g_v.led_gn = 7;
-			}
+				g_v.led_rt = 7;
+			}*/
         }
         // war ein Fehler (Bits in g_dev_errflags oder g_dev_errflags2 gesetzt, DEV_ERR_FLG_*)
         if (g_dev_errflags || g_dev_errflags2) {
@@ -506,7 +525,9 @@ static void bldr_leds_task(void) {
  * 
  * siehe avr libc https://www.nongnu.org/avr-libc/user-manual/group__util__crc.html, https://www.nongnu.org/avr-libc/user-manual/group__util__crc.html#ga1c1d3ad875310cbc58000e24d981ad20
  */
+#ifdef WITH_SECS
 BLDR_APP_SECTION
+#endif
 static uint16_t crc_ccitt_update(uint16_t crc, uint8_t data) {
     return _crc_ccitt_update(crc, data);
 }
@@ -518,7 +539,10 @@ static uint16_t crc_ccitt_update(uint16_t crc, uint8_t data) {
  *  - SBOXNET_CMD_DEV_GET_DESC: Gerätebeschreibung lesen
  *  - SBOXNET_CMD_DEV_IDENTIFY: Identify Flag setzen
  */
-BLDR_APP_SECTION NOINLINE __ATTR_USED
+#ifdef WITH_SECS
+BLDR_APP_SECTION
+#endif
+NOINLINE __ATTR_USED
 static uint8_t _bldr_process_basic_msg(struct sboxnet_msg_header *pmsg) {
     switch (pmsg->cmd) {        
         /* Firmware Update Start
@@ -689,7 +713,10 @@ static uint8_t _bldr_process_basic_msg(struct sboxnet_msg_header *pmsg) {
  * - R_DEBUG_EEPROM_BASE..    DEBUG EEPROM lesen (Wortweise)
  * - R_DEBUG_SRAM_BASE..      DEBUG SRAM lesen (Wortweise)
  */
-BLDR_APP_SECTION NOINLINE __ATTR_USED
+#ifdef WITH_SECS
+BLDR_APP_SECTION
+#endif
+NOINLINE __ATTR_USED
 static uint8_t _bldr_reg_read(uint16_t reg, uint16_t *pdata) {
     switch (reg) {
         case R_PUID_L: *pdata = (uint16_t)g_v.dev_puid; return 0;
@@ -747,7 +774,9 @@ static uint8_t _bldr_reg_read(uint16_t reg, uint16_t *pdata) {
  * uint8_t bldr_cmd_reg_read(struct sboxnet_msg_header *pmsg)
  *   pmsg Zeiger auf Nachricht
  */
+#ifdef WITH_SECS
 BLDR_APP_SECTION
+#endif
 static uint8_t bldr_cmd_reg_read(struct sboxnet_msg_header *pmsg) {
     // zeiger auf Nachricht Daten
     uint16_t *pdata = (uint16_t*)pmsg->data;
@@ -775,7 +804,9 @@ static uint8_t bldr_cmd_reg_read(struct sboxnet_msg_header *pmsg) {
  * uint8_t bldr_cmd_reg_read_multi(struct sboxnet_msg_header *pmsg)
  *  pmsg  Zeiger auf Nachricht
  */
+#ifdef WITH_SECS
 BLDR_APP_SECTION
+#endif
 static uint8_t bldr_cmd_reg_read_multi(struct sboxnet_msg_header *pmsg) {
     // Zeiger auf Nachricht
     uint16_t *pdata = (uint16_t*)pmsg->data;
@@ -801,7 +832,9 @@ static uint8_t bldr_cmd_reg_read_multi(struct sboxnet_msg_header *pmsg) {
  * - setzt als Geräteadresse auf die Broadcastadresse
  * - setzt State Flag DEV_STATE_FLG_REQ_ADDR_b, erwarte Adresse
  */
+#ifdef WITH_SECS
 BLDR_APP_SECTION
+#endif
 static void bldr_process_cmd_net_reset(void) {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         g_v.dev_addr = SBOXNET_ADDR_BROADCAST;
@@ -824,7 +857,9 @@ static void bldr_process_cmd_net_reset(void) {
  * wenn nichts zugetroffen hat: weiter zu bldr_process_basic_msg()
  * 
  */
+#ifdef WITH_SECS
 BLDR_APP_SECTION
+#endif
 static uint8_t bldr_process_std_msg(struct sboxnet_msg_header *pmsg, uint8_t* pagebuf) {
     switch (pmsg->cmd) {
         // Nachricht SBOXNET_CMD_NET_RESET
@@ -944,6 +979,7 @@ static uint8_t bldr_process_std_msg(struct sboxnet_msg_header *pmsg, uint8_t* pa
             pmsg->opt.len = 0;
             return SBOXNET_ACKRC_OK;
         }
+        
         default:
             // weiter zu bldr_process_basic_msg()
             return bldr_process_basic_msg(pmsg);        
@@ -956,7 +992,9 @@ static uint8_t bldr_process_std_msg(struct sboxnet_msg_header *pmsg, uint8_t* pa
  * - pmsg  Zeiger auf Nachricht
  * - pagebuf  Buffer für Flash Seite
  */
+#ifdef WITH_SECS
 BLDR_APP_SECTION
+#endif
 static uint8_t NOINLINE bldr_process_msg(struct sboxnet_msg_header* pmsg, uint8_t* pagebuf) {    
     uint8_t rc = 0;
     
@@ -997,45 +1035,60 @@ send_ok:
 /* Den Chip auf 32MHz umschalten.
  * Chip läuft nach dem Start mit 2MHz.
  */
-BOOTLOADER_SECTION
+//BOOTLOADER_SECTION
+BLDR_APP_SECTION
 static void bldr_switch_to_32MHz(void) {
-    
-    // Auf 16Mhz externen Oszillator umschalten und die PLL auf 2x stellen == 32MHz
-    
-    // Frequenzberich 12-16MHz wählen und Startup Zeit 16k
-    OSC.XOSCCTRL = OSC_FRQRANGE_12TO16_gc|OSC_XOSCSEL_XTAL_16KCLK_gc;
-    
-    // Externen Oszillator einschalten
-    setbit(OSC.CTRL, OSC_XOSCEN_bp);
-    
-    // warte bis Oszillator stabil ist
-    while (bit_is_clear(OSC.STATUS, OSC_XOSCRDY_bp)){
-        _NOP();
-    }
-    
-    // Die PLL auf extenen Takt umstellen und 2x als Multiplikator einstellen
-    OSC.PLLCTRL = OSC_PLLSRC_XOSC_gc|2; // PLL multiplier: 2x
-    
-    // PLL aktivieren
-    setbit(OSC.CTRL, OSC_PLLEN_bp);
-    
-    // warte bis PLL stabil ist
-    while (bit_is_clear(OSC.STATUS, OSC_PLLRDY_bp)){
-        _NOP();
-    }
-    
-    // die PLL als Taktquelle einstellen
-    ioreg_ccp(&CLK.CTRL, CLK_SCLKSEL_PLL_gc);
-    
-    // den internen 2MHz Takt stoppen
-    clrbit(OSC.CTRL, OSC_RC2MEN_bp);
+    // zuerst auf internen 32 MHz Osz Umschalten
+	OSC.CTRL |= OSC_RC32MEN_bm;
+	//warte bis der Stabil ist
+	while (bit_is_clear(OSC.STATUS,OSC_RC32MRDY_bp)) {
+		_NOP();
+	}
+	// die RC32MEN als Taktquelle einstellen
+	ioreg_ccp(&CLK.CTRL, CLK_SCLKSEL_RC32M_gc);
+	// den internen 2MHz Takt stoppen
+	clrbit(OSC.CTRL, OSC_RC2MEN_bp);
+	//auf externen 16Mhz OSC Schalten
+	// Frequenzberich 12-16MHz wählen und Startup Zeit 16k
+	OSC.XOSCCTRL = OSC_FRQRANGE_12TO16_gc|OSC_XOSCSEL_XTAL_16KCLK_gc;
+	// Externen Oszillator einschalten
+	setbit(OSC.CTRL, OSC_XOSCEN_bp);
+	// warte bis ext. Oszillator stabil ist
+	// 200 Mal versuchen umzuschalten
+	uint8_t is32 = 0;
+	uint8_t cnt = 200;
+	while (cnt--) {
+		if (bit_is_set(OSC.STATUS, OSC_XOSCRDY_bp)) {
+			is32 = 1;
+			break;
+		}
+		_NOP();
+		_NOP();
+		_NOP();
+	}
+	// Wenn externer Osc ist stabil?
+	if (is32) {
+		// dann die PLL auf 2x stellen == 32MHz
+		OSC.PLLCTRL = OSC_PLLSRC_XOSC_gc|2; // PLL multiplier: 2x
+		// PLL aktivieren
+		setbit(OSC.CTRL, OSC_PLLEN_bp);
+		// warte bis PLL stabil ist
+		while (bit_is_clear(OSC.STATUS, OSC_PLLRDY_bp)){
+			_NOP();
+		}
+		// die PLL als Taktquelle einstellen
+		ioreg_ccp(&CLK.CTRL, CLK_SCLKSEL_PLL_gc);
+		// den internen 32MHz Takt stoppen
+		clrbit(OSC.CTRL, OSC_RC32MRDY_bp);
+	}
 }
 
 /* Random Funktion
  * xor shift Random Generator.
  * siehe https://de.wikipedia.org/wiki/Xorshift
  */
-BOOTLOADER_SECTION
+//BOOTLOADER_SECTION
+BLDR_APP_SECTION
 static uint16_t bldr_random(void) {
     uint16_t r;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
@@ -1067,6 +1120,7 @@ static void bldr_init_system(void) {
     PORTC.DIR = 0;
     // Portcfg auf alle Pins
     PORTCFG_MPCMASK = 0xff; // all pins
+
     // pull down ein
     PORTC.PIN0CTRL = PORT_OPC_PULLDOWN_gc;
     
@@ -1138,7 +1192,9 @@ static void bldr_init_system(void) {
 /* Sboxnet Logon.
  * 
  */
+#ifdef WITH_SECS
 BLDR_APP_SECTION
+#endif
 static void bldr_sboxnet_logon(struct sboxnet_msg_max* pmsg) {
     uint32_t *ppuid = (uint32_t*)pmsg->data;
     uint16_t *pprodid = (uint16_t*)(pmsg->data + 4);
@@ -1180,6 +1236,8 @@ static void bldr_sboxnet_logon(struct sboxnet_msg_max* pmsg) {
         }
     }
     // falls keine Nachricht Adresse anfordern...
+    //g_v.timer_watchdog;
+    volatile uint8_t x1 = g_v.timer_logon;
     if (g_v.timer_watchdog && g_v.timer_logon == 0) {
         // Ziel ist Adresse 0
         pmsg->msgh.dstaddr = 0;
@@ -1202,7 +1260,10 @@ static void bldr_sboxnet_logon(struct sboxnet_msg_max* pmsg) {
  * - Geräte Reset
  * - anfordern einer Adresse
  */
-BLDR_APP_SECTION NOINLINE __ATTR_USED
+#ifdef WITH_SECS
+BLDR_APP_SECTION
+#endif
+NOINLINE __ATTR_USED
 static uint8_t _bldr_task(struct sboxnet_msg_max* pmsg) {
     // LEDs je nach Status setzen
     bldr_leds_task();
@@ -1230,7 +1291,10 @@ static uint8_t _bldr_task(struct sboxnet_msg_max* pmsg) {
 
 /* Bootloader Hauptroutine.
  */
-BLDR_APP_SECTION NOINLINE
+#ifdef WITH_SECS
+BLDR_APP_SECTION
+#endif
+NOINLINE
 static void bldr_main(uint8_t boot) {
     // Buffer für Flashbereich
     struct sboxnet_msg_max msg;
@@ -1323,7 +1387,10 @@ void bldr_start(void) {
 
 /* Bootloader aktiviern aus der Applikation.
  */
-BLDR_APP_SECTION NOINLINE __ATTR_USED
+#ifdef WITH_SECS
+BLDR_APP_SECTION
+#endif
+NOINLINE __ATTR_USED
 static void _bldr_activate(void) {
     // zuerst Interrupts aus
     cli();

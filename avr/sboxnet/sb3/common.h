@@ -1,10 +1,43 @@
 
 #ifndef _COMMON_H_
 #define _COMMON_H_
-
+/*
+iox64a4u: ATxmega64A4U
+PROGMEM_START     (0x0000U)
+PROGMEM_SIZE      (69632U)
+PROGMEM_END       (PROGMEM_START + PROGMEM_SIZE - 1) 0+69632-1=69631=0x10FFF
+APP_SECTION_START     (0x0000U)
+APP_SECTION_SIZE      (65536U)
+APP_SECTION_END       (APP_SECTION_START + APP_SECTION_SIZE - 1) 0+65536-1=0xFFFF
+APPTABLE_SECTION_START     (0xF000)
+APPTABLE_SECTION_SIZE      (4096)
+APPTABLE_SECTION_END       (APPTABLE_SECTION_START + APPTABLE_SECTION_SIZE - 1) 0xF000+4096-1=0xFFFF
+BOOT_SECTION_START     (0x10000U)
+BOOT_SECTION_SIZE      (4096U)
+BOOT_SECTION_END       (BOOT_SECTION_START + BOOT_SECTION_SIZE - 1) 0x10000+4096-1=0x10FFF
+ -----
+ -Wl,--section-start=.appcrc=dffe
+ -Wl,--section-start=.bldrapp=e000
+ -Wl,--section-start=.bldrinit=10000
+ -Wl,--section-start=.bldrvec=10200
+ -Wl,--section-start=.bootloader=100242
+ -Wl,--section-start=.bldrcrc=10dfe
+ -Wl,--section-start=.bldrstatic=10d00
+ -Wl,--section-start=.bldrstatvec=10ff8
+ -Wl,--section-start=.bldrfwheader=11000
+ -Wl,--section-start=.fwheader=12000
+ -------------------
+  atxmega64a4u:
+  -Wl,--section-start=.appcrc=dffe -Wl,--section-start=.bldrapp=e000 -Wl,--section-start=.bldrinit=10000 -Wl,--section-start=.bldrvec=10200 -Wl,--section-start=.bootloader=100242  -Wl,--section-start=.bldrcrc=10dfe -Wl,--section-start=.bldrstatic=10e00  -Wl,--section-start=.bldrstatvec=10ff8 -Wl,--section-start=.bldrfwheader=11000 -Wl,--section-start=.fwheader=12000
+  --
+  atxmega32a4u:
+  -Wl,--section-start=.appcrc=6ffe -Wl,--section-start=.bldrapp=7000 -Wl,--section-start=.bldrinit=8000 -Wl,--section-start=.bldrvec=8200 -Wl,--section-start=.bootloader=8242 -Wl,--section-start=.bldrcrc=8dfe -Wl,--section-start=.bldrstatic=8e00 -Wl,--section-start=.bldrstatvec=8ff8 -Wl,--section-start=.bldrfwheader=9000 -Wl,--section-start=.fwheader=9100
+  
+  -fno-inline-small-functions -Wall -std=gnu99 -save-temps=obj -fno-move-loop-invariants -fno-tree-loop-optimize -fno-jump-tables -fno-tree-ter -fno-caller-saves -mstrict-X-fno-inline-small-functions -Wall -std=gnu99 -save-temps=obj -fno-move-loop-invariants -fno-tree-loop-optimize -fno-jump-tables -fno-tree-ter -fno-caller-saves -mstrict-X
+  */
 // check processor: cpu must be ATxmega32A4 or ATxmega16A4
-#if !defined(__AVR_ATxmega32A4__) && !defined(__AVR_ATxmega16A4__) && !defined(__AVR_ATxmega32A4U__)
-# error "please compile for device: ATxmega32A4, ATxmega16A4, ATxmega32A4U"
+#if !defined(__AVR_ATxmega32A4__) && !defined(__AVR_ATxmega16A4__) && !defined(__AVR_ATxmega32A4U__) && !defined(__AVR_ATxmega64A4U__)
+# error "please compile for device: ATxmega32A4, ATxmega16A4, ATxmega32A4U, ATxmega64A4U"
 #endif
 
 #define F_CPU_MHZ 32
@@ -240,7 +273,8 @@ struct bldr_eeprom_t {
 #define DEV_STATE_FLG_RESET_b           6
 
 // bit manipulation with setbit/clrbit result in atomic sbi/cbi asm instructions !
-#define g_dev_state    GPIO_GPIOR0
+//#define g_dev_state    GPIO_GPIOR0
+extern uint8_t g_dev_state;
 
 // device error flags
 #define DEV_ERR_FLG_ERROR_b      0
@@ -257,8 +291,11 @@ struct bldr_eeprom_t {
 
 
 // bit manipulation with setbit/clrbit result in atomic sbi/cbi asm instructions !
-#define g_dev_errflags  GPIO_GPIOR1
-#define g_dev_errflags2 GPIO_GPIOR2
+//#define g_dev_errflags  GPIO_GPIOR1
+//#define g_dev_errflags2 GPIO_GPIOR2
+
+extern uint8_t g_dev_errflags;
+extern uint8_t g_dev_errflags2;
 
 #define setbit_atomic(_reg, _bitnr) \
     ({ if (&(_reg) <= (uint8_t*)31) { \
@@ -464,5 +501,7 @@ extern uint8_t do_reg_write(uint16_t reg, uint16_t data, uint16_t mask);
 #endif // BOOTLOADER
 
 #define EOSC 0xe1
+
+#define WITH_SECS 1
 
 #endif //_COMMON_H_
