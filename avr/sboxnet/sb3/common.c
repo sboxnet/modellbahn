@@ -566,7 +566,8 @@ __ATTR_OS_MAIN int main(void) {
         struct sboxnet_msg_max msg;
         
         // wird keine Adresse angefordert? 0==keine Addresse angefordert: !=0 Adresse angefordert
-        if (bldr_task(&msg) == 0) {
+        volatile uint8_t r2 = bldr_task(&msg);
+        if (/*bldr_task(&msg)*/ r2 == 0) {
             // dann verarbeiten
             com_receive_and_process_msg(&msg);
             // ist das Gerät im FW Update Modus?

@@ -392,9 +392,9 @@ void init_leds_ports(void) {
     // LED_PORT auf LEDs off
     port_out(LED_PORT) = Bit(LED_CUR_OV_b)|Bit(LED_CUR_SHORT_b)|Bit(LED_NOTAUS_b)|Bit(LED_BO_ON_b);
     // LED_PORT auf Ausgabe
-    port_dirout(LED_PORT, Bit(LED_CUR_OV_b)|Bit(LED_CUR_SHORT_b)|Bit(LED_NOTAUS_b)|Bit(LED_BO_ON_b));
+    port_dirout(LED_PORT, Bit(7)|Bit(LED_CUR_OV_b)|Bit(LED_CUR_SHORT_b)|Bit(LED_NOTAUS_b)|Bit(LED_BO_ON_b));
     // LED_PORTs auf totem pole
-    PORTCFG_MPCMASK = Bit(LED_CUR_OV_b)|Bit(LED_CUR_SHORT_b)|Bit(LED_NOTAUS_b)|Bit(LED_BO_ON_b); // PD2..0
+    PORTCFG_MPCMASK = Bit(7)|Bit(LED_CUR_OV_b)|Bit(LED_CUR_SHORT_b)|Bit(LED_NOTAUS_b)|Bit(LED_BO_ON_b); // PD2..0
     LED_PORT.PIN0CTRL = PORT_OPC_TOTEM_gc;
 }
 
@@ -407,7 +407,7 @@ void init_dccm_ports(void) {
     // alles OFF vorbereiten
     port_out(DCCM_PORT) = 0;
     // PC0 (IN1), PC1(IN2), PC2 (EN) als Ausgabe
-    port_dirout(DCCM_PORT, /*Bit(DCCM_DCCOUT_b)|*/(DCCM_EN_b)|Bit(DCCM_IN2_b)|Bit(DCCM_IN1_b));
+    port_dirout(DCCM_PORT, /*Bit(DCCM_DCCOUT_b)|*/Bit(DCCM_EN_b)|Bit(DCCM_IN2_b)|Bit(DCCM_IN1_b));
     // PC3(OV), PC4 (DCCIN), PC5(NOTAUS) als Eingabe
     port_dirin(DCCM_PORT, Bit(DCCM_OV_b)|Bit(DCCM_DCCIN_b)|Bit(DCCM_NOTAUS_b));
     // Ausgabe ports als totem pole
@@ -590,6 +590,7 @@ void do_main(void) {
 static uint8_t first = 0;
  if (first == 0) {
     first = 1;
+    port_setbit(LED_PORT,7);
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         PORTC.INT1MASK = Bit(DCC_IN_b);
         PORTC.PIN4CTRL = PORT_ISC_BOTHEDGES_gc;
@@ -613,7 +614,7 @@ static uint8_t first = 0;
         */
     }
 }
-    sleep_cpu();
+    //sleep_cpu();
 }
 
 
@@ -672,11 +673,12 @@ void do_before_bldr_activate(void) {
 
 /*********** Interrupts ************************/
 ISR(PORTC_INT1_vect) { // DCC Input Signal
-    uint8_t v = 0;
+    volatile uint8_t v = 0;
     if (bit_is_set(port_in(DCC_IN_PORT), DCC_IN_b)) {
         v = Bit(TC0_CMPA_bp)|Bit(TC0_CMPB_bp);
     }
     TCC0.CTRLC = v;
+    port_tglbit(PORTD, 7);
 }
 
 // dcc detector cutout generator
