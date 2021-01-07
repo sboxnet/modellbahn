@@ -4,7 +4,7 @@ MCU=atmega32u2
 
 INC=-I..
 
-COPTS= -Os -fno-inline-small-functions -Wall -std=gnu99 $(INC) -save-temps \
+COPTS= -g3 -fno-inline-small-functions -Wall -std=gnu99 $(INC) -save-temps \
          -fno-move-loop-invariants -fno-tree-loop-optimize -fno-jump-tables \
          -fno-tree-ter \
          -fno-caller-saves \

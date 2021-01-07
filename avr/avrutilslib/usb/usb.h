@@ -235,35 +235,37 @@ uint8_t usb_event_ep0_request(struct usb_device_request*);
 
 
 
-static inline uint8_t usb_ep_isSETUP(void) {
+#define Inline
+
+static Inline uint8_t usb_ep_isSETUP(void) {
     return bit_is_set(UEINTX, RXSTPI);
 }
-static inline void usb_ep_clearSETUP(void) {
+static Inline void usb_ep_clearSETUP(void) {
     clrbit(UEINTX, RXSTPI);
 }
-uint8_t inline usb_ep_isIN(void) {
+uint8_t usb_ep_isIN(void) {
     return bit_is_set(UEINTX, TXINI);
 }
-static inline void usb_ep_clearIN(void) {
+static Inline void usb_ep_clearIN(void) {
     clrbit(UEINTX, TXINI);
 }
-static inline void usb_ep_clearFIFOCON(void) {
+static Inline void usb_ep_clearFIFOCON(void) {
     clrbit(UEINTX, FIFOCON);
 }
-static inline uint8_t usb_ep_isOUT(void) {
+static Inline uint8_t usb_ep_isOUT(void) {
     return bit_is_set(UEINTX, RXOUTI);
 }
-static inline void usb_ep_clearOUT(void) {
+static Inline void usb_ep_clearOUT(void) {
     clrbit(UEINTX, RXOUTI);
 }
-static inline void usb_ep_set_stall(void) {
+static Inline void usb_ep_set_stall(void) {
     setbit(UECONX, STALLRQ);
 }
 
-static inline uint8_t usb_req_isOUT(struct usb_device_request* ur) {
+static Inline uint8_t usb_req_isOUT(struct usb_device_request* ur) {
     return (ur->bmRequestType & 0x80) == USB_REQTYPE_HOST2DEV;
 }
-static inline uint8_t usb_req_isIN(struct usb_device_request* ur) {
+static Inline uint8_t usb_req_isIN(struct usb_device_request* ur) {
     return (ur->bmRequestType & 0x80) == USB_REQTYPE_DEV2HOST;
 }
 
