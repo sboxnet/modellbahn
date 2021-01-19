@@ -20,6 +20,8 @@
 #define SYSCLK_DIVISOR  1
 #define F_CPU   (SYSCLK_FREQ_MHZ * 1000000 / SYSCLK_DIVISOR)
 
+#include "avrutilslib/defines.h"
+
 #if !defined(__AVR_ATmega32U2__)
 # error "please compile for device: atmega32u2"
 #endif
@@ -47,8 +49,7 @@
 #include <avr/pgmspace.h>
 #include <util/delay.h>
 
-
-#include "avrutilslib/defines.h"
+#include <avr/power.h> // for clock_prescale_set
 
 uint8_t g_sboxnet_addr;
 struct sboxnet_device g_sboxnet;
@@ -179,7 +180,6 @@ void stack_init8(void) {
         *p++ = STACK_MAGIC;
     }
 }
-
 
 #define USE_LOGGER_USART 0
 #include "avrutilslib/usb/usb.c"
@@ -444,15 +444,79 @@ uint8_t usb_event_ep0_request(struct usb_device_request* req) {
     return 1;
 }
 
-
+uint8_t t1 = 0;
+uint8_t t2 = 0;
 ISR(TIMER1_OVF_vect) { // every 32.77ms
     
     g_timer++;
-    
-    if ((g_timer & 0x0f) == 0) { // every 0.5s
-        PORTB ^= Bit(LED_ACTIVE);
-    }
-    
+	// startup test: blink leds
+	static uint8_t rb = 1;
+	switch (g_timer & 0xf) {// every 0.5s
+		case 0: // every 0.5s
+		{	
+			rb <<= 1;
+			switch(rb) {
+				case 0:
+				{
+					PORTB ^= Bit(LED_ACTIVE);
+					break;
+				}
+				case 0x02:
+				{
+					PORTB ^= Bit(LED_ACTIVE);
+					break;
+				}
+				case 0x04:
+				{
+					PORTB ^= Bit(LED_MSG_READ);
+					break;
+				}
+				case 0x08:
+				{
+					PORTB ^= Bit(LED_MSG_WRITE);
+					break;
+				}
+				case 0x10:
+				{
+					PORTB ^= Bit(LED_ACTIVE);
+					break;
+				}
+				case 0x20:
+				{
+					PORTB ^= Bit(LED_MSG_READ);
+					break;
+				}
+				case 0x40:
+				{
+					PORTB ^= Bit(LED_MSG_WRITE);
+					break;
+				}
+				case 0x80:
+				{
+					rb = 0;
+				}
+			}
+			// blink ACTIVE LED
+			//PORTB ^= Bit(LED_ACTIVE);
+		//PORTB ^= Bit(LED_MSG_READ);
+		//PORTB ^= Bit(LED_MSG_WRITE);
+			break;
+		}
+/*		case 1:
+		{
+			if (!t1)
+				PORTB ^= Bit(LED_MSG_READ);
+			t1 = 1;
+			break;
+		}
+		case 2:
+		{
+			if (!t2)
+				PORTB ^= Bit(LED_MSG_WRITE);
+			break;
+		}
+*/
+	}
     if (g_timer_led_msg_read) {
         g_timer_led_msg_read--;
         if (g_timer_led_msg_read == 0)
@@ -468,6 +532,7 @@ ISR(TIMER1_OVF_vect) { // every 32.77ms
 
 
 static NOINLINE void init_system(void) {
+// sboxnet_init is done when sboxnet2usb is init over usb command CMD_SBOXNET_SET_MODE
     wdt_reset();
     uint8_t mcusr = MCUSR;
     MCUSR = 0;
@@ -479,19 +544,39 @@ static NOINLINE void init_system(void) {
         );
     }
     
+	// PB7 ge Write Access
+	// PB6 gn Read Access
+	// PB5 rt sboxnet2usb is active/blinks
+	// PB1 SCLK
+	// PB2 MOSI
+	// PB3 MISO
+	// PC1 Reset with external pull up
     PORTB = 0b00011111; // PB5..7: LEDs
+	// PC4 .. PC7 N.C.
     PORTC = 0b11111111;
+	// PD2 read from bus
+	// PD3 write to bus
     PORTD = 0b01111111; // PD7=HWBE is low over resistor
+	// DDR
+	// PB5..7 Output
     DDRB = 0b11100000; // PB5..7: LEDs
+	// PC input
     DDRC = 0;
+	// PD input, Bus transmitter overwrites port PD3 to be output when transmitter is enabled
     DDRD = 0;
     
     // system clock prescaler
-    CLKPR = Bsv(CLKPCE,1);
+	// set CLKPE to enable change of CLKPS bits in CLKPR
+//    CLKPR = Bsv(CLKPCE,1);
+//#if SYSCLK_DIVISOR == 2
+//    CLKPR = 0x01;
+//#else
+//    CLKPR = 0x00;
+//#endif
 #if SYSCLK_DIVISOR == 2
-    CLKPR = 0x01;
+	clock_prescale_set(1);
 #else
-    CLKPR = 0x00;
+	clock_prescale_set(0);
 #endif
     
     // timer 1: for generic timing and sboxnet. Every 32,77ms Overflow.

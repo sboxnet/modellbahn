@@ -986,7 +986,7 @@ Wire Wire Line
 Wire Wire Line
 	8220 3070 8385 3070
 $Comp
-L sboxnet:sboxnet-buchse_02x17 J6
+L sboxnet-modul-rescue:sboxnet-buchse_02x17-sboxnet J6
 U 1 1 5D99F745
 P 8020 2670
 F 0 "J6" H 7968 3610 50  0000 C CNN
