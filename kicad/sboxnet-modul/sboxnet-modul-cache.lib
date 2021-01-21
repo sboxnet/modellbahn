@@ -424,11 +424,11 @@ X pwr 1 0 0 0 U 50 50 0 0 w
 ENDDRAW
 ENDDEF
 #
-# sboxnet-modul-rescue_sboxnet-buchse_02x17-sboxnet
+# sboxnet_sboxnet-buchse_02x17
 #
-DEF sboxnet-modul-rescue_sboxnet-buchse_02x17-sboxnet J 0 40 Y N 1 F N
+DEF sboxnet_sboxnet-buchse_02x17 J 0 40 Y N 1 F N
 F0 "J" -50 -1000 50 H V C CNN
-F1 "sboxnet-modul-rescue_sboxnet-buchse_02x17-sboxnet" 0 850 50 H V C CNN
+F1 "sboxnet_sboxnet-buchse_02x17" 0 850 50 H V C CNN
 F2 "sboxnet:connector_2x17" 0 -100 50 H I C CNN
 F3 "" 0 -100 50 H I C CNN
 $FPLIST

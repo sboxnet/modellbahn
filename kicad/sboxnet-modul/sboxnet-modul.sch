@@ -1133,7 +1133,7 @@ U 1 1 5DE7F26D
 P 2530 3385
 F 0 "J2" V 2494 3097 50  0000 R CNN
 F 1 "Conn_01x04" V 2403 3097 50  0000 R CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical_SMD_Pin1Left" H 2530 3385 50  0001 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical" H 2530 3385 50  0001 C CNN
 F 3 "~" H 2530 3385 50  0001 C CNN
 	1    2530 3385
 	0    -1   -1   0   
