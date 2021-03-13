@@ -561,6 +561,11 @@ __ATTR_OS_MAIN int main(void) {
     // Gerät Setup
     do_setup();
 
+// Clk output at PC7
+/*
+PORTC_DIRSET=PIN7_bm;
+PORTCFG_CLKEVOUT=PORTCFG_CLKOUT_PD7_gc;
+*/
     // Hauptschleife
     while(1) {
         // Buffer für Nachrichten

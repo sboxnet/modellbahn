@@ -61,7 +61,7 @@ BOOT_SECTION_END       (BOOT_SECTION_START + BOOT_SECTION_SIZE - 1) 0x10000+4096
 #include "avrutilslib/defines.h"
 #include "avrutilslib/ringbuffer.h"
 
-#include "sboxnet/sboxnet.h"
+#include "sboxnet.h"
 
 #define BLDR_VERSION           0x0004
 
@@ -262,15 +262,16 @@ struct bldr_eeprom_t {
 
     // device state flags
 #define DEV_STATE_FLG_BOOTLOADER_b         0
-#define DEV_STATE_FLG_FWUP_BOOTLOADER_b    1
-#define DEV_STATE_FLG_FWUP_APPLICATION_b   2
+#define DEV_STATE_FLG_FWUP_BOOTLOADER_b    1 // 0x01
+#define DEV_STATE_FLG_FWUP_APPLICATION_b   2 // 0x02
 #define DEV_STATE_FLG_FWUP_MASK            0x06
 #define DEV_STATE_FLG_FWUP_BOOTLOADER      0x02
 #define DEV_STATE_FLG_FWUP_APPLICATION     0x04
-#define DEV_STATE_FLG_REQ_ADDR_b           3
-#define DEV_STATE_FLG_IDENTIFY_b           4
-#define DEV_STATE_FLG_WATCHDOG_b           5
-#define DEV_STATE_FLG_RESET_b           6
+#define DEV_STATE_FLG_REQ_ADDR_b           3 // 0x08
+#define DEV_STATE_FLG_IDENTIFY_b           4 // 0x10
+#define DEV_STATE_FLG_WATCHDOG_b           5 // 0x20
+#define DEV_STATE_FLG_RESET_b			   6 // 0x40
+
 
 // bit manipulation with setbit/clrbit result in atomic sbi/cbi asm instructions !
 //#define g_dev_state    GPIO_GPIOR0
@@ -341,6 +342,7 @@ struct bldr_ram {
     
     struct sboxnet_device sboxnet;
 };
+extern struct bldr_ram g_v;
 
 
 struct timer {
@@ -363,9 +365,10 @@ struct com_ram {
 
 extern struct com_ram g_com;
 
-#define BLDR_RAM_START (INTERNAL_SRAM_END - sizeof(struct bldr_ram) - 1)
-#define BLDR_STACK_TOP (BLDR_RAM_START - 1)
-#define g_v (*(struct bldr_ram*)BLDR_RAM_START)
+//#define BLDR_RAM_START (INTERNAL_SRAM_END - sizeof(struct bldr_ram) - 1)
+#define BLDR_STACK_TOP (INTERNAL_SRAM_END -1) //(BLDR_RAM_START - 1)
+//#define g_v (*(struct bldr_ram*)BLDR_RAM_START)
+extern 
 
 #define nvmc_wait_busy()  ({ while (bit_is_set(NVM_STATUS, NVM_NVMBUSY_bp)); })
 
@@ -390,26 +393,9 @@ extern struct com_ram g_com;
 #define TIMER_RESOLUTION_1MS  0
 #define TIMER_RESOLUTION_16MS 1
 
-static INLINE void timer_register(struct timer* t, uint8_t resolution) {
-    if (resolution == TIMER_RESOLUTION_16MS) {
-        t->next = g_com.timer_16ms;
-        g_com.timer_16ms = t;
-    } else {
-        t->next = g_com.timer_1ms;
-        g_com.timer_1ms = t;
-    }
-    t->value = 0;
-}
-
-static INLINE uint8_t timer_timedout(struct timer* t) {
-    return t->value == 0;
-}
-
-static INLINE void timer_set(struct timer* t, int8_t value) {
-    t->value = value;
-}
-
-
+void timer_register(struct timer* t, uint8_t resolution);
+uint8_t timer_timedout(struct timer* t);
+void timer_set(struct timer* t, int8_t value);
 
 
 struct pipe {
@@ -486,6 +472,7 @@ extern int8_t sbn_receive_msg(struct sboxnet_msg_header* pmsg, uint8_t maxmsglen
 static INLINE void sboxnet_init(void) { sbn_init(); }
 static INLINE uint8_t sboxnet_all_sent(void) { return sbn_all_sent(); }
 extern uint8_t sboxnet_send_msg(struct sboxnet_msg_header* pmsg);
+uint8_t sboxnet_send_msg(struct sboxnet_msg_header* pmsg);
 static INLINE int8_t sboxnet_receive_msg(struct sboxnet_msg_header* pmsg, uint8_t maxmsglen) { return sbn_receive_msg(pmsg, maxmsglen); }
 extern uint8_t sboxnet_can_send_msg(struct sboxnet_msg_header* pmsg);
 

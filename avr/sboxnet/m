@@ -1,4 +1,0 @@
-FLASHADDR=0x3800
-FLASH=32
-MCU=atxmega${FLASH}a4
-

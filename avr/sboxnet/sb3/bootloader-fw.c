@@ -345,11 +345,11 @@ void write_errinfo(uint8_t code, uint8_t *errstr) {
 // USART der genutzt werden soll
 #define SBOXNET_USART_ID              USARTE0 // use defines for __SELECT_USART == 0
 // Definiere Interrupts
-#define SBOXNET_USART_DEF_INTR        0
+#define SBOXNET_USART_DEF_INTR        1
 // Sboxnet Randomfunktion
 #define SBOXNET_PRNG_SEED             (g_v.prandom)
 // den Code für Sboxnet einbinden
-#include "sboxnet/sboxnet.c"
+#include "sboxnet.c"
 
 //BOOTLOADER_SECTION
 uint8_t g_dev_state = 0;
@@ -359,6 +359,8 @@ uint8_t g_dev_errflags = 0;
 
 //BOOTLOADER_SECTION
 uint8_t g_dev_errflags2 = 0;
+
+struct bldr_ram g_v;
 
 // TCE0 CCA Interrupt
 //SBOXNET_SECTION ISR(TCC0_CCA_vect) {
@@ -406,6 +408,26 @@ ISR(TCE0_OVF_vect) { // every 4ms
     }
 }
 
+void timer_register(struct timer* t, uint8_t resolution) {
+	if (resolution == TIMER_RESOLUTION_16MS) {
+		t->next = g_com.timer_16ms;
+		g_com.timer_16ms = t;
+		} else {
+		t->next = g_com.timer_1ms;
+		g_com.timer_1ms = t;
+	}
+	t->value = 0;
+}
+
+uint8_t timer_timedout(struct timer* t) {
+	return t->value == 0;
+}
+
+void timer_set(struct timer* t, int8_t value) {
+	t->value = value;
+}
+
+
 /* void bldr_leds_task(void)
  * Status LEDs ansteuern.
  */
@@ -416,10 +438,13 @@ static void bldr_leds_task(void) {
     
     // Zuerst Identify Key lesen.
     // Wann der Identify Key gedrückt ist -> Bit 1 von Port E LOW
-    if (g_v.timer_keys == 0) {
-        // Direction von PORTE Bit 1 == LED_RED_b
+	
+	if (g_v.timer_keys == 0) { // alle 40ms
+        
+		// Direction von PORTE Bit 1 == LED_RED_b
         
         // Direction von PORTE Bit 1?
+		// bei PE1 == 0
          if (bit_is_clear(port_dir(LED_PORT), LED_RED_b)) {
             // ist Eingabe, setzte timer_keys auf 10
             g_v.timer_keys = 10;
@@ -460,7 +485,8 @@ static void bldr_leds_task(void) {
         // Status überprüfen
         volatile uint8_t st = g_dev_state; // aktueller Status
 		volatile uint8_t st_old = g_v.dev_old_state;
-        if (1||st != st_old) { // ist aktueller STatus != alter Status
+		if (st != st_old) { // ist aktueller STatus != alter Status
+			
             g_v.dev_old_state = st; // dann alter Status gleich aktueller Status
            
             // Ist Identify Flag gesetzt?
@@ -472,7 +498,8 @@ static void bldr_leds_task(void) {
             } else if (bit_is_set(st, DEV_STATE_FLG_REQ_ADDR_b)) {
                 // rote LED blinken
                 g_v.led_gn = 0;
-                g_v.led_rt = 0x1; //0x55;
+                g_v.led_rt = 0x55;
+				
             // sind wir im Firmware Update Modus?
             /*} else if (bit_is_set(st, DEV_STATE_FLG_FWUP_MASK)) {
                 // grüne LED schnell blinken
@@ -509,13 +536,14 @@ static void bldr_leds_task(void) {
         } else {
             port_set(LED_PORT, Bit(LED_GREEN_b));
         }
-        
+
         g_v.led_rt = rol_byte(g_v.led_rt);
         if (g_v.led_rt & 0x80) {
             port_clr(LED_PORT, Bit(LED_RED_b));
         } else {
             port_set(LED_PORT, Bit(LED_RED_b));
         }
+		uint8_t a = 0;
     }
 }
 
